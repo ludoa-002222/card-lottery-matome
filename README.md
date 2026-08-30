@@ -27,6 +27,21 @@ npm run wp:seed        # static/data/*.json 相当のサンプルデータを投
 
 投入されるもの: カード種類5・ボックス8・店舗8・抽選12・攻略コラム5・固定ページ11。
 
+### 開発環境URLの発行（公開トンネル）
+
+チームに一時的な公開URLを渡したいときは cloudflared のクイックトンネルを使う（アカウント不要）。
+
+```bash
+brew install cloudflared   # 初回のみ
+npm run wp:start           # wp-env が起動していること
+npm run wp:tunnel          # → https://xxxx.trycloudflare.com が発行される（起動のたび変わる）
+```
+
+- `wp-env/mu-plugins/00-dynamic-siteurl.php`（mu-plugin）がリクエストの Host に追従して
+  `home` / `siteurl` / テーマ・アセット・REST の各URLを書き換えるため、トンネル経由でもリダイレクトせず動く
+- この mu-plugin は **ローカル開発専用**。本番には配置しない
+- トンネルを止めると公開URLは失効する
+
 ## 静的プロトタイプ（static/）
 
 `fetch()` で `static/data/*.json` を読むため、`file://` では動きません。

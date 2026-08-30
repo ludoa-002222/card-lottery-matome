@@ -13,6 +13,7 @@
     "wp:seed": "wp-env run cli wp eval-file wp-content/themes/oripa-market/bin/seed.php",
     "wp:setup": "wp-env start && npm run wp:activate && npm run wp:seed",
     "wp:activate": "wp-env run cli wp theme activate oripa-market && wp-env run cli wp plugin activate advanced-custom-fields.latest-stable && wp-env run cli wp rewrite structure '/%postname%/' --hard",
+    "wp:tunnel": "cloudflared tunnel --url http://localhost:8888 --no-autoupdate",
     "static:dev": "live-server static/ --port=5500 --wait=200 --entry-file=index.html",
     "static:serve": "python3 -m http.server 5500 --directory static"
   },
