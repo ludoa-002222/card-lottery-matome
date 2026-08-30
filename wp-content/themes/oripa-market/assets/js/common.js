@@ -50,6 +50,22 @@ function latestUpdatedAt(items) {
   return items.reduce((a, b) => (new Date(a.updatedAt) > new Date(b.updatedAt) ? a : b)).updatedAt;
 }
 
+/**
+ * 締切が近い順に並べ替えた新しい配列を返す。
+ * すでに締め切られた（終了）ものは末尾へ回し、その中でも締切が早い順にする。
+ */
+function sortByDeadline(items) {
+  const now = Date.now();
+  return [...items].sort((a, b) => {
+    const ta = new Date(a.deadline).getTime();
+    const tb = new Date(b.deadline).getTime();
+    const aEnded = ta <= now;
+    const bEnded = tb <= now;
+    if (aEnded !== bEnded) return aEnded ? 1 : -1;
+    return ta - tb;
+  });
+}
+
 function countdownParts(iso) {
   const diffMs = new Date(iso).getTime() - Date.now();
   if (diffMs <= 0) return { label: "終了", urgent: true, ended: true };

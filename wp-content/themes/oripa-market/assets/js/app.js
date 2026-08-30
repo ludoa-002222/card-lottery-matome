@@ -86,7 +86,7 @@
       });
       const cnt = document.getElementById("result-count");
       if (cnt) cnt.innerHTML = `全<b>${filtered.length}</b>件・${fmtUpdated(latestUpdatedAt(lotteries) || new Date().toISOString())}`;
-      renderLotteryList("all-list", filtered, ctx, 6);
+      renderLotteryList("all-list", sortByDeadline(filtered), ctx, 6);
     }
     [boxSel, methodSel, shopSel, areaSel].forEach(s => s.addEventListener("change", applyFilter));
     applyFilter();
