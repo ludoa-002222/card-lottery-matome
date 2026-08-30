@@ -1,0 +1,14 @@
+{
+  "name": "card-lottery-matome",
+  "version": "0.1.0",
+  "private": true,
+  "description": "トレカ（ポケカ・ワンピ・遊戯王など）抽選販売・予約情報まとめサイトのUIプロトタイプ（静的HTML/CSS/JS、ダミーデータ）",
+  "scripts": {
+    "dev": "live-server --port=5500 --wait=200 --entry-file=index.html",
+    "start": "live-server --port=5500 --wait=200 --entry-file=index.html",
+    "serve": "python3 -m http.server 5500"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

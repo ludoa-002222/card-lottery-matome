@@ -3,6 +3,28 @@
 トレカ（ポケカ・ワンピ・遊戯王など）の抽選販売・予約情報まとめサイトのUIプロトタイプ。
 `cardchusen.com` の導線・情報設計を参考にしつつ、独自デザインで一から構築（静的HTML/CSS/JS、ダミーデータ）。
 
+## ローカル開発
+
+各ページは `fetch()` で `data/*.json` を読み込むため、`file://` で直接開くと動きません。ローカルHTTPサーバ経由で表示してください。
+
+**方法A: npm（ライブリロードあり・推奨）**
+
+```bash
+npm install      # 初回のみ（live-server を devDependencies に取得）
+npm run dev      # http://localhost:5500/ を開く。ファイル保存で自動リロード
+```
+
+**方法B: 依存なし（Python 標準ライブラリのみ）**
+
+```bash
+python3 -m http.server 5500
+# → http://localhost:5500/
+```
+
+> ポート 5500 が使用中の場合は `--port` / `http.server <番号>` で変更してください。
+
+ビルド工程はありません。`*.html` / `assets/` / `data/` を直接編集すれば反映されます。
+
 ## 構成
 
 - `index.html` — トップページ
