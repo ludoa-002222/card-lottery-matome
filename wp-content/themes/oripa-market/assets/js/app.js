@@ -74,6 +74,20 @@
     shops.forEach(s => shopSel.insertAdjacentHTML("beforeend", `<option value="${s.id}">${s.name}</option>`));
     [...new Set(shops.map(s => s.area))].filter(Boolean).forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
 
+    // 「終了済」セクションの開閉トグル
+    const endedSection = document.getElementById("ended-section");
+    const endedToggle = document.getElementById("ended-toggle");
+    if (endedToggle && endedSection) {
+      endedToggle.addEventListener("click", () => {
+        const open = endedSection.classList.toggle("collapsed");
+        endedToggle.setAttribute("aria-expanded", open ? "false" : "true");
+      });
+    }
+
+    function isEnded(l) {
+      return new Date(l.deadline).getTime() <= Date.now();
+    }
+
     function applyFilter() {
       const box = boxSel.value, method = methodSel.value, shop = shopSel.value, area = areaSel.value;
       const filtered = lotteries.filter(l => {
@@ -84,9 +98,21 @@
         if (area && (!s || s.area !== area)) return false;
         return true;
       });
+
+      // 受付中 = 締切が近い順、終了済 = 直近に終わった順
+      const active = sortByDeadline(filtered.filter(l => !isEnded(l)));
+      const ended = filtered.filter(isEnded).sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
+
       const cnt = document.getElementById("result-count");
-      if (cnt) cnt.innerHTML = `全<b>${filtered.length}</b>件・${fmtUpdated(latestUpdatedAt(lotteries) || new Date().toISOString())}`;
-      renderLotteryList("all-list", sortByDeadline(filtered), ctx, 6);
+      if (cnt) cnt.innerHTML = `受付中 <b>${active.length}</b> 件・${fmtUpdated(latestUpdatedAt(lotteries) || new Date().toISOString())}`;
+      renderLotteryList("all-list", active, ctx, 6);
+
+      if (endedSection) {
+        const ecnt = document.getElementById("ended-count");
+        if (ecnt) ecnt.textContent = String(ended.length);
+        endedSection.hidden = ended.length === 0;
+        renderLotteryList("ended-list", ended, ctx, 6);
+      }
     }
     [boxSel, methodSel, shopSel, areaSel].forEach(s => s.addEventListener("change", applyFilter));
     applyFilter();

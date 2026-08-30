@@ -226,10 +226,10 @@ function lotteryCardHtml(l, ctx) {
   const cd = countdownParts(l.deadline);
   const href = l.permalink || "#";
   return `
-  <div class="lottery-card ${cd.urgent ? "urgent-card" : ""}">
+  <div class="lottery-card ${cd.urgent && !cd.ended ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
     <div class="thumb-wrap">
       ${lotteryThumbHtml(l)}
-      <span class="ribbon ${cd.urgent ? "urgent" : ""}">${cd.ended ? "終了" : `残${cd.num}${cd.unit}`}</span>
+      <span class="ribbon ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
       <button class="save-btn" aria-label="保存する" type="button">♡</button>
       <span class="method-chip ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>
     </div>

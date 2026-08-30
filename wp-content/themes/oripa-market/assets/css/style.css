@@ -313,3 +313,26 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .process-step .num { width: 40px; height: 40px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; z-index: 1; }
 .process-step h3 { margin: 4px 0 4px; font-size: 1rem; }
 .process-step p { margin: 0; color: var(--ink-soft); font-size: .88rem; }
+
+/* --- 終了済セクション（トップ / 抽選アーカイブ） --- */
+.ended-section { margin-top: 34px; border-top: 1px solid var(--border); padding-top: 8px; }
+.ended-toggle {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; margin: 8px 0 16px; padding: 8px 2px;
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; font-weight: 700; font-size: .95rem; color: var(--ink-soft);
+}
+.ended-toggle:hover { color: var(--ink); }
+.ended-toggle .tri { font-size: .7rem; transition: transform .15s; }
+.ended-toggle[aria-expanded="false"] .tri { transform: rotate(-90deg); }
+.ended-section.collapsed .ended-list,
+.ended-section.collapsed [id$="-more-wrap"] { display: none; }
+.ended-section #ended-count { font-variant-numeric: tabular-nums; }
+
+.lottery-card.is-ended { opacity: .6; }
+.lottery-card.is-ended .lottery-thumb { filter: grayscale(1); }
+.lottery-card.is-ended:hover { opacity: .9; transform: none; box-shadow: none; border-color: var(--border); }
+.lottery-card.is-ended .verified-row,
+.lottery-card.is-ended .badges { display: none; }
+.lottery-card.is-ended .btn.primary { background: var(--surface-2); color: var(--ink-soft); border-color: var(--border); pointer-events: auto; }
+.ribbon.ended { background: var(--ink-soft); }
