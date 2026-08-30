@@ -6,6 +6,7 @@ const CFG = window.ORIPA || {};
 const REST_BASE = CFG.restBase || "/wp-json/oripa/v1/";
 const ASSETS = CFG.assetsBase || "/wp-content/themes/oripa-market/assets/img/";
 const CATEGORY_BASE = CFG.categoryBase || "/card-category/";
+const BOX_BASE = CFG.boxBase || "/card-box/";
 
 async function loadJSON(name) {
   const res = await fetch(REST_BASE + name, { headers: { "X-WP-Nonce": CFG.nonce || "" } });
@@ -217,7 +218,11 @@ const DEFAULT_BOX_PHOTO = "30th-celebration.webp";
 
 function lotteryThumbHtml(l) {
   const photo = BOX_PHOTOS[l.box] || DEFAULT_BOX_PHOTO;
-  return `<img class="lottery-thumb" src="${ASSETS}${photo}" alt="" loading="lazy">`;
+  const img = `<img class="lottery-thumb" src="${ASSETS}${photo}" alt="" loading="lazy">`;
+  // サムネイル画像タップでボックス別の抽選情報ページへ
+  return l.box
+    ? `<a class="lottery-thumb-link" href="${BOX_BASE}${l.box}/" aria-label="このボックスの抽選一覧を見る">${img}</a>`
+    : img;
 }
 
 function lotteryCardHtml(l, ctx) {
