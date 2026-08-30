@@ -1,0 +1,7 @@
+[
+  { "slug": "pokeka", "name": "ポケカ", "fullName": "ポケモンカード" },
+  { "slug": "onepiece", "name": "ワンピ", "fullName": "ワンピースカード" },
+  { "slug": "yugioh", "name": "遊戯王", "fullName": "遊戯王OCG" },
+  { "slug": "dragonball", "name": "ドラゴンボール", "fullName": "ドラゴンボールフュージョンワールド" },
+  { "slug": "duema", "name": "デュエマ", "fullName": "デュエル・マスターズ" }
+]

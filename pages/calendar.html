@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>抽選締切カレンダー｜オリパマーケット</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <nav class="breadcrumb"><a href="../index.html">ホーム</a> &gt; 抽選締切カレンダー</nav>
+  <div class="page-title"><h1>抽選締切カレンダー</h1></div>
+  <p class="footer-note">日付をタップすると、その日に締め切られる抽選をチェックできます。</p>
+
+  <section class="section" style="padding-top:0;">
+    <div class="cal-nav">
+      <button class="btn ghost" id="prev">＜ 前月</button>
+      <h2 id="cal-title"></h2>
+      <button class="btn ghost" id="next">次月 ＞</button>
+    </div>
+    <div class="cal-grid" id="cal-dow"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </section>
+
+  <section class="section" id="day-section" style="display:none;">
+    <div class="section-heading"><span class="bar"></span><h2 id="day-title"></h2></div>
+    <div class="lottery-list" id="day-list"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading"><span class="bar"></span><h2>よくある質問</h2></div>
+    <div class="accordion-item"><details><summary>カレンダーはいつ更新されますか？</summary>
+      <p>各店舗の公式発表を確認次第、随時更新しています（AIによる巡回チェックも活用しています）。</p></details></div>
+    <div class="accordion-item"><details><summary>締切当日でも応募できますか？</summary>
+      <p>締切時刻より前であれば応募可能です。時間ギリギリの応募はシステム混雑にご注意ください。</p></details></div>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script src="../assets/js/common.js"></script>
+<script>
+(async function(){
+  const { lotteries, shops, boxes } = await loadAllData();
+  const ctx = { shops, boxes };
+  const dow = ["日","月","火","水","木","金","土"];
+  document.getElementById("cal-dow").innerHTML = dow.map(d=>`<div class="cal-dow">${d}</div>`).join("");
+
+  let view = new Date();
+  view.setDate(1);
+
+  function countByDay(y,m,d){
+    return lotteries.filter(l => {
+      const dl = new Date(l.deadline);
+      return dl.getFullYear()===y && dl.getMonth()===m && dl.getDate()===d;
+    }).length;
+  }
+
+  function drawCalendar(){
+    const y = view.getFullYear(), m = view.getMonth();
+    document.getElementById("cal-title").textContent = `${y}年${m+1}月`;
+    const firstDow = new Date(y,m,1).getDay();
+    const daysInMonth = new Date(y,m+1,0).getDate();
+    const today = new Date();
+    let cells = [];
+    for (let i=0;i<firstDow;i++) cells.push(`<div class="cal-cell empty"></div>`);
+    for (let d=1; d<=daysInMonth; d++){
+      const cnt = countByDay(y,m,d);
+      const isToday = today.getFullYear()===y && today.getMonth()===m && today.getDate()===d;
+      cells.push(`<div class="cal-cell ${isToday?"today":""}" data-y="${y}" data-m="${m}" data-d="${d}">
+        <div class="d">${d}</div>
+        ${cnt>0?`<span class="count">${cnt}件</span>`:""}
+      </div>`);
+    }
+    document.getElementById("cal-grid").innerHTML = cells.join("");
+    document.querySelectorAll(".cal-cell:not(.empty)").forEach(c => c.addEventListener("click", () => showDay(+c.dataset.y, +c.dataset.m, +c.dataset.d)));
+  }
+
+  function showDay(y,m,d){
+    const list = lotteries.filter(l => {
+      const dl = new Date(l.deadline);
+      return dl.getFullYear()===y && dl.getMonth()===m && dl.getDate()===d;
+    });
+    document.getElementById("day-section").style.display = "block";
+    document.getElementById("day-title").textContent = `${m+1}/${d} 締切の抽選（${list.length}件）`;
+    document.getElementById("day-list").innerHTML = list.length ? list.map(l => lotteryCardHtml(l, ctx)).join("") : `<div class="empty-state">この日に締め切られる抽選はありません。</div>`;
+    document.getElementById("day-section").scrollIntoView({behavior:"smooth"});
+  }
+
+  document.getElementById("prev").addEventListener("click", () => { view.setMonth(view.getMonth()-1); drawCalendar(); });
+  document.getElementById("next").addEventListener("click", () => { view.setMonth(view.getMonth()+1); drawCalendar(); });
+  drawCalendar();
+})();
+</script>
+</body>
+</html>

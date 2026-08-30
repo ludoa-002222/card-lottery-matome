@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ポケカ・ワンピ・遊戯王カード抽選販売まとめ｜オリパマーケット</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="kicker">TRUSTED LOTTERY DATA PLATFORM</span>
+      <h1>公式情報のみを検証して届ける、トレカ抽選の信頼できる情報基盤</h1>
+      <p>AIによる一次収集と人による二重確認を経た抽選・予約情報だけを掲載。掲載後も定期的に再確認し、鮮度と正確性を保っています。</p>
+    </div>
+    <div class="trust-stats" id="trust-stats"></div>
+  </section>
+
+  <section class="section" id="category-section">
+    <div class="section-heading"><span class="bar"></span><h2>カードの種類から探す</h2></div>
+    <div class="category-grid" id="category-grid"></div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="section-heading"><span class="bar"></span><h2>データの信頼性について</h2></div>
+    <div class="trust-badges">
+      <div class="trust-badge"><span class="ico">🛡️</span><div><h3>二重チェック体制</h3><p>AIが一次収集した情報を、人が公式ページと突合して確認してから掲載します。</p></div></div>
+      <div class="trust-badge"><span class="ico">🕒</span><div><h3>継続的な鮮度管理</h3><p>掲載後も定期的に再確認し、締切変更や終了を検知次第すぐに反映します。</p></div></div>
+      <div class="trust-badge"><span class="ico">🔗</span><div><h3>一次情報へのリンク</h3><p>各抽選から公式ページへ直接遷移できるようにし、応募前の最終確認を徹底できます。</p></div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="promo-grid promo-grid-3">
+      <a class="promo-card" href="pages/calendar.html">
+        <span class="icon">📅</span>
+        <div><h3>抽選締切カレンダー</h3><p>締切日ごとにまとめてチェック</p></div>
+        <span class="go">見る</span>
+      </a>
+      <a class="promo-card" href="pages/guide.html">
+        <span class="icon">📘</span>
+        <div><h3>トレカ攻略コラム</h3><p>定価入手・買取相場を検証済み記事で解説</p></div>
+        <span class="go">見る</span>
+      </a>
+      <a class="promo-card" href="pages/trust.html">
+        <span class="icon">🛡️</span>
+        <div><h3>情報の正確性について</h3><p>収集から掲載までの検証プロセスを公開</p></div>
+        <span class="go">見る</span>
+      </a>
+    </div>
+    <p class="footer-note" style="margin-top:10px;">※当ページにはアフィリエイト広告（PR）が含まれます。</p>
+  </section>
+
+  <section class="section">
+    <div class="section-heading"><span class="bar"></span><h2>すべての抽選情報</h2></div>
+    <div class="layout-with-sidebar">
+      <aside class="filter-sidebar">
+        <div class="fs-title">🔍 絞り込み</div>
+        <div>
+          <label>ボックス</label>
+          <select id="f-box"><option value="">すべて</option></select>
+        </div>
+        <div>
+          <label>抽選方式</label>
+          <select id="f-method">
+            <option value="">すべて</option>
+            <option value="online">オンライン</option>
+            <option value="store">店頭</option>
+          </select>
+        </div>
+        <div>
+          <label>店舗</label>
+          <select id="f-shop"><option value="">すべて</option></select>
+        </div>
+        <div>
+          <label>エリア</label>
+          <select id="f-area"><option value="">すべて</option></select>
+        </div>
+        <div class="fs-count" id="result-count"></div>
+      </aside>
+      <div>
+        <div class="lottery-list" id="all-list"></div>
+        <div id="all-list-more-wrap"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<script src="assets/js/common.js"></script>
+<script>
+(async function () {
+  const { lotteries, shops, boxes, categories } = await loadAllData();
+  const ctx = { shops, boxes };
+
+  // カテゴリタイル
+  document.getElementById("category-grid").innerHTML = categories.map(c => {
+    const count = lotteries.filter(l => l.category === c.slug).length;
+    return `<a class="category-card" href="pages/category.html?cat=${c.slug}">
+      ${categoryThumbHtml(c.slug, "cat-thumb")}
+      <div class="cat-body">
+        <div class="cat-name">${c.name}</div>
+        <div class="cat-count">${count}件</div>
+      </div>
+    </a>`;
+  }).join("");
+
+  // 信頼ダッシュボードの統計
+  const verifiedShops = new Set(lotteries.map(l => l.shopId)).size;
+  document.getElementById("trust-stats").innerHTML = `
+    <div class="stat"><div class="stat-num">${lotteries.length}<span class="unit">件</span></div><div class="stat-label">検証済み掲載件数</div></div>
+    <div class="stat"><div class="stat-num">${verifiedShops}<span class="unit">店舗</span></div><div class="stat-label">確認済み店舗数</div></div>
+    <div class="stat"><div class="stat-num">2<span class="unit">重</span></div><div class="stat-label">AI＋人によるチェック</div></div>
+    <div class="stat"><div class="stat-num">30<span class="unit">分以内</span></div><div class="stat-label">平均再確認間隔</div></div>`;
+
+  // フィルタ選択肢
+  const boxSel = document.getElementById("f-box");
+  boxes.forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}">${b.name}</option>`));
+  const shopSel = document.getElementById("f-shop");
+  shops.forEach(s => shopSel.insertAdjacentHTML("beforeend", `<option value="${s.id}">${s.name}</option>`));
+  const areaSel = document.getElementById("f-area");
+  [...new Set(shops.map(s => s.area))].forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
+
+  function applyFilter() {
+    const box = boxSel.value, method = document.getElementById("f-method").value;
+    const shop = shopSel.value, area = areaSel.value;
+    const filtered = lotteries.filter(l => {
+      const s = shops.find(x => x.id === l.shopId);
+      if (box && l.box !== box) return false;
+      if (method && l.method !== method) return false;
+      if (shop && l.shopId !== shop) return false;
+      if (area && (!s || s.area !== area)) return false;
+      return true;
+    });
+    document.getElementById("result-count").innerHTML = `全<b>${filtered.length}</b>件・${fmtUpdated(latestUpdatedAt(lotteries) || new Date().toISOString())}`;
+    renderLotteryList("all-list", filtered, ctx, 6);
+  }
+  [boxSel, document.getElementById("f-method"), shopSel, areaSel].forEach(s => s.addEventListener("change", applyFilter));
+  applyFilter();
+})();
+</script>
+</body>
+</html>

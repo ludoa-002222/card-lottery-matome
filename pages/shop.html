@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全店舗一覧｜オリパマーケット</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <nav class="breadcrumb"><a href="../index.html">ホーム</a> &gt; 全店舗一覧</nav>
+  <div class="page-title"><h1>全店舗一覧</h1></div>
+  <section class="section" style="padding-top:0;">
+    <table class="shop-table">
+      <thead><tr><th>店舗名</th><th>エリア</th><th>オンライン抽選</th><th>店頭抽選</th><th>掲載中の抽選件数</th><th>信頼スコア</th></tr></thead>
+      <tbody id="shop-rows"></tbody>
+    </table>
+    <p class="footer-note" style="margin-top:10px;">信頼スコアは、公式情報との一致率・情報の安定性をもとにした参考指標です（ダミー値）。</p>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script src="../assets/js/common.js"></script>
+<script>
+(async function(){
+  const { lotteries, shops } = await loadAllData();
+  document.getElementById("shop-rows").innerHTML = shops.map(s => {
+    const count = lotteries.filter(l => l.shopId === s.id).length;
+    return `<tr>
+      <td>${s.name}</td>
+      <td>${s.area}</td>
+      <td>${s.isOnline ? "◯" : "―"}</td>
+      <td>${s.isStore ? "◯" : "―"}</td>
+      <td>${count}件</td>
+      <td>${trustScoreBarHtml(trustScoreOf(s.id))}</td>
+    </tr>`;
+  }).join("");
+})();
+</script>
+</body>
+</html>

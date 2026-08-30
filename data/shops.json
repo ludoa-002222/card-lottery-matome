@@ -1,0 +1,10 @@
+[
+  { "id": "shop-01", "name": "カードラボ 秋葉原本店", "area": "東京", "isOnline": true, "isStore": true },
+  { "id": "shop-02", "name": "イエローサブマリン 池袋店", "area": "東京", "isOnline": true, "isStore": true },
+  { "id": "shop-03", "name": "ビックカメラ 柏店", "area": "千葉", "isOnline": false, "isStore": true },
+  { "id": "shop-04", "name": "MTGトレカ 心斎橋店", "area": "大阪", "isOnline": true, "isStore": true },
+  { "id": "shop-05", "name": "TSUTAYA トレカ 北千住店", "area": "東京", "isOnline": false, "isStore": true },
+  { "id": "shop-06", "name": "カードキングダム 札幌店", "area": "北海道", "isOnline": true, "isStore": false },
+  { "id": "shop-07", "name": "駿河屋 名古屋店", "area": "愛知", "isOnline": true, "isStore": true },
+  { "id": "shop-08", "name": "トレトク福岡天神店", "area": "福岡", "isOnline": false, "isStore": true }
+]

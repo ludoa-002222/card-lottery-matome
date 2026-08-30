@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">カード抽選情報一覧｜オリパマーケット</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+
+<main class="wrap">
+  <nav class="breadcrumb" id="breadcrumb"><a href="../index.html">ホーム</a></nav>
+  <div class="page-title">
+    <span class="updated-badge" id="updated-badge"></span>
+    <h1 id="h1">カード抽選情報一覧</h1>
+  </div>
+
+  <section class="section" style="padding-top:0;">
+    <div class="section-heading"><span class="bar"></span><h2>ボックスから選ぶ</h2></div>
+    <div class="category-grid" id="box-grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));"></div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="layout-with-sidebar">
+      <aside class="filter-sidebar">
+        <div class="fs-title">🔍 絞り込み</div>
+        <div>
+          <label>ボックス</label>
+          <select id="f-box"><option value="">すべて</option></select>
+        </div>
+        <div>
+          <label>店舗</label>
+          <select id="f-shop"><option value="">すべて</option></select>
+        </div>
+        <div>
+          <label>エリア</label>
+          <select id="f-area"><option value="">すべて</option></select>
+        </div>
+        <div class="fs-count" id="online-count"></div>
+      </aside>
+      <div>
+        <div class="section-heading"><span class="bar"></span><h2>オンラインで応募できる抽選</h2></div>
+        <div class="lottery-list" id="online-list"></div>
+        <div id="online-list-more-wrap"></div>
+
+        <div class="section-heading" style="margin-top:28px;"><span class="bar"></span><h2>店頭で応募できる抽選</h2></div>
+        <div class="lottery-list" id="store-list"></div>
+        <div id="store-list-more-wrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading"><span class="bar"></span><h2>よくある質問</h2></div>
+    <div class="accordion-item">
+      <details><summary>オンライン抽選はいつから応募できますか？</summary>
+      <p>各店舗の発表スケジュールにより異なります。カード上部の締切日時をご確認のうえ、公式ページから最新の受付開始時刻をご確認ください。</p></details>
+    </div>
+    <div class="accordion-item">
+      <details><summary>会員登録は必須ですか？</summary>
+      <p>店舗により異なります。カードの「会員登録要」バッジで事前に確認できます。</p></details>
+    </div>
+    <div class="accordion-item">
+      <details><summary>店頭抽選は並ぶ必要がありますか？</summary>
+      <p>店舗によって整理券配布方式や来店予約方式など運用が異なります。各店舗の公式告知をご確認ください。</p></details>
+    </div>
+  </section>
+
+  <p class="footer-note">掲載内容は各店舗の公式発表をもとにしていますが、受付期間・応募条件は予告なく変更される場合があります。応募の前に必ず各店舗の公式ページで最新の情報をご確認ください。当サイトは抽選の実施主体ではありません。</p>
+</main>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<script src="../assets/js/common.js"></script>
+<script>
+(async function () {
+  const params = new URLSearchParams(location.search);
+  const catSlug = params.get("cat") || "pokeka";
+  const boxSlugParam = params.get("box") || "";
+
+  const { lotteries, shops, boxes, categories } = await loadAllData();
+  const ctx = { shops, boxes };
+  const cat = categories.find(c => c.slug === catSlug) || categories[0];
+  const catLotteries = lotteries.filter(l => l.category === cat.slug);
+  const catBoxes = boxes.filter(b => b.category === cat.slug);
+
+  document.getElementById("page-title").textContent = `${cat.fullName}抽選販売・予約情報一覧｜オリパマーケット`;
+  document.getElementById("h1").textContent = `${cat.fullName} 抽選販売一覧`;
+  document.getElementById("breadcrumb").insertAdjacentHTML("beforeend", ` &gt; <a href="category.html?cat=${cat.slug}">${cat.name}</a>`);
+  document.getElementById("updated-badge").textContent = fmtUpdated(latestUpdatedAt(catLotteries) || new Date().toISOString());
+
+  document.getElementById("box-grid").innerHTML = catBoxes.map(b => {
+    const count = catLotteries.filter(l => l.box === b.slug).length;
+    return `<a class="category-card" href="category.html?cat=${cat.slug}&box=${b.slug}">
+      ${categoryThumbHtml(cat.slug, "cat-thumb")}
+      <div class="cat-body">
+        <div class="cat-name" style="font-size:.92rem;">${b.name}</div>
+        <div class="cat-count">${count}件</div>
+      </div>
+    </a>`;
+  }).join("") || `<p class="footer-note">現在このカテゴリのボックス情報はありません。</p>`;
+
+  const boxSel = document.getElementById("f-box");
+  catBoxes.forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}" ${b.slug === boxSlugParam ? "selected" : ""}>${b.name}</option>`));
+  const shopSel = document.getElementById("f-shop");
+  const shopIds = new Set(catLotteries.map(l => l.shopId));
+  shops.filter(s => shopIds.has(s.id)).forEach(s => shopSel.insertAdjacentHTML("beforeend", `<option value="${s.id}">${s.name}</option>`));
+  const areaSel = document.getElementById("f-area");
+  const areas = new Set(shops.filter(s => shopIds.has(s.id)).map(s => s.area));
+  areas.forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
+
+  function filtered(method) {
+    const box = boxSel.value, shop = shopSel.value, area = areaSel.value;
+    return catLotteries.filter(l => {
+      const s = shops.find(x => x.id === l.shopId);
+      if (l.method !== method) return false;
+      if (box && l.box !== box) return false;
+      if (shop && l.shopId !== shop) return false;
+      if (area && (!s || s.area !== area)) return false;
+      return true;
+    });
+  }
+
+  function draw() {
+    const online = filtered("online");
+    const store = filtered("store");
+    document.getElementById("online-count").innerHTML = `全<b>${online.length}</b>件`;
+    renderLotteryList("online-list", online, ctx, 5);
+    renderLotteryList("store-list", store, ctx, 5);
+  }
+  [boxSel, shopSel, areaSel].forEach(s => s.addEventListener("change", draw));
+  draw();
+})();
+</script>
+</body>
+</html>

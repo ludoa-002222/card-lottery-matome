@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">攻略コラム｜オリパマーケット</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <nav class="breadcrumb" id="breadcrumb"><a href="../index.html">ホーム</a> &gt; <a href="guide.html">攻略コラム</a></nav>
+
+  <div class="column-layout" style="margin-top:16px;">
+    <article>
+      <span class="badge" id="art-cat" style="margin-bottom:8px;display:inline-block;"></span>
+      <h1 id="art-title" style="font-size:1.4rem;margin:6px 0 10px;"></h1>
+      <div class="article-meta-row">
+        <span id="art-updated"></span>
+        <span>・</span>
+        <span id="art-readmin"></span>
+        <span class="verified-row" style="margin-left:6px;"><span class="check">✓</span>編集部確認済み</span>
+      </div>
+      <div id="art-thumb-slot"></div>
+
+      <div class="toc-box">
+        <div class="toc-title">この記事のポイント</div>
+        <p id="art-excerpt" style="margin:0;color:var(--ink-soft);"></p>
+      </div>
+
+      <div class="article-body" id="art-body"></div>
+
+      <p class="footer-note" style="margin-top:24px;">本記事は当サイトが収集した抽選・予約情報の傾向をもとにした参考情報です。実際の当落・相場を保証するものではありません。最新情報は必ず各店舗・公式サイトでご確認ください。</p>
+
+      <a href="guide.html" class="btn ghost" style="margin-top:10px;display:inline-block;">← 攻略コラム一覧へ戻る</a>
+    </article>
+    <aside id="ranking-slot"></aside>
+  </div>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script src="../assets/js/common.js"></script>
+<script>
+(async function () {
+  const params = new URLSearchParams(location.search);
+  const slug = params.get("slug");
+  const articles = await loadArticles();
+  const a = articles.find(x => x.slug === slug) || articles[0];
+  if (!a) return;
+
+  document.getElementById("page-title").textContent = `${a.title}｜オリパマーケット`;
+  document.getElementById("breadcrumb").insertAdjacentHTML("beforeend", ` &gt; <span>${a.title}</span>`);
+  document.getElementById("art-cat").textContent = a.category;
+  document.getElementById("art-title").textContent = a.title;
+  document.getElementById("art-updated").textContent = `更新 ${fmtDateSlash(a.updatedAt)}`;
+  document.getElementById("art-readmin").textContent = `${a.readMin}分で読める`;
+  document.getElementById("art-thumb-slot").innerHTML = articleThumbHtml(a.category, "article-detail-hero");
+  document.getElementById("art-excerpt").textContent = a.excerpt;
+  document.getElementById("art-body").innerHTML = a.body.map(p => `<p>${p}</p>`).join("");
+  document.getElementById("ranking-slot").innerHTML = rankingBoxHtml(articles.filter(x => x.slug !== a.slug));
+})();
+</script>
+</body>
+</html>

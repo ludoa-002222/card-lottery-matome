@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>トレカ攻略コラム一覧｜オリパマーケット</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <nav class="breadcrumb"><a href="../index.html">ホーム</a> &gt; 攻略コラム</nav>
+
+  <section class="column-hero">
+    <span class="kicker">VERIFIED GUIDE COLUMN</span>
+    <h1>トレカ攻略コラム</h1>
+    <p>抽選・予約情報を継続調査してきた当サイトが、公式情報と実績データをもとに検証した記事のみを掲載しています。</p>
+    <div class="cat-menu" id="cat-menu"></div>
+  </section>
+
+  <div class="column-layout">
+    <div>
+      <section class="section" style="padding-top:20px;">
+        <div class="section-heading"><span class="bar"></span><h2 id="list-title">新着記事</h2></div>
+        <div class="article-grid" id="article-grid"></div>
+      </section>
+    </div>
+    <aside id="ranking-slot"></aside>
+  </div>
+
+  <section class="section">
+    <div class="section-heading"><span class="bar"></span><h2>便利なツール・ページ</h2></div>
+    <div class="promo-grid">
+      <a class="promo-card" href="calendar.html">
+        <span class="icon">📅</span>
+        <div><h3>抽選締切カレンダー</h3><p>締切日から逆算して応募する</p></div>
+        <span class="go">見る</span>
+      </a>
+      <a class="promo-card" href="trust.html">
+        <span class="icon">🛡️</span>
+        <div><h3>情報の正確性について</h3><p>収集から掲載までの検証プロセス</p></div>
+        <span class="go">見る</span>
+      </a>
+    </div>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script src="../assets/js/common.js"></script>
+<script>
+(async function () {
+  const articles = await loadArticles();
+  const params = new URLSearchParams(location.search);
+  const cat = params.get("cat") || "";
+
+  const categoriesOfArticles = [...new Set(articles.map(a => a.category))];
+  document.getElementById("cat-menu").innerHTML =
+    `<a href="guide.html" class="${!cat ? "active" : ""}">すべて</a>` +
+    categoriesOfArticles.map(c => `<a href="guide.html?cat=${encodeURIComponent(c)}" class="${cat === c ? "active" : ""}">${c}</a>`).join("");
+
+  const list = cat ? articles.filter(a => a.category === cat) : articles;
+  document.getElementById("list-title").textContent = cat ? `${cat}の記事` : "新着記事";
+  document.getElementById("article-grid").innerHTML = list
+    .slice()
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    .map(articleCardHtml)
+    .join("");
+
+  document.getElementById("ranking-slot").innerHTML = rankingBoxHtml(articles);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>店頭抽選まとめ｜オリパマーケット</title>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <nav class="breadcrumb"><a href="../index.html">ホーム</a> &gt; 店頭抽選</nav>
+  <div class="page-title"><span class="updated-badge" id="updated-badge"></span><h1>店頭抽選まとめ</h1></div>
+  <section class="section" style="padding-top:0;">
+    <div class="layout-with-sidebar">
+      <aside class="filter-sidebar">
+        <div class="fs-title">🔍 絞り込み</div>
+        <div><label>カード種類</label><select id="f-cat"><option value="">すべて</option></select></div>
+        <div><label>ボックス</label><select id="f-box"><option value="">すべて</option></select></div>
+        <div><label>エリア</label><select id="f-area"><option value="">すべて</option></select></div>
+        <div class="fs-count" id="cnt"></div>
+      </aside>
+      <div>
+        <div class="lottery-list" id="list"></div>
+        <div id="list-more-wrap"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script src="../assets/js/common.js"></script>
+<script>
+(async function(){
+  const { lotteries, shops, boxes, categories } = await loadAllData();
+  const ctx = { shops, boxes };
+  const base = lotteries.filter(l => l.method === "store");
+  document.getElementById("updated-badge").textContent = fmtUpdated(latestUpdatedAt(base) || new Date().toISOString());
+
+  const catSel = document.getElementById("f-cat");
+  categories.forEach(c => catSel.insertAdjacentHTML("beforeend", `<option value="${c.slug}">${c.name}</option>`));
+  const boxSel = document.getElementById("f-box");
+  boxes.forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}">${b.name}</option>`));
+  const areaSel = document.getElementById("f-area");
+  [...new Set(shops.map(s=>s.area))].forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
+
+  function draw(){
+    const cat = catSel.value, box = boxSel.value, area = areaSel.value;
+    const f = base.filter(l => {
+      const s = shops.find(x=>x.id===l.shopId);
+      if (cat && l.category !== cat) return false;
+      if (box && l.box !== box) return false;
+      if (area && (!s || s.area !== area)) return false;
+      return true;
+    });
+    document.getElementById("cnt").innerHTML = `全<b>${f.length}</b>件`;
+    renderLotteryList("list", f, ctx, 8);
+  }
+  [catSel, boxSel, areaSel].forEach(s=>s.addEventListener("change", draw));
+  draw();
+})();
+</script>
+</body>
+</html>
