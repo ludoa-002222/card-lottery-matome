@@ -1,0 +1,10 @@
+[
+  { "slug": "30th-anniversary", "category": "pokeka", "name": "30周年記念パック" },
+  { "slug": "storm-emerald", "category": "pokeka", "name": "ストームエメラルド" },
+  { "slug": "battle-collection", "category": "pokeka", "name": "バトルコレクション" },
+  { "slug": "romance-dawn", "category": "onepiece", "name": "ロマンスドーン" },
+  { "slug": "two-legends", "category": "onepiece", "name": "二つの伝説" },
+  { "slug": "quarter-century-1", "category": "yugioh", "name": "クォーターセンチュリーレガシー" },
+  { "slug": "premium-pack", "category": "dragonball", "name": "プレミアムパック" },
+  { "slug": "dm-25th", "category": "duema", "name": "DM25周年パック" }
+]

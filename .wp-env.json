@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "core": null,
+  "phpVersion": null,
+  "themes": [
+    "./wp-content/themes/oripa-market"
+  ],
+  "plugins": [
+    "https://downloads.wordpress.org/plugin/advanced-custom-fields.latest-stable.zip"
+  ],
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true,
+    "WP_DEBUG_DISPLAY": false,
+    "WP_ENVIRONMENT_TYPE": "local"
+  }
+}

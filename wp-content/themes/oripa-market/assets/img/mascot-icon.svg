@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="90 0 150 150" width="44" height="44">
+  <defs>
+    <linearGradient id="furGradIcon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff9a52"/>
+      <stop offset="100%" stop-color="#f2712f"/>
+    </linearGradient>
+  </defs>
+  <path d="M96 118C96 72 128 40 165 40s69 32 69 78c0 46-31 78-69 78s-69-32-69-78z"
+        fill="url(#furGradIcon)" stroke="#c94f1f" stroke-width="4"/>
+  <path d="M100 66L78 8l52 34z" fill="url(#furGradIcon)" stroke="#c94f1f" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M104 54L92 22l30 20z" fill="#fff4e6"/>
+  <path d="M230 66l22-58-52 34z" fill="url(#furGradIcon)" stroke="#c94f1f" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M226 54l12-32-30 20z" fill="#fff4e6"/>
+  <path d="M118 128c8 30 26 46 47 46s39-16 47-46c-14 14-30 20-47 20s-33-6-47-20z" fill="#fff4e6"/>
+  <ellipse cx="118" cy="128" rx="13" ry="8" fill="#ff9a52" opacity=".55"/>
+  <ellipse cx="212" cy="128" rx="13" ry="8" fill="#ff9a52" opacity=".55"/>
+  <ellipse cx="138" cy="108" rx="8" ry="10" fill="#241a12"/>
+  <ellipse cx="192" cy="108" rx="8" ry="10" fill="#241a12"/>
+  <circle cx="140.5" cy="104" r="2.4" fill="#fff"/>
+  <circle cx="194.5" cy="104" r="2.4" fill="#fff"/>
+  <path d="M158 132l7 8 7-8-7-6z" fill="#241a12"/>
+</svg>

@@ -3,3 +3,10 @@
 node_modules/
 .vscode/
 .idea/
+
+# wp-env / WordPress local
+.wp-env.override.json
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/plugins/
+!wp-content/themes/

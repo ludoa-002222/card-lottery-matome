@@ -1,0 +1,16 @@
+/*
+Theme Name: オリパマーケット
+Theme URI: https://github.com/ludoa-002222/card-lottery-matome
+Author: オリパマーケット運営
+Description: トレカ（ポケカ・ワンピ・遊戯王など）抽選販売・予約情報まとめサイトのクラシックPHPテーマ。抽選=カスタム投稿タイプ lottery、カテゴリ/ボックス=タクソノミー、店舗=CPT shop、攻略コラム=CPT column。ACF でメタ項目を管理し、一覧の絞り込み・カウントダウン等は /wp-json/oripa/v1/ を叩くフロントJSで描画する。
+Version: 0.1.0
+Requires at least: 6.4
+Requires PHP: 8.1
+Text Domain: oripa-market
+Tags: custom-post-types, custom-fields, translation-ready
+*/
+
+/*
+ * 実スタイルは assets/css/style.css を wp_enqueue_style で読み込む（静的プロトタイプから流用）。
+ * この style.css はテーマ識別用ヘッダーのみ。
+ */
