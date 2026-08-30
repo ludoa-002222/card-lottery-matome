@@ -53,6 +53,14 @@ get_header();
 				<div class="section-heading" style="margin-top:28px;"><span class="bar"></span><h2>店頭で応募できる抽選</h2></div>
 				<div class="lottery-list" id="store-list"></div>
 				<div id="store-list-more-wrap"></div>
+
+				<div class="ended-section collapsed" id="ended-section" hidden>
+					<button type="button" class="ended-toggle" id="ended-toggle" aria-expanded="false">
+						<span class="tri" aria-hidden="true">▼</span>終了済の抽選販売（<span id="ended-count">0</span>件）
+					</button>
+					<div class="lottery-list ended-list" id="ended-list"></div>
+					<div id="ended-list-more-wrap"></div>
+				</div>
 			</div>
 		</div>
 	</section>

@@ -8,6 +8,29 @@
   const page = document.body.dataset.page || "";
   const main = document.querySelector("main");
 
+  const isEnded = l => new Date(l.deadline).getTime() <= Date.now();
+
+  /**
+   * 「終了済の抽選販売」開閉セクションを描画する共通処理。
+   * ページ側に #ended-section / #ended-toggle / #ended-count / #ended-list が必要。
+   */
+  function renderEndedSection(endedItems, ctx, pageSize = 6) {
+    const section = document.getElementById("ended-section");
+    if (!section) return;
+    const toggle = document.getElementById("ended-toggle");
+    if (toggle && !toggle.dataset.wired) {
+      toggle.dataset.wired = "1";
+      toggle.addEventListener("click", () => {
+        const collapsed = section.classList.toggle("collapsed");
+        toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      });
+    }
+    const cnt = document.getElementById("ended-count");
+    if (cnt) cnt.textContent = String(endedItems.length);
+    section.hidden = endedItems.length === 0;
+    renderLotteryList("ended-list", endedItems, ctx, pageSize);
+  }
+
   const handlers = {
     "home": initHome,
     "category": initCategory,
@@ -74,20 +97,6 @@
     shops.forEach(s => shopSel.insertAdjacentHTML("beforeend", `<option value="${s.id}">${s.name}</option>`));
     [...new Set(shops.map(s => s.area))].filter(Boolean).forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
 
-    // 「終了済」セクションの開閉トグル
-    const endedSection = document.getElementById("ended-section");
-    const endedToggle = document.getElementById("ended-toggle");
-    if (endedToggle && endedSection) {
-      endedToggle.addEventListener("click", () => {
-        const open = endedSection.classList.toggle("collapsed");
-        endedToggle.setAttribute("aria-expanded", open ? "false" : "true");
-      });
-    }
-
-    function isEnded(l) {
-      return new Date(l.deadline).getTime() <= Date.now();
-    }
-
     function applyFilter() {
       const box = boxSel.value, method = methodSel.value, shop = shopSel.value, area = areaSel.value;
       const filtered = lotteries.filter(l => {
@@ -106,13 +115,7 @@
       const cnt = document.getElementById("result-count");
       if (cnt) cnt.innerHTML = `受付中 <b>${active.length}</b> 件・${fmtUpdated(latestUpdatedAt(lotteries) || new Date().toISOString())}`;
       renderLotteryList("all-list", active, ctx, 6);
-
-      if (endedSection) {
-        const ecnt = document.getElementById("ended-count");
-        if (ecnt) ecnt.textContent = String(ended.length);
-        endedSection.hidden = ended.length === 0;
-        renderLotteryList("ended-list", ended, ctx, 6);
-      }
+      renderEndedSection(ended, ctx, 6);
     }
     [boxSel, methodSel, shopSel, areaSel].forEach(s => s.addEventListener("change", applyFilter));
     applyFilter();
@@ -161,24 +164,25 @@
     [...new Set(shops.filter(s => shopIds.has(s.id)).map(s => s.area))].filter(Boolean)
       .forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
 
-    function filtered(method) {
+    function matchFilters(l) {
       const box = boxSel.value, shop = shopSel.value, area = areaSel.value;
-      return catLotteries.filter(l => {
-        const s = shops.find(x => x.id === l.shopId);
-        if (l.method !== method) return false;
-        if (box && l.box !== box) return false;
-        if (shop && l.shopId !== shop) return false;
-        if (area && (!s || s.area !== area)) return false;
-        return true;
-      });
+      const s = shops.find(x => x.id === l.shopId);
+      if (box && l.box !== box) return false;
+      if (shop && l.shopId !== shop) return false;
+      if (area && (!s || s.area !== area)) return false;
+      return true;
     }
     function draw() {
-      const online = filtered("online");
-      const store = filtered("store");
+      const matched = catLotteries.filter(matchFilters);
+      const online = sortByDeadline(matched.filter(l => l.method === "online" && !isEnded(l)));
+      const store = sortByDeadline(matched.filter(l => l.method === "store" && !isEnded(l)));
+      const ended = matched.filter(isEnded).sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
+
       const oc = document.getElementById("online-count");
-      if (oc) oc.innerHTML = `全<b>${online.length}</b>件`;
+      if (oc) oc.innerHTML = `受付中 オンライン<b>${online.length}</b>件・店頭<b>${store.length}</b>件`;
       renderLotteryList("online-list", online, ctx, 5);
       renderLotteryList("store-list", store, ctx, 5);
+      renderEndedSection(ended, ctx, 6);
     }
     [boxSel, shopSel, areaSel].forEach(s => s.addEventListener("change", draw));
     draw();
