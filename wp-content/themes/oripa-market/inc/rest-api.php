@@ -117,8 +117,9 @@ function oripa_rest_shops() {
 			'id'       => (string) $p->ID,
 			'name'     => $p->post_title,
 			'area'     => $areas && ! is_wp_error( $areas ) ? $areas[0] : '',
-			'isOnline' => (bool) get_post_meta( $p->ID, 'is_online', true ),
-			'isStore'  => (bool) get_post_meta( $p->ID, 'is_store', true ),
+			'isOnline'    => (bool) get_post_meta( $p->ID, 'is_online', true ),
+			'isStore'     => (bool) get_post_meta( $p->ID, 'is_store', true ),
+			'officialUrl' => get_post_meta( $p->ID, 'official_url', true ) ?: '',
 		);
 	}
 	return $out;
@@ -183,6 +184,8 @@ function oripa_rest_lotteries() {
 			'roundTotal'     => (int) ( get_post_meta( $p->ID, 'round_total', true ) ?: 1 ),
 			'updatedAt'      => $updated_at,
 			'permalink'      => get_permalink( $p ),
+			'applyUrl'       => get_post_meta( $p->ID, 'apply_url', true ) ?: '',
+			'confidence'     => (float) get_post_meta( $p->ID, 'confidence_score', true ),
 		);
 	}
 	return $out;
