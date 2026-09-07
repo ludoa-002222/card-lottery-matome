@@ -6,7 +6,12 @@ node_modules/
 
 # wp-env / WordPress local
 .wp-env.override.json
+wp-env/.ngrok-domain
+wp-content/themes/oripa-market/bin/.seed-token
 wp-content/uploads/
 wp-content/upgrade/
 wp-content/plugins/
 !wp-content/themes/
+
+# ビルド成果物（テーマZIP）
+oripa-market.zip

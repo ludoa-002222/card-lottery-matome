@@ -29,18 +29,29 @@ npm run wp:seed        # static/data/*.json 相当のサンプルデータを投
 
 ### 開発環境URLの発行（公開トンネル）
 
-チームに一時的な公開URLを渡したいときは cloudflared のクイックトンネルを使う（アカウント不要）。
+チームに公開URLを渡すときは ngrok の固定ドメインを使う。**毎回同じURL**で公開できる。
 
 ```bash
-brew install cloudflared   # 初回のみ
+brew install ngrok/ngrok/ngrok            # 初回のみ
+ngrok config add-authtoken <YOUR_TOKEN>   # 初回のみ（https://dashboard.ngrok.com/ で取得）
+# ダッシュボードの Domains で無料の静的ドメインを1つ作成し、ローカルに登録:
+echo 'your-name.ngrok-free.app' > wp-env/.ngrok-domain   # 初回のみ（gitignore 済み）
+
 npm run wp:start           # wp-env が起動していること
-npm run wp:tunnel          # → https://xxxx.trycloudflare.com が発行される（起動のたび変わる）
+npm run wp:tunnel          # → https://your-name.ngrok-free.app で公開（毎回同じURL）
 ```
 
+- ドメインは `NGROK_DOMAIN` 環境変数でも指定可（`wp-env/.ngrok-domain` より優先）
 - `wp-env/mu-plugins/00-dynamic-siteurl.php`（mu-plugin）がリクエストの Host に追従して
   `home` / `siteurl` / テーマ・アセット・REST の各URLを書き換えるため、トンネル経由でもリダイレクトせず動く
 - この mu-plugin は **ローカル開発専用**。本番には配置しない
-- トンネルを止めると公開URLは失効する
+- トンネルを止めている間は公開URLにアクセスできない（再開すれば同じURLで復活）
+
+トンネルではなく **サーバー上に公開して固定URLにする**場合:
+
+- エックスサーバーの `dev.oripa-market.com`（サブドメイン）に載せる手順 … [`docs/deploy-xserver.md`](docs/deploy-xserver.md)
+  （既存サイトは触らない。FTP/SSH 不要。`npm run theme:zip` の `oripa-market.zip` を管理画面からアップロード）
+- 無料ホスティング等の他の選択肢 … [`docs/deploy-free.md`](docs/deploy-free.md)
 
 ## 静的プロトタイプ（static/）
 

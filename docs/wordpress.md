@@ -18,17 +18,27 @@ npm run wp:seed       # サンプルデータ投入（冪等。再実行で更�
 | `npm run wp:cli -- <args>` | 例: `npm run wp:cli -- post list --post_type=lottery` |
 | `npm run wp:stop` / `wp:destroy` | 停止 / 破棄 |
 | `npm run wp:logs` | PHP/Apache ログ |
-| `npm run wp:tunnel` | 公開URL（cloudflared quick tunnel）を発行 |
+| `npm run wp:tunnel` | 公開URL（ngrok 固定ドメイン）を発行 |
 
 管理画面: `http://localhost:8888/wp-admin/`（`admin` / `password`）
 
 ## 開発環境URL（公開トンネル）
 
+ngrok の固定ドメインで公開する。**毎回同じURL**。
+
 ```bash
-brew install cloudflared   # 初回のみ
+brew install ngrok/ngrok/ngrok            # 初回のみ
+ngrok config add-authtoken <YOUR_TOKEN>   # 初回のみ（dashboard.ngrok.com で取得）
+echo 'your-name.ngrok-free.app' > wp-env/.ngrok-domain   # 初回のみ（Domains で作成した静的ドメイン。gitignore 済み）
+
 npm run wp:start
-npm run wp:tunnel          # https://<ランダム>.trycloudflare.com を発行（起動のたび変わる）
+npm run wp:tunnel          # https://your-name.ngrok-free.app で公開
 ```
+
+- ドメイン解決順: 環境変数 `NGROK_DOMAIN` → `wp-env/.ngrok-domain`
+- 実体は `wp-env/tunnel.sh`（`ngrok http 8888 --domain=<解決したドメイン>`）
+- authtoken はリポジトリに置かない（ngrok のグローバル設定に入る）
+- `.ngrok-free.app` は mu-plugin の Host 判定（`ngrok(-free)?\.app`）で HTTPS 扱いになる
 
 `wp-env/mu-plugins/00-dynamic-siteurl.php` が肝。wp-env は `wp-config.php` に
 `WP_HOME` / `WP_SITEURL` / `WP_CONTENT_URL` を **定数** で焼き込むため、`home_url()` などは
