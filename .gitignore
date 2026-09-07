@@ -15,3 +15,6 @@ wp-content/plugins/
 
 # ビルド成果物（テーマZIP）
 oripa-market.zip
+
+# ローカル専用デプロイ設定（実サーバーのSSHユーザー名等）
+scripts/deploy-local.env

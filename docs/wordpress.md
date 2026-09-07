@@ -55,10 +55,13 @@ DBオプションではなく定数を見る。この mu-plugin は次を行う:
 
 ## ブランチ運用
 
-- `main` … 静的プロトタイプのみ
-- `wordpress-theme` … WordPress テーマ初版
-- `staging` … `wordpress-theme` から派生。wp-env + 公開トンネル + mu-plugin を含む
-  「Claude 上でローカル管理する用」の作業ブランチ。以後の変更はここに積む
+`wordpress-theme`（WordPressテーマ初版）は `staging`（wp-env + 公開トンネル + mu-plugin を含む
+「Claude 上でローカル管理する用」の作業ブランチ）を経て、2026-09-07 に `main` へ統合済み。
+現在は3ブランチとも同一コミットで、`main` = 本番（`oripa-market.com`）へ自動デプロイされる対象
+（[`docs/deploy-github-actions.md`](./deploy-github-actions.md)）。
+
+- 通常の作業は `staging` に積む → `main` にマージして push すると自動デプロイが走る
+- `wordpress-theme` は履歴上の名残。新規の作業ブランチとしては使わない
 
 ## データモデル
 

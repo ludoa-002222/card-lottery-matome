@@ -83,7 +83,17 @@ npm run static:serve   # 依存なし: python3 -m http.server（static/ を配�
 
 ## 未実装（今回のスコープ外）
 
-- 実データ収集・巡回クローラ・掲載審査ワークフロー
+- 巡回クローラ・掲載審査ワークフロー自体（本リポジトリ外の別プロジェクト。受け口の
+  `POST /wp-json/oripa/v1/sync/lotteries` はテーマ側に実装済み、詳細は
+  [`docs/wordpress.md`](docs/wordpress.md) の REST API 節）
 - 会員向け機能の中身（お気に入り抽選、新着通知）
 - 当選率投票・買取価格予想などのUGC機能
-- 本番デプロイ構成（現状は wp-env のローカルのみ）
+
+## 本番デプロイ
+
+`main` の `wp-content/themes/oripa-market/**` が変わると GitHub Actions が自動で
+エックスサーバーの本番（`oripa-market.com`）へ rsync する。手順・ロールバックは
+[`docs/deploy-github-actions.md`](docs/deploy-github-actions.md)、本番 `.htaccess` の設定は
+[`docs/production-server-config.md`](docs/production-server-config.md) を参照。
+ローカルから直接デプロイしたい場合は `scripts/deploy-local.sh` も使える
+（`scripts/deploy-local.env` にSSHユーザー名等を設定。gitignore済み）。
