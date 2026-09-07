@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# !! 非推奨 !! 本番デプロイは 2026-09-07 からサーバー上 git pull 方式に移行した
+# （docs/deploy-server-git-pull.md）。deploy.yml の自動トリガーは止めてあるため
+# 現在このスクリプトは呼ばれない。参考として残置。
+#
 # 本番サーバー上で実行される。GitHub Actions の deploy ワークフローが
 #   ssh prod "DEPLOY_PATH=... WP_PATH=... bash -s" < scripts/remote-backup.sh
 # の形で標準入力に流し込む。

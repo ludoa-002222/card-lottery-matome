@@ -1,7 +1,11 @@
 name: Deploy theme to production
 
-# main の oripa-market テーマが変わったら本番（エックスサーバー）へ rsync する。
-# 手動実行（Actions タブの Run workflow）でもデプロイできる。
+# !! 現在は無効化中 !!
+# 本番デプロイは 2026-09-07 からサーバー上での `git pull` 方式に移行した
+# （docs/deploy-server-git-pull.md）。この rsync 方式と同時に使うと、サーバー側の
+# git 作業ツリーを rsync が直接書き換えてしまい `git pull` が壊れるため、
+# 自動トリガーを止め、手動実行のみ残してある。Secrets も未設定（意図的）。
+# 元々の内容は下記コメントと docs/deploy-github-actions.md を参照。
 #
 # 必要な Secrets（Settings → Secrets and variables → Actions）:
 #   SSH_PRIVATE_KEY  デプロイ鍵の秘密鍵全文（対応する公開鍵 oripa-market-deploy を
@@ -15,11 +19,6 @@ name: Deploy theme to production
 #                    例: /home/xxxxx/oripa-market.com/public_html
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "wp-content/themes/oripa-market/**"
-      - ".github/workflows/deploy.yml"
   workflow_dispatch:
     inputs:
       dry_run:

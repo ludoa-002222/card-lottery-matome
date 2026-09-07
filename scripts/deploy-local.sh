@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# !! 非推奨 !! 本番デプロイは 2026-09-07 からサーバー上 git pull 方式に移行した
+# （docs/deploy-server-git-pull.md）。本番のテーマディレクトリはサーバー上のgit作業
+# ツリーへのsymlinkになっているため、このスクリプトのrsyncを実行すると git 管理外で
+# ファイルを書き換えてしまい、次の git pull を壊す。使わないこと。
+#
+# 以下は移行前の内容（参考として残置）。
+#
 # ローカルから本番（エックスサーバー）へテーマを rsync でデプロイする。
 #   使い方:  sh scripts/deploy-local.sh            # dry-run で差分表示 → y で本実行
 #            sh scripts/deploy-local.sh --yes      # 確認なしで本実行

@@ -91,9 +91,10 @@ npm run static:serve   # 依存なし: python3 -m http.server（static/ を配�
 
 ## 本番デプロイ
 
-`main` の `wp-content/themes/oripa-market/**` が変わると GitHub Actions が自動で
-エックスサーバーの本番（`oripa-market.com`）へ rsync する。手順・ロールバックは
-[`docs/deploy-github-actions.md`](docs/deploy-github-actions.md)、本番 `.htaccess` の設定は
-[`docs/production-server-config.md`](docs/production-server-config.md) を参照。
-ローカルから直接デプロイしたい場合は `scripts/deploy-local.sh` も使える
-（`scripts/deploy-local.env` にSSHユーザー名等を設定。gitignore済み）。
+本番（`oripa-market.com`）のテーマディレクトリはサーバー上のgit作業ツリーへの
+symlinkになっており、SSHして `git pull origin main` するだけで反映される。
+手順・注意点は [`docs/deploy-server-git-pull.md`](docs/deploy-server-git-pull.md)、
+本番 `.htaccess` の設定は [`docs/production-server-config.md`](docs/production-server-config.md) を参照。
+
+GitHub Actions での rsync 方式（`scripts/deploy-local.sh` によるローカルからの手動rsyncも含む）は
+上記と競合するため**現在は使用していない**（[`docs/deploy-github-actions.md`](docs/deploy-github-actions.md) に経緯を記載）。

@@ -1,4 +1,11 @@
-# GitHub Actions で本番へ自動デプロイ
+# GitHub Actions で本番へ自動デプロイ（非推奨・現在は無効化中）
+
+> **2026-09-07以降、本番デプロイは [`docs/deploy-server-git-pull.md`](./deploy-server-git-pull.md)
+> の「サーバー上 git pull 方式」に統一した。** このページの rsync 方式は、本番の
+> テーマディレクトリがサーバー上のgit作業ツリーへのsymlinkになったことで git-pull 方式と
+> 競合するため使用しない（自動トリガーは止め、Secretsも未設定）。歴史的経緯・
+> 元の設計として残している。復活させる場合は symlink 構成を通常ディレクトリに戻すこと
+> （`docs/deploy-server-git-pull.md` のロールバック節に元ディレクトリのバックアップパスの記載あり）。
 
 `main` の `wp-content/themes/oripa-market/**` が変わると、GitHub Actions が
 エックスサーバーの本番テーマへ `rsync` する。手動実行（Actions タブ → Deploy theme

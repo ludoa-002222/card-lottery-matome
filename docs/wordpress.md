@@ -57,10 +57,11 @@ DBオプションではなく定数を見る。この mu-plugin は次を行う:
 
 `wordpress-theme`（WordPressテーマ初版）は `staging`（wp-env + 公開トンネル + mu-plugin を含む
 「Claude 上でローカル管理する用」の作業ブランチ）を経て、2026-09-07 に `main` へ統合済み。
-現在は3ブランチとも同一コミットで、`main` = 本番（`oripa-market.com`）へ自動デプロイされる対象
-（[`docs/deploy-github-actions.md`](./deploy-github-actions.md)）。
+`main` = 本番（`oripa-market.com`）が追跡するブランチ（[`docs/deploy-server-git-pull.md`](./deploy-server-git-pull.md)）。
 
-- 通常の作業は `staging` に積む → `main` にマージして push すると自動デプロイが走る
+- 通常の作業は `staging` に積む → `main` にマージして push
+- 本番への反映は自動ではない。サーバー上で `git pull origin main` する必要がある
+  （[`docs/deploy-server-git-pull.md`](./deploy-server-git-pull.md)）
 - `wordpress-theme` は履歴上の名残。新規の作業ブランチとしては使わない
 
 ## データモデル
