@@ -1,0 +1,106 @@
+name: Deploy theme to production
+
+# main の oripa-market テーマが変わったら本番（エックスサーバー）へ rsync する。
+# 手動実行（Actions タブの Run workflow）でもデプロイできる。
+#
+# 必要な Secrets（Settings → Secrets and variables → Actions）:
+#   SSH_PRIVATE_KEY  デプロイ鍵の秘密鍵全文（対応する公開鍵 oripa-market-deploy を
+#                    エックスサーバーの「SSH設定」に登録しておく）
+#   SSH_HOST         例: sv17093.xserver.jp
+#   SSH_PORT         例: 10022
+#   SSH_USER         エックスサーバーの SSH ユーザー名
+#   DEPLOY_PATH      サーバー上のテーマの絶対パス
+#                    例: /home/xxxxx/oripa-market.com/public_html/wp-content/themes/oripa-market
+#   WP_PATH          （任意）wp-cli 用の WordPress ルート。未設定なら DB バックアップはスキップ
+#                    例: /home/xxxxx/oripa-market.com/public_html
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wp-content/themes/oripa-market/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "rsync を --dry-run で実行（転送しない）"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.SSH_PORT }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          {
+            printf 'Host prod\n'
+            printf '  HostName %s\n' "${{ secrets.SSH_HOST }}"
+            printf '  User %s\n' "${{ secrets.SSH_USER }}"
+            printf '  Port %s\n' "${{ secrets.SSH_PORT }}"
+            printf '  IdentityFile ~/.ssh/deploy_key\n'
+            printf '  IdentitiesOnly yes\n'
+          } > ~/.ssh/config
+
+      - name: Verify connection
+        run: |
+          ssh prod 'echo connected to $(hostname) at $(date)'
+
+      - name: Backup current theme + database on server
+        run: |
+          ssh prod "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' WP_PATH='${{ secrets.WP_PATH }}' bash -s" < scripts/remote-backup.sh
+
+      - name: Rsync theme to production
+        run: |
+          DRY=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            DRY="--dry-run"
+            echo "::notice::DRY RUN — 実際の転送は行いません"
+          fi
+          rsync -az --delete $DRY \
+            --exclude='.git/' \
+            --exclude='bin/' \
+            --exclude='.DS_Store' \
+            --exclude='*.map' \
+            -e "ssh" \
+            wp-content/themes/oripa-market/ \
+            prod:"${{ secrets.DEPLOY_PATH }}/"
+
+      - name: Verify deployed assets match repo
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
+        run: |
+          BASE="https://oripa-market.com/wp-content/themes/oripa-market"
+          fail=0
+          for f in assets/js/app.js assets/js/common.js assets/css/style.css; do
+            curl -fsS "$BASE/$f" -o /tmp/remote_file
+            if diff -q "wp-content/themes/oripa-market/$f" /tmp/remote_file >/dev/null; then
+              echo "OK   $f"
+            else
+              echo "DIFF $f  (本番と repo が不一致)"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Deploy to production"
+            echo ""
+            echo "- commit: \`${{ github.sha }}\`"
+            echo "- event: ${{ github.event_name }}"
+            echo "- result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -49,6 +49,8 @@ npm run wp:tunnel          # → https://your-name.ngrok-free.app で公開（�
 
 トンネルではなく **サーバー上に公開して固定URLにする**場合:
 
+- **本番 `oripa-market.com` へ自動デプロイ**（`main` に push すると GitHub Actions が rsync）
+  … [`docs/deploy-github-actions.md`](docs/deploy-github-actions.md)
 - エックスサーバーの `dev.oripa-market.com`（サブドメイン）に載せる手順 … [`docs/deploy-xserver.md`](docs/deploy-xserver.md)
   （既存サイトは触らない。FTP/SSH 不要。`npm run theme:zip` の `oripa-market.zip` を管理画面からアップロード）
 - 無料ホスティング等の他の選択肢 … [`docs/deploy-free.md`](docs/deploy-free.md)
