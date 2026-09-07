@@ -210,15 +210,16 @@ function categoryRailHtml(categories, lotteries, activeSlug) {
   }).join("");
 }
 
-// 実写BOX画像（ボックスごとに用意できたものを差し替え。無いボックスは共通のデフォルト画像を使用）
-const BOX_PHOTOS = {
-  "30th-anniversary": "30th-celebration.webp"
-};
+// 実写BOX画像。WordPress側（card_boxタクソノミーのimage_url term meta、
+// Notion「パック種類マスタ」DB由来）から取得したURLを最優先で使う。
+// 未設定のボックスのみ、テーマ内蔵のデフォルト画像にフォールバックする
+// （2026-09-07: 従来はここに全パック共通のハードコード対応表しかなく、
+// ほぼ全ての商品が同じデフォルト画像になっていた）。
 const DEFAULT_BOX_PHOTO = "30th-celebration.webp";
 
-function lotteryThumbHtml(l) {
-  const photo = BOX_PHOTOS[l.box] || DEFAULT_BOX_PHOTO;
-  const img = `<img class="lottery-thumb" src="${ASSETS}${photo}" alt="" loading="lazy">`;
+function lotteryThumbHtml(l, box) {
+  const photo = box && box.image ? box.image : `${ASSETS}${DEFAULT_BOX_PHOTO}`;
+  const img = `<img class="lottery-thumb" src="${photo}" alt="" loading="lazy">`;
   // サムネイル画像タップでボックス別の抽選情報ページへ
   return l.box
     ? `<a class="lottery-thumb-link" href="${BOX_BASE}${l.box}/" aria-label="このボックスの抽選一覧を見る">${img}</a>`
@@ -233,7 +234,7 @@ function lotteryCardHtml(l, ctx) {
   return `
   <div class="lottery-card ${cd.urgent && !cd.ended ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
     <div class="thumb-wrap">
-      ${lotteryThumbHtml(l)}
+      ${lotteryThumbHtml(l, box)}
       <span class="ribbon ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
       <button class="save-btn" aria-label="保存する" type="button">♡</button>
       <span class="method-chip ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>

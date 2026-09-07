@@ -151,6 +151,8 @@ GET /wp-json/oripa/v1/bootstrap    → {categories,boxes,shops,lotteries,article
 ## 未対応 / 今後
 
 - 本番デプロイ構成（現状 wp-env のみ）。テーマは `wp-content/themes/oripa-market/` をそのまま持ち出せる
+  - 本番（oripa-market.com）の `.htaccess` 設定は [production-server-config.md](./production-server-config.md) を参照。
+    特にApplication Password認証に必須のAuthorizationヘッダー透過設定を忘れないこと。
 - 管理画面の一覧カラム／絞り込みの作り込み（現状は WP 既定 + `show_admin_column`）
 - 会員向け機能の実装（お気に入り、通知）
 - `card_box` の「親=カテゴリ」を term 二重管理している点は、将来 `card_category` との関連メタに寄せる余地あり

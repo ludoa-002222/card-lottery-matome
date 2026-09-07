@@ -113,6 +113,35 @@ add_action(
 						'return_format'  => 'Y-m-d H:i:s',
 						'instructions' => '空欄なら投稿の最終更新日時を使用します（カード上の「◯分前に確認」表示）。',
 					),
+					array(
+						'key'          => 'field_lottery_apply_url',
+						'label'        => '応募URL',
+						'name'         => 'apply_url',
+						'type'         => 'url',
+						'instructions' => '抽選応募フォーム・店舗公式ページ等、実際に応募できるページのURL。',
+					),
+					array(
+						'key'          => 'field_lottery_source_url',
+						'label'        => '情報源URL',
+						'name'         => 'source_url',
+						'type'         => 'url',
+						'instructions' => '情報を検知した元記事・投稿のURL（突合の証跡）。',
+					),
+					array(
+						'key'          => 'field_lottery_confidence_score',
+						'label'        => '確信度スコア',
+						'name'         => 'confidence_score',
+						'type'         => 'number',
+						'instructions' => 'Notion側STEP3の確信度スコア（0〜1）。',
+					),
+					array(
+						'key'          => 'field_lottery_notion_page_id',
+						'label'        => 'Notion Page ID',
+						'name'         => 'notion_page_id',
+						'type'         => 'text',
+						'instructions' => 'Notion連携の同期キー。手動で変更しないでください。',
+						'readonly'     => 1,
+					),
 				),
 				'location' => array(
 					array(
@@ -151,6 +180,20 @@ add_action(
 						'type'          => 'true_false',
 						'ui'            => 1,
 						'default_value' => 1,
+					),
+					array(
+						'key'          => 'field_shop_official_url',
+						'label'        => '公式サイトURL',
+						'name'         => 'official_url',
+						'type'         => 'url',
+					),
+					array(
+						'key'          => 'field_shop_notion_shop_key',
+						'label'        => '店舗名（同期用キー）',
+						'name'         => 'notion_shop_key',
+						'type'         => 'text',
+						'instructions' => 'Notion連携で店舗を同定するための正規化名。手動で変更しないでください。',
+						'readonly'     => 1,
 					),
 				),
 				'location' => array(
@@ -206,14 +249,19 @@ add_action(
 	'init',
 	function () {
 		$lottery_meta = array(
-			'method'          => 'string',
-			'deadline'        => 'string',
-			'member_required' => 'boolean',
-			'id_required'     => 'boolean',
-			'round_no'        => 'integer',
-			'round_total'     => 'integer',
-			'shop'            => 'integer',
-			'last_checked'    => 'string',
+			'method'           => 'string',
+			'deadline'         => 'string',
+			'member_required'  => 'boolean',
+			'id_required'      => 'boolean',
+			'round_no'         => 'integer',
+			'round_total'      => 'integer',
+			'shop'             => 'integer',
+			'last_checked'     => 'string',
+			// Notion連携（2026-09-06追加）。
+			'apply_url'        => 'string',
+			'source_url'       => 'string',
+			'confidence_score' => 'number',
+			'notion_page_id'   => 'string',
 		);
 		foreach ( $lottery_meta as $key => $type ) {
 			register_post_meta(
@@ -232,6 +280,17 @@ add_action(
 				$key,
 				array(
 					'type'         => 'boolean',
+					'single'       => true,
+					'show_in_rest' => true,
+				)
+			);
+		}
+		foreach ( array( 'official_url', 'notion_shop_key' ) as $key ) {
+			register_post_meta(
+				'shop',
+				$key,
+				array(
+					'type'         => 'string',
 					'single'       => true,
 					'show_in_rest' => true,
 				)

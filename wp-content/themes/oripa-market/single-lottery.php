@@ -24,6 +24,7 @@ while ( have_posts() ) :
 	$round_total = (int) ( get_post_meta( $post_id, 'round_total', true ) ?: 1 );
 	$member_req  = (bool) get_post_meta( $post_id, 'member_required', true );
 	$id_req      = (bool) get_post_meta( $post_id, 'id_required', true );
+	$apply_url   = get_post_meta( $post_id, 'apply_url', true );
 
 	$cat_terms = get_the_terms( $post_id, 'card_category' );
 	$box_terms = get_the_terms( $post_id, 'card_box' );
@@ -85,6 +86,10 @@ while ( have_posts() ) :
 						</tbody>
 					</table>
 				</div>
+
+				<?php if ( $apply_url ) : ?>
+				<a href="<?php echo esc_url( $apply_url ); ?>" class="btn primary" target="_blank" rel="noopener nofollow" style="margin-top:16px;display:inline-block;">応募はこちら（店舗公式ページへ）→</a>
+				<?php endif; ?>
 
 				<div class="article-body" style="margin-top:20px;">
 					<?php the_content(); ?>
