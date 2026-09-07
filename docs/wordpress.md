@@ -18,8 +18,37 @@ npm run wp:seed       # サンプルデータ投入（冪等。再実行で更�
 | `npm run wp:cli -- <args>` | 例: `npm run wp:cli -- post list --post_type=lottery` |
 | `npm run wp:stop` / `wp:destroy` | 停止 / 破棄 |
 | `npm run wp:logs` | PHP/Apache ログ |
+| `npm run wp:tunnel` | 公開URL（cloudflared quick tunnel）を発行 |
 
 管理画面: `http://localhost:8888/wp-admin/`（`admin` / `password`）
+
+## 開発環境URL（公開トンネル）
+
+```bash
+brew install cloudflared   # 初回のみ
+npm run wp:start
+npm run wp:tunnel          # https://<ランダム>.trycloudflare.com を発行（起動のたび変わる）
+```
+
+`wp-env/mu-plugins/00-dynamic-siteurl.php` が肝。wp-env は `wp-config.php` に
+`WP_HOME` / `WP_SITEURL` / `WP_CONTENT_URL` を **定数** で焼き込むため、`home_url()` などは
+DBオプションではなく定数を見る。この mu-plugin は次を行う:
+
+- `option_home` / `option_siteurl` フィルタ … canonical・リダイレクト・管理バー
+- `content_url` / `plugins_url` / `includes_url` / `theme_root_uri` / `*_directory_uri` /
+  `home_url` / `site_url` / `admin_url` / `rest_url` / `upload_dir` フィルタ …
+  `://localhost(:port)` を現在のリクエストの Host（`X-Forwarded-Host` 優先）へ置換
+- HTTPS 終端トンネルでは `$_SERVER['HTTPS']='on'` を補い `is_ssl()` を真に
+
+`.wp-env.json` の `mappings` で `wp-content/mu-plugins/` にマウントしている。
+**本番不可**（開発専用）。
+
+## ブランチ運用
+
+- `main` … 静的プロトタイプのみ
+- `wordpress-theme` … WordPress テーマ初版
+- `staging` … `wordpress-theme` から派生。wp-env + 公開トンネル + mu-plugin を含む
+  「Claude 上でローカル管理する用」の作業ブランチ。以後の変更はここに積む
 
 ## データモデル
 

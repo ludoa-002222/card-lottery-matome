@@ -6,6 +6,7 @@ const CFG = window.ORIPA || {};
 const REST_BASE = CFG.restBase || "/wp-json/oripa/v1/";
 const ASSETS = CFG.assetsBase || "/wp-content/themes/oripa-market/assets/img/";
 const CATEGORY_BASE = CFG.categoryBase || "/card-category/";
+const BOX_BASE = CFG.boxBase || "/card-box/";
 
 async function loadJSON(name) {
   const res = await fetch(REST_BASE + name, { headers: { "X-WP-Nonce": CFG.nonce || "" } });
@@ -48,6 +49,22 @@ function fmtUpdated(iso) {
 function latestUpdatedAt(items) {
   if (!items.length) return null;
   return items.reduce((a, b) => (new Date(a.updatedAt) > new Date(b.updatedAt) ? a : b)).updatedAt;
+}
+
+/**
+ * 締切が近い順に並べ替えた新しい配列を返す。
+ * すでに締め切られた（終了）ものは末尾へ回し、その中でも締切が早い順にする。
+ */
+function sortByDeadline(items) {
+  const now = Date.now();
+  return [...items].sort((a, b) => {
+    const ta = new Date(a.deadline).getTime();
+    const tb = new Date(b.deadline).getTime();
+    const aEnded = ta <= now;
+    const bEnded = tb <= now;
+    if (aEnded !== bEnded) return aEnded ? 1 : -1;
+    return ta - tb;
+  });
 }
 
 function countdownParts(iso) {
@@ -202,7 +219,11 @@ const DEFAULT_BOX_PHOTO = "30th-celebration.webp";
 
 function lotteryThumbHtml(l, box) {
   const photo = box && box.image ? box.image : `${ASSETS}${DEFAULT_BOX_PHOTO}`;
-  return `<img class="lottery-thumb" src="${photo}" alt="" loading="lazy">`;
+  const img = `<img class="lottery-thumb" src="${photo}" alt="" loading="lazy">`;
+  // サムネイル画像タップでボックス別の抽選情報ページへ
+  return l.box
+    ? `<a class="lottery-thumb-link" href="${BOX_BASE}${l.box}/" aria-label="このボックスの抽選一覧を見る">${img}</a>`
+    : img;
 }
 
 function lotteryCardHtml(l, ctx) {
@@ -211,10 +232,10 @@ function lotteryCardHtml(l, ctx) {
   const cd = countdownParts(l.deadline);
   const href = l.permalink || "#";
   return `
-  <div class="lottery-card ${cd.urgent ? "urgent-card" : ""}">
+  <div class="lottery-card ${cd.urgent && !cd.ended ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
     <div class="thumb-wrap">
       ${lotteryThumbHtml(l, box)}
-      <span class="ribbon ${cd.urgent ? "urgent" : ""}">${cd.ended ? "終了" : `残${cd.num}${cd.unit}`}</span>
+      <span class="ribbon ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
       <button class="save-btn" aria-label="保存する" type="button">♡</button>
       <span class="method-chip ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>
     </div>
