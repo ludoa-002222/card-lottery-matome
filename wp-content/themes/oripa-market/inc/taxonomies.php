@@ -155,3 +155,24 @@ foreach ( array( 'created_card_category', 'edited_card_category' ) as $hook ) {
 		}
 	);
 }
+
+/**
+ * card_box term に「代表画像URL（image_url）」を持たせるための term meta（2026-09-07追加）。
+ * Notion「パック種類マスタ」DBと同じパック名で対応し、商品ごとの画像を出し分けるために使う。
+ * 従来はフロントJS（common.js）内にBOX_PHOTOSというハードコードの対応表しかなく、
+ * ほぼ全パックが同じデフォルト画像になっていた問題への対応。
+ */
+add_action(
+	'init',
+	function () {
+		register_term_meta(
+			'card_box',
+			'image_url',
+			array(
+				'type'         => 'string',
+				'single'       => true,
+				'show_in_rest' => true,
+			)
+		);
+	}
+);

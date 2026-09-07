@@ -93,6 +93,7 @@ function oripa_rest_boxes() {
 			'slug'     => $t->slug,
 			'category' => $parent && ! is_wp_error( $parent ) ? $parent->slug : '',
 			'name'     => $t->name,
+			'image'    => get_term_meta( $t->term_id, 'image_url', true ) ?: '',
 		);
 	}
 	return $out;
