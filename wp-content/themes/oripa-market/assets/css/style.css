@@ -173,7 +173,9 @@ body.oripa-modal-open { overflow: hidden; }
 .box-hero-img { display: block; max-width: 320px; width: 100%; max-height: 220px; object-fit: contain; }
 
 /* 行レイアウト。カード（グリッド）と違い、1件を横長の行として縦に積む */
-.lottery-list--rows { display: flex; flex-direction: column; gap: 10px; }
+/* .lottery-list のグリッド指定（後方で定義）に負けないよう、クラス2つ分の詳細度にする。
+   単一クラス同士だと後に書かれた .lottery-list が勝ち、グリッドのままになる。 */
+.lottery-list.lottery-list--rows { display: flex; flex-direction: column; gap: 10px; }
 .lottery-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px 14px; }
 .lottery-row.is-ended { opacity: .62; }
 .lottery-row .row-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
