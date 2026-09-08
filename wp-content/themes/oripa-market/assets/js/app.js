@@ -145,6 +145,16 @@
     const badge = document.getElementById("updated-badge");
     if (badge) badge.textContent = fmtUpdated(latestUpdatedAt(catLotteries) || new Date().toISOString());
 
+    // ボックス別ページ: 商品画像はページ上部に1枚だけ出す（各行には画像を出さない）。
+    // 2026-09-09: ボックス別ページをギャラリーからリスト表示に変更したため追加。
+    const hero = document.getElementById("box-hero");
+    if (hero && boxSlugParam) {
+      const heroBox = boxes.find(b => b.slug === boxSlugParam);
+      const heroImg = heroBox && heroBox.image ? heroBox.image : `${ASSETS}${DEFAULT_BOX_PHOTO}`;
+      hero.innerHTML = `<img class="box-hero-img" src="${heroImg}" alt="${heroBox ? heroBox.name : ""}">`;
+      hero.hidden = false;
+    }
+
     const boxGrid = document.getElementById("box-grid");
     if (boxGrid) {
       boxGrid.innerHTML = catBoxes.map(b => {

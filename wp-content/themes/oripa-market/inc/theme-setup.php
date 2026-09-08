@@ -45,8 +45,6 @@ function oripa_required_pages() {
 		'company'  => '会社概要',
 		'terms'    => '利用規約',
 		'privacy'  => 'プライバシーポリシー',
-		'mypage'   => 'マイページ',
-		'register' => '無料会員登録',
 	);
 }
 

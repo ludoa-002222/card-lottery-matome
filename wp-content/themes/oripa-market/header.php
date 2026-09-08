@@ -31,10 +31,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php endforeach; ?>
 			<span class="live-pill"><span class="dot"></span>自動監視中</span>
 		</nav>
-		<?php if ( is_user_logged_in() ) : ?>
-			<a class="nav-cta" href="<?php echo esc_url( home_url( '/mypage/' ) ); ?>">マイページ</a>
-		<?php else : ?>
-			<a class="nav-cta" href="<?php echo esc_url( home_url( '/register/' ) ); ?>">無料会員登録</a>
-		<?php endif; ?>
 	</div>
 </header>

@@ -167,6 +167,28 @@ body.oripa-modal-open { overflow: hidden; }
 .text-link:hover { color: var(--accent-deep, var(--accent)); }
 .btn.is-disabled { background: var(--surface-2); color: var(--ink-soft); cursor: default; pointer-events: none; }
 
+/* ===== ボックス別ページ: 商品画像ヒーロー ＋ リスト（行）表示（2026-09-09追加） ===== */
+.box-hero { display: flex; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 18px; }
+.box-hero[hidden] { display: none; }
+.box-hero-img { display: block; max-width: 320px; width: 100%; max-height: 220px; object-fit: contain; }
+
+/* 行レイアウト。カード（グリッド）と違い、1件を横長の行として縦に積む */
+.lottery-list--rows { display: flex; flex-direction: column; gap: 10px; }
+.lottery-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px 14px; }
+.lottery-row.is-ended { opacity: .62; }
+.lottery-row .row-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.lottery-row .row-tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.lottery-row .row-countdown { flex-shrink: 0; font-size: .74rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+.lottery-row .row-countdown.urgent { color: var(--accent-deep, #d8402f); }
+.lottery-row .row-countdown.ended { color: var(--ink-soft); }
+.lottery-row .row-shop { font-weight: 700; font-size: 1rem; }
+.lottery-row .row-meta { font-size: .76rem; color: var(--ink-soft); margin-top: 2px; }
+.lottery-row .row-verified { display: flex; align-items: center; gap: 5px; font-size: .68rem; font-weight: 700; color: var(--verified); margin: 6px 0 10px; }
+.lottery-row .btn.primary { margin-top: 0; }
+
+/* 行の中では方式チップを絶対配置しない（カードのサムネ上に重ねる用の指定を打ち消す） */
+.method-chip.static { position: static; background: var(--surface-2); }
+
 /* ===== Promo cards ===== */
 .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .promo-grid-3 { grid-template-columns: repeat(3, 1fr); }
