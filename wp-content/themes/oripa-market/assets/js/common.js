@@ -337,11 +337,16 @@ function lotteryCardHtml(l, ctx) {
   const box = ctx.boxes.find(b => b.slug === l.box);
   const cd = countdownParts(l.deadline);
   const ctaUrl = lotteryCtaUrl(l, shop);
-  const ctaHtml = ctaUrl
-    ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
-    : `<span class="btn primary block is-disabled" aria-disabled="true">応募先未定</span>`;
+  // 締切を過ぎたものに「抽選に応募する！」を出すと、応募できないページへ誘導してしまうため出さない
+  // （2026-09-09修正。それまでは終了済みでも応募ボタンが出ていた）。
+  const ctaHtml = cd.ended
+    ? `<span class="btn primary block is-disabled" aria-disabled="true">受付終了</span>`
+    : ctaUrl
+      ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
+      : `<span class="btn primary block is-disabled" aria-disabled="true">応募先未定</span>`;
   // 「応募方法をみる」はテキストリンクとして、応募ボタンのすぐ下に小さく配置する（個別詳細ページは廃止）。
-  const methodLinkHtml = l.applyUrl
+  // 終了済みは応募できないので出さない。
+  const methodLinkHtml = l.applyUrl && !cd.ended
     ? `<button type="button" class="text-link oripa-method-open" data-lottery-id="${l.id}">応募方法をみる</button>`
     : "";
   return `
@@ -349,7 +354,6 @@ function lotteryCardHtml(l, ctx) {
     <div class="thumb-wrap">
       ${lotteryThumbHtml(l, box)}
       <span class="ribbon ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
-      <button class="save-btn" aria-label="保存する" type="button">♡</button>
       <span class="method-chip ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>
     </div>
     <div class="card-body">
@@ -459,10 +463,13 @@ function lotteryRowHtml(l, ctx) {
   const box = ctx.boxes.find(b => b.slug === l.box);
   const cd = countdownParts(l.deadline);
   const ctaUrl = lotteryCtaUrl(l, shop);
-  const ctaHtml = ctaUrl
-    ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
-    : `<span class="btn primary block is-disabled" aria-disabled="true">応募先未定</span>`;
-  const methodLinkHtml = l.applyUrl
+  // カード表示と同じ扱い: 終了済みには応募導線を出さない。
+  const ctaHtml = cd.ended
+    ? `<span class="btn primary block is-disabled" aria-disabled="true">受付終了</span>`
+    : ctaUrl
+      ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
+      : `<span class="btn primary block is-disabled" aria-disabled="true">応募先未定</span>`;
+  const methodLinkHtml = l.applyUrl && !cd.ended
     ? `<button type="button" class="text-link oripa-method-open" data-lottery-id="${l.id}">応募方法をみる</button>`
     : "";
   return `
