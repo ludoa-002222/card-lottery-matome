@@ -142,6 +142,20 @@ add_action(
 						'instructions' => 'Notion連携の同期キー。手動で変更しないでください。',
 						'readonly'     => 1,
 					),
+					array(
+						'key'          => 'field_lottery_purchase_link_url',
+						'label'        => '購入導線リンク（アフィリエイト）',
+						'name'         => 'purchase_link_url',
+						'type'         => 'url',
+						'instructions' => 'ジャンル別のアフィリエイトリンク（A8.net等）。応募URLとは別物で、上書きしない。',
+					),
+					array(
+						'key'          => 'field_lottery_purchase_link_service',
+						'label'        => '購入導線リンクのサービス名',
+						'name'         => 'purchase_link_service',
+						'type'         => 'text',
+						'readonly'     => 1,
+					),
 				),
 				'location' => array(
 					array(
@@ -186,6 +200,13 @@ add_action(
 						'label'        => '公式サイトURL',
 						'name'         => 'official_url',
 						'type'         => 'url',
+					),
+					array(
+						'key'          => 'field_shop_sns_url',
+						'label'        => 'X（旧Twitter）URL',
+						'name'         => 'sns_url',
+						'type'         => 'url',
+						'instructions' => '公式サイトが無い場合の応募導線フォールバックに使用。',
 					),
 					array(
 						'key'          => 'field_shop_notion_shop_key',
@@ -262,6 +283,9 @@ add_action(
 			'source_url'       => 'string',
 			'confidence_score' => 'number',
 			'notion_page_id'   => 'string',
+			// 購入導線リンク（2026-09-09追加）。
+			'purchase_link_url'     => 'string',
+			'purchase_link_service' => 'string',
 		);
 		foreach ( $lottery_meta as $key => $type ) {
 			register_post_meta(
@@ -285,7 +309,7 @@ add_action(
 				)
 			);
 		}
-		foreach ( array( 'official_url', 'notion_shop_key' ) as $key ) {
+		foreach ( array( 'official_url', 'sns_url', 'notion_shop_key' ) as $key ) {
 			register_post_meta(
 				'shop',
 				$key,

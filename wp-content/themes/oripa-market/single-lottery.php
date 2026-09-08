@@ -26,6 +26,14 @@ while ( have_posts() ) :
 	$id_req      = (bool) get_post_meta( $post_id, 'id_required', true );
 	$apply_url   = get_post_meta( $post_id, 'apply_url', true );
 
+	// 「抽選に応募する！」ボタンの遷移先の優先順位:
+	// ①購入導線リンク（アフィリエイト） → ②店舗のX（旧Twitter） → ③店舗の公式サイト。
+	// 応募URL自体（$apply_url）は上書きせず、常にポップアップ側で案内する。
+	$purchase_link_url = get_post_meta( $post_id, 'purchase_link_url', true );
+	$shop_sns_url      = $shop_id ? get_post_meta( $shop_id, 'sns_url', true ) : '';
+	$shop_official_url = $shop_id ? get_post_meta( $shop_id, 'official_url', true ) : '';
+	$cta_url            = $purchase_link_url ?: ( $shop_sns_url ?: $shop_official_url );
+
 	$cat_terms = get_the_terms( $post_id, 'card_category' );
 	$box_terms = get_the_terms( $post_id, 'card_box' );
 	$cat_term  = $cat_terms && ! is_wp_error( $cat_terms ) ? $cat_terms[0] : null;
@@ -87,8 +95,48 @@ while ( have_posts() ) :
 					</table>
 				</div>
 
-				<?php if ( $apply_url ) : ?>
-				<a href="<?php echo esc_url( $apply_url ); ?>" class="btn primary" target="_blank" rel="noopener nofollow" style="margin-top:16px;display:inline-block;">応募はこちら（店舗公式ページへ）→</a>
+				<div class="lottery-cta" style="margin-top:16px;">
+					<?php if ( $cta_url ) : ?>
+					<a href="<?php echo esc_url( $cta_url ); ?>" class="btn primary" target="_blank" rel="noopener nofollow" style="display:block;">抽選に応募する！</a>
+					<?php endif; ?>
+					<?php if ( $apply_url ) : ?>
+					<button type="button" class="btn ghost oripa-method-open" data-modal-target="#oripa-method-modal" style="display:block;margin-top:8px;width:100%;">応募方法をみる</button>
+					<?php endif; ?>
+				</div>
+
+				<?php if ( $apply_url ) :
+					$method_label = 'online' === $method ? 'オンライン' : '店頭';
+					$steps        = array();
+					if ( 'online' === $method ) {
+						$steps[] = '応募フォームを開く';
+						$steps[] = '必要事項を入力して送信する';
+						$steps[] = 'お店からの連絡（当選メールなど）を待つ';
+						$steps[] = '当選したら期限内にお店で購入する';
+					} else {
+						$steps[] = '店頭の抽選券・応募用紙を受け取る';
+						$steps[] = '必要事項を記入して応募箱へ入れる';
+						$steps[] = '抽選結果の発表を待つ（店頭掲示・呼出等）';
+						$steps[] = '当選したら期限内にお店で購入する';
+					}
+					?>
+					<div class="oripa-modal" id="oripa-method-modal" hidden>
+						<div class="oripa-modal-backdrop" data-modal-close></div>
+						<div class="oripa-modal-panel" role="dialog" aria-modal="true" aria-labelledby="oripa-method-modal-title">
+							<button type="button" class="oripa-modal-close" data-modal-close aria-label="閉じる">×</button>
+							<h2 id="oripa-method-modal-title" class="oripa-modal-title">抽選方法</h2>
+							<div class="oripa-modal-shop-row">
+								<span class="oripa-modal-shop-name"><?php echo esc_html( $shop_title ); ?></span>
+								<span class="method-chip <?php echo esc_attr( $method ); ?>"><?php echo esc_html( $method_label ); ?></span>
+							</div>
+							<ol class="oripa-modal-steps">
+								<?php foreach ( $steps as $step ) : ?>
+								<li><?php echo esc_html( $step ); ?></li>
+								<?php endforeach; ?>
+							</ol>
+							<p class="oripa-modal-note">※ 応募内容は送信後に修正できないことが多いです。会員登録は不要な場合がほとんどです。応募条件・締切は変更される場合があるため、応募前に必ず店舗の公式ページでご確認ください。</p>
+							<a href="<?php echo esc_url( $apply_url ); ?>" class="btn primary" target="_blank" rel="noopener nofollow" style="display:block;">抽選に応募する！</a>
+						</div>
+					</div>
 				<?php endif; ?>
 
 				<div class="article-body" style="margin-top:20px;">
