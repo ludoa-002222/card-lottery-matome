@@ -18,6 +18,9 @@ async function loadAllData() {
   const res = await fetch(REST_BASE + "bootstrap", { headers: { "X-WP-Nonce": CFG.nonce || "" } });
   if (!res.ok) throw new Error(`REST bootstrap ${res.status}`);
   const data = await res.json();
+  // 「応募方法をみる」ポップアップをカード側から開く際、クリック起点のイベント委任だけで
+  // 該当データを引けるよう、直近取得分をグローバルに保持しておく（ページごとに再取得済み）。
+  window.__oripaCtx = { lotteries: data.lotteries || [], shops: data.shops || [] };
   return {
     lotteries: data.lotteries || [],
     shops: data.shops || [],
@@ -226,11 +229,25 @@ function lotteryThumbHtml(l, box) {
     : img;
 }
 
+// カード上の「抽選に応募する！」の遷移先優先順位（single-lottery.phpと同じ考え方）:
+// ①購入導線リンク（アフィリエイト） → ②店舗のX（旧Twitter） → ③店舗の公式サイト。
+// どれも無ければ従来通り詳細ページへのリンクにフォールバックする。
+function lotteryCtaUrl(l, shop) {
+  return l.purchaseLinkUrl || (shop && (shop.snsUrl || shop.officialUrl)) || "";
+}
+
 function lotteryCardHtml(l, ctx) {
   const shop = ctx.shops.find(s => s.id === l.shopId);
   const box = ctx.boxes.find(b => b.slug === l.box);
   const cd = countdownParts(l.deadline);
   const href = l.permalink || "#";
+  const ctaUrl = lotteryCtaUrl(l, shop);
+  const ctaHtml = ctaUrl
+    ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
+    : `<a class="btn primary block" href="${href}">抽選の詳細を見る</a>`;
+  const methodBtnHtml = l.applyUrl
+    ? `<button type="button" class="btn ghost block oripa-method-open" data-lottery-id="${l.id}" style="margin-top:6px;">応募方法をみる</button>`
+    : "";
   return `
   <div class="lottery-card ${cd.urgent && !cd.ended ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
     <div class="thumb-wrap">
@@ -245,10 +262,97 @@ function lotteryCardHtml(l, ctx) {
       <div class="shop-name">${shop ? shop.name : "店舗名未定"}</div>
       <div class="meta">${box ? box.name : ""}</div>
       <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
-      <a class="btn primary block" href="${href}">抽選の詳細を見る</a>
+      ${ctaHtml}
+      ${methodBtnHtml}
+      <a class="btn ghost block" href="${href}" style="margin-top:6px;">抽選の詳細を見る</a>
     </div>
   </div>`;
 }
+
+/**
+ * 一覧カードの「応募方法をみる」用ポップアップ（動的生成・全カード共通で1個だけ使い回す）。
+ * single-lottery.php側のモーダルとはDOMが別だが、見た目のCSSクラスは共通化している。
+ */
+let oripaDynamicMethodModal = null;
+function ensureDynamicMethodModal() {
+  if (oripaDynamicMethodModal) return oripaDynamicMethodModal;
+  const el = document.createElement("div");
+  el.className = "oripa-modal";
+  el.id = "oripa-dynamic-method-modal";
+  el.hidden = true;
+  el.innerHTML = `
+    <div class="oripa-modal-backdrop" data-modal-close></div>
+    <div class="oripa-modal-panel" role="dialog" aria-modal="true">
+      <button type="button" class="oripa-modal-close" data-modal-close aria-label="閉じる">×</button>
+      <h2 class="oripa-modal-title">抽選方法</h2>
+      <div class="oripa-modal-shop-row">
+        <span class="oripa-modal-shop-name" data-slot="shop"></span>
+        <span class="method-chip" data-slot="method-chip"></span>
+      </div>
+      <ol class="oripa-modal-steps" data-slot="steps"></ol>
+      <p class="oripa-modal-note">※ 応募内容は送信後に修正できないことが多いです。会員登録は不要な場合がほとんどです。応募条件・締切は変更される場合があるため、応募前に必ず店舗の公式ページでご確認ください。</p>
+      <a class="btn primary" data-slot="apply-link" target="_blank" rel="noopener nofollow" style="display:block;">抽選に応募する！</a>
+    </div>`;
+  document.body.appendChild(el);
+  oripaDynamicMethodModal = el;
+  return el;
+}
+
+const ORIPA_METHOD_STEPS = {
+  online: ["応募フォームを開く", "必要事項を入力して送信する", "お店からの連絡（当選メールなど）を待つ", "当選したら期限内にお店で購入する"],
+  store: ["店頭の抽選券・応募用紙を受け取る", "必要事項を記入して応募箱へ入れる", "抽選結果の発表を待つ（店頭掲示・呼出等）", "当選したら期限内にお店で購入する"],
+};
+
+function openDynamicMethodModal(l, shop) {
+  if (!l.applyUrl) return;
+  const modal = ensureDynamicMethodModal();
+  modal.querySelector('[data-slot="shop"]').textContent = shop ? shop.name : "店舗名未定";
+  const chip = modal.querySelector('[data-slot="method-chip"]');
+  chip.textContent = l.method === "online" ? "オンライン" : "店頭";
+  chip.className = `method-chip ${l.method}`;
+  const steps = ORIPA_METHOD_STEPS[l.method] || ORIPA_METHOD_STEPS.online;
+  modal.querySelector('[data-slot="steps"]').innerHTML = steps.map(s => `<li>${s}</li>`).join("");
+  modal.querySelector('[data-slot="apply-link"]').href = l.applyUrl;
+  openModal(modal);
+}
+
+function openModal(modal) {
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.classList.add("oripa-modal-open");
+}
+function closeModal(modal) {
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove("oripa-modal-open");
+}
+
+// モーダルの開閉はイベント委任で一括処理（PHP側の静的モーダル／JS側の動的モーダル両対応）。
+document.addEventListener("click", (e) => {
+  const openBtn = e.target.closest(".oripa-method-open");
+  if (openBtn) {
+    const targetSel = openBtn.getAttribute("data-modal-target");
+    if (targetSel) {
+      openModal(document.querySelector(targetSel));
+      return;
+    }
+    const lotteryId = openBtn.getAttribute("data-lottery-id");
+    if (lotteryId && window.__oripaCtx) {
+      const l = window.__oripaCtx.lotteries.find(x => x.id === lotteryId);
+      const shop = l && window.__oripaCtx.shops.find(s => s.id === l.shopId);
+      if (l) openDynamicMethodModal(l, shop);
+    }
+    return;
+  }
+  if (e.target.closest("[data-modal-close]")) {
+    closeModal(e.target.closest(".oripa-modal"));
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".oripa-modal:not([hidden])").forEach(closeModal);
+  }
+});
 
 /**
  * 一覧＋絞り込み＋もっと見る のセット描画

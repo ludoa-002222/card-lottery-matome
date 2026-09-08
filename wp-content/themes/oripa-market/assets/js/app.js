@@ -108,8 +108,12 @@
         return true;
       });
 
-      // 受付中 = 締切が近い順、終了済 = 直近に終わった順
-      const active = sortByDeadline(filtered.filter(l => !isEnded(l)));
+      // 受付中 = 購入導線リンク（アフィリエイト）を持つ抽選を先頭に、その中では締切が近い順。
+      // 終了済 = 直近に終わった順。
+      const activeAll = sortByDeadline(filtered.filter(l => !isEnded(l)));
+      const withLink = activeAll.filter(l => l.purchaseLinkUrl);
+      const withoutLink = activeAll.filter(l => !l.purchaseLinkUrl);
+      const active = [...withLink, ...withoutLink];
       const ended = filtered.filter(isEnded).sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
 
       const cnt = document.getElementById("result-count");
