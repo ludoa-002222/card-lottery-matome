@@ -186,7 +186,9 @@ body.oripa-modal-open { overflow: hidden; }
 .lottery-row .row-shop { font-weight: 700; font-size: 1rem; }
 .lottery-row .row-meta { font-size: .76rem; color: var(--ink-soft); margin-top: 2px; }
 .lottery-row .row-verified { display: flex; align-items: center; gap: 5px; font-size: .68rem; font-weight: 700; color: var(--verified); margin: 6px 0 10px; }
-.lottery-row .btn.primary { margin-top: 0; }
+/* 応募ボタンは行の横幅いっぱいに（.btn.block の width:100% は .card-body 配下限定の指定で、
+   行レイアウトでは効かず横幅が中途半端になっていた）。 */
+.lottery-row .btn.block { display: block; width: 100%; margin-top: 2px; }
 
 /* 行の中では方式チップを絶対配置しない（カードのサムネ上に重ねる用の指定を打ち消す） */
 .method-chip.static { position: static; background: var(--surface-2); }
