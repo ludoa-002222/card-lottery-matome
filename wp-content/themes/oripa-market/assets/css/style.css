@@ -146,11 +146,12 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .category-card .cat-name { font-weight: 700; font-size: 1.02rem; }
 .category-card .cat-count { font-size: .72rem; color: var(--ink-soft); margin-top: 4px; }
 
-.lottery-thumb { display: block; width: 100%; aspect-ratio: 16/10; border-radius: var(--radius-sm); object-fit: cover; object-position: center top; background: var(--surface-2); }
+.lottery-thumb { display: block; width: 100%; aspect-ratio: 16/10; border-radius: var(--radius-sm); object-fit: contain; background: var(--surface-2); }
 
 /* ===== 応募方法ポップアップ（single-lottery.php の静的モーダル / common.js の動的モーダル共通） ===== */
 body.oripa-modal-open { overflow: hidden; }
 .oripa-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; }
+.oripa-modal[hidden] { display: none; }
 .oripa-modal-backdrop { position: absolute; inset: 0; background: rgba(20, 20, 20, .55); }
 .oripa-modal-panel { position: relative; background: #fff; border-radius: var(--radius, 12px); padding: 24px; width: min(420px, 92vw); max-height: 86vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
 .oripa-modal-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--surface-2); font-size: 1.1rem; line-height: 1; cursor: pointer; }
@@ -160,6 +161,11 @@ body.oripa-modal-open { overflow: hidden; }
 .oripa-modal-shop-name { font-weight: 700; }
 .oripa-modal-steps { margin: 0 0 14px; padding-left: 1.4em; display: flex; flex-direction: column; gap: 6px; }
 .oripa-modal-note { font-size: .74rem; color: var(--ink-soft); margin: 0 0 16px; line-height: 1.5; }
+
+/* カード上の「応募方法をみる」テキストリンク（ボタンではなく控えめに）。 */
+.text-link { display: block; margin: 4px auto 0; background: none; border: none; padding: 2px 4px; font-size: .74rem; color: var(--ink-soft); text-decoration: underline; cursor: pointer; text-align: center; }
+.text-link:hover { color: var(--accent-deep, var(--accent)); }
+.btn.is-disabled { background: var(--surface-2); color: var(--ink-soft); cursor: default; pointer-events: none; }
 
 /* ===== Promo cards ===== */
 .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
