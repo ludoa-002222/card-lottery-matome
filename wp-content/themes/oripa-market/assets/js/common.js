@@ -229,24 +229,24 @@ function lotteryThumbHtml(l, box) {
     : img;
 }
 
-// カード上の「抽選に応募する！」の遷移先優先順位（single-lottery.phpと同じ考え方）:
-// ①購入導線リンク（アフィリエイト） → ②店舗のX（旧Twitter） → ③店舗の公式サイト。
-// どれも無ければ従来通り詳細ページへのリンクにフォールバックする。
+// 「抽選に応募する！」の遷移先優先順位:
+// ①購入導線リンク（アフィリエイト） → ②店舗のX（旧Twitter） → ③店舗の公式サイト → ④応募URL（実際の応募フォーム）。
+// 個別詳細ページを廃止したため、最終手段として必ず応募URLへフォールバックする（2026-09-09）。
 function lotteryCtaUrl(l, shop) {
-  return l.purchaseLinkUrl || (shop && (shop.snsUrl || shop.officialUrl)) || "";
+  return l.purchaseLinkUrl || (shop && (shop.snsUrl || shop.officialUrl)) || l.applyUrl || "";
 }
 
 function lotteryCardHtml(l, ctx) {
   const shop = ctx.shops.find(s => s.id === l.shopId);
   const box = ctx.boxes.find(b => b.slug === l.box);
   const cd = countdownParts(l.deadline);
-  const href = l.permalink || "#";
   const ctaUrl = lotteryCtaUrl(l, shop);
   const ctaHtml = ctaUrl
     ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
-    : `<a class="btn primary block" href="${href}">抽選の詳細を見る</a>`;
-  const methodBtnHtml = l.applyUrl
-    ? `<button type="button" class="btn ghost block oripa-method-open" data-lottery-id="${l.id}" style="margin-top:6px;">応募方法をみる</button>`
+    : `<span class="btn primary block is-disabled" aria-disabled="true">応募先未定</span>`;
+  // 「応募方法をみる」はテキストリンクとして、応募ボタンのすぐ下に小さく配置する（個別詳細ページは廃止）。
+  const methodLinkHtml = l.applyUrl
+    ? `<button type="button" class="text-link oripa-method-open" data-lottery-id="${l.id}">応募方法をみる</button>`
     : "";
   return `
   <div class="lottery-card ${cd.urgent && !cd.ended ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
@@ -263,8 +263,7 @@ function lotteryCardHtml(l, ctx) {
       <div class="meta">${box ? box.name : ""}</div>
       <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
       ${ctaHtml}
-      ${methodBtnHtml}
-      <a class="btn ghost block" href="${href}" style="margin-top:6px;">抽選の詳細を見る</a>
+      ${methodLinkHtml}
     </div>
   </div>`;
 }
