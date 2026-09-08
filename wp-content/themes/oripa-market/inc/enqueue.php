@@ -51,7 +51,6 @@ add_action(
 				'boxBase'     => home_url( '/card-box/' ),
 				'isLoggedIn'  => is_user_logged_in(),
 				'displayName' => is_user_logged_in() ? $current_user->display_name : '',
-				'loginUrl'    => wp_login_url( home_url( '/' ) ),
 				'logoutUrl'   => wp_logout_url( home_url( '/' ) ),
 				'registerUrl' => home_url( '/register/' ),
 				'myPageUrl'   => home_url( '/mypage/' ),
