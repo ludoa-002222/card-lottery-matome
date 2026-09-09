@@ -60,16 +60,25 @@
 
     const grid = document.getElementById("category-grid");
     if (grid) {
-      grid.innerHTML = categories.map(c => {
-        const count = lotteries.filter(l => l.category === c.slug).length;
-        return `<a class="category-card" href="${CAT_BASE}${c.slug}/">
-          ${categoryThumbHtml(c.slug, "cat-thumb")}
+      // 【受付中があるジャンルだけ出す・2026-09-10】
+      // 全ジャンルを常に並べると「0件」のタイルが並び、探しに来た人が空振りする。
+      // 件数も掲載総数ではなく受付中の数を出す（押した先で応募できる数と一致させる）。
+      const withActive = categories
+        .map(c => ({ cat: c, count: lotteries.filter(l => l.category === c.slug && !isEnded(l)).length }))
+        .filter(x => x.count > 0)
+        .sort((a, b) => b.count - a.count);
+
+      grid.innerHTML = withActive.map(({ cat, count }) => `<a class="category-card" href="${CAT_BASE}${cat.slug}/">
+          ${categoryThumbHtml(cat.slug, "cat-thumb")}
           <div class="cat-body">
-            <div class="cat-name">${c.name}</div>
-            <div class="cat-count">${count}件</div>
+            <div class="cat-name">${cat.name}</div>
+            <div class="cat-count">受付中 ${count}件</div>
           </div>
-        </a>`;
-      }).join("");
+        </a>`).join("");
+
+      // 受付中が1件も無いときだけ、セクションごと隠す（見出しだけ残ると壊れて見える）
+      const section = document.getElementById("category-section");
+      if (section) section.hidden = withActive.length === 0;
     }
 
     const stats = document.getElementById("trust-stats");
@@ -93,9 +102,21 @@
     const areaSel = document.getElementById("f-area");
     if (!boxSel || !document.getElementById("all-list")) return;
 
-    boxes.forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}">${b.name}</option>`));
-    shops.forEach(s => shopSel.insertAdjacentHTML("beforeend", `<option value="${s.id}">${s.name}</option>`));
-    [...new Set(shops.map(s => s.area))].filter(Boolean).forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
+    // 【受付中があるものだけを選択肢に出す・2026-09-10】
+    // 全件を並べると、選んでも0件になる選択肢がほとんどになる。
+    // 「選べる＝結果がある」状態にしておく。
+    const active = lotteries.filter(l => !isEnded(l));
+    const activeBoxes = new Set(active.map(l => l.box));
+    const activeShops = new Set(active.map(l => String(l.shopId)));
+    const activeAreas = new Set(
+      active.map(l => (shops.find(s => s.id === l.shopId) || {}).area).filter(Boolean)
+    );
+
+    boxes.filter(b => activeBoxes.has(b.slug))
+      .forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}">${b.name}</option>`));
+    shops.filter(s => activeShops.has(String(s.id)))
+      .forEach(s => shopSel.insertAdjacentHTML("beforeend", `<option value="${s.id}">${s.name}</option>`));
+    [...activeAreas].forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
 
     function applyFilter() {
       const box = boxSel.value, method = methodSel.value, shop = shopSel.value, area = areaSel.value;
@@ -162,8 +183,10 @@
 
     const boxGrid = document.getElementById("box-grid");
     if (boxGrid) {
-      boxGrid.innerHTML = catBoxes.map(b => {
-        const count = catLotteries.filter(l => l.box === b.slug).length;
+      // 受付中があるボックスだけを出す（0件のタイルを並べない）
+      const shownBoxes = catBoxes.filter(b => catLotteries.some(l => l.box === b.slug && !isEnded(l)));
+      boxGrid.innerHTML = shownBoxes.map(b => {
+        const count = catLotteries.filter(l => l.box === b.slug && !isEnded(l)).length;
         // ボックスごとの商品画像を出す（抽選カードのサムネイルと同じ画像）。
         // 2026-09-09修正: ここはジャンルのアイコンを出していたため、
         // 同じカテゴリのボックスが全部同じ絵になり、どのパックか見分けがつかなかった。
@@ -176,16 +199,21 @@
           ${thumb}
           <div class="cat-body">
             <div class="cat-name" style="font-size:.92rem;">${b.name}</div>
-            <div class="cat-count">${count}件</div>
+            <div class="cat-count">受付中 ${count}件</div>
           </div>
         </a>`;
-      }).join("") || `<p class="footer-note">現在このカテゴリのボックス情報はありません。</p>`;
+      }).join("") || `<p class="footer-note">現在このカテゴリで受付中の抽選はありません。</p>`;
     }
 
+    // 選択肢は受付中があるものだけ（0件になる選択肢を並べない）
+    const activeCatLotteries = catLotteries.filter(l => !isEnded(l));
+    const activeBoxSlugs = new Set(activeCatLotteries.map(l => l.box));
+
     const boxSel = document.getElementById("f-box");
-    catBoxes.forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}" ${b.slug === boxSlugParam ? "selected" : ""}>${b.name}</option>`));
+    catBoxes.filter(b => activeBoxSlugs.has(b.slug))
+      .forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}" ${b.slug === boxSlugParam ? "selected" : ""}>${b.name}</option>`));
     const shopSel = document.getElementById("f-shop");
-    const shopIds = new Set(catLotteries.map(l => l.shopId));
+    const shopIds = new Set(activeCatLotteries.map(l => l.shopId));
     shops.filter(s => shopIds.has(s.id)).forEach(s => shopSel.insertAdjacentHTML("beforeend", `<option value="${s.id}">${s.name}</option>`));
     const areaSel = document.getElementById("f-area");
     [...new Set(shops.filter(s => shopIds.has(s.id)).map(s => s.area))].filter(Boolean)
@@ -278,12 +306,22 @@
     const badge = document.getElementById("updated-badge");
     if (badge) badge.textContent = fmtUpdated(latestUpdatedAt(base) || new Date().toISOString());
 
+    // 選択肢は受付中があるものだけ（選んでも0件になる選択肢を並べない）
+    const activeBase = base.filter(l => !isEnded(l));
+    const hasCat = new Set(activeBase.map(l => l.category));
+    const hasBox = new Set(activeBase.map(l => l.box));
+    const hasArea = new Set(
+      activeBase.map(l => (shops.find(s => s.id === l.shopId) || {}).area).filter(Boolean)
+    );
+
     const catSel = document.getElementById("f-cat");
-    categories.forEach(c => catSel.insertAdjacentHTML("beforeend", `<option value="${c.slug}">${c.name}</option>`));
+    categories.filter(c => hasCat.has(c.slug))
+      .forEach(c => catSel.insertAdjacentHTML("beforeend", `<option value="${c.slug}">${c.name}</option>`));
     const boxSel = document.getElementById("f-box");
-    boxes.forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}">${b.name}</option>`));
+    boxes.filter(b => hasBox.has(b.slug))
+      .forEach(b => boxSel.insertAdjacentHTML("beforeend", `<option value="${b.slug}">${b.name}</option>`));
     const areaSel = document.getElementById("f-area");
-    [...new Set(shops.map(s => s.area))].filter(Boolean).forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
+    [...hasArea].forEach(a => areaSel.insertAdjacentHTML("beforeend", `<option value="${a}">${a}</option>`));
 
     function draw() {
       const c = catSel.value, box = boxSel.value, area = areaSel.value;
