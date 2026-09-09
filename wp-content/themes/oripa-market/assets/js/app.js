@@ -159,8 +159,16 @@
     if (boxGrid) {
       boxGrid.innerHTML = catBoxes.map(b => {
         const count = catLotteries.filter(l => l.box === b.slug).length;
+        // ボックスごとの商品画像を出す（抽選カードのサムネイルと同じ画像）。
+        // 2026-09-09修正: ここはジャンルのアイコンを出していたため、
+        // 同じカテゴリのボックスが全部同じ絵になり、どのパックか見分けがつかなかった。
+        // 商品画像が未登録のボックスだけ、従来どおりジャンルのアイコンにフォールバックする
+        // （別商品の写真を出すと、どのパックの抽選か誤認させてしまうため）。
+        const thumb = b.image
+          ? `<img class="cat-thumb box-thumb" src="${b.image}" alt="" loading="lazy" decoding="async">`
+          : categoryThumbHtml(cat.slug, "cat-thumb");
         return `<a class="category-card" href="${BOX_BASE}${b.slug}/">
-          ${categoryThumbHtml(cat.slug, "cat-thumb")}
+          ${thumb}
           <div class="cat-body">
             <div class="cat-name" style="font-size:.92rem;">${b.name}</div>
             <div class="cat-count">${count}件</div>
