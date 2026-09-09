@@ -165,6 +165,14 @@ body.oripa-modal-open { overflow: hidden; }
 .oripa-modal-shop-name { font-weight: 700; }
 .oripa-modal-steps { margin: 0 0 14px; padding-left: 1.4em; display: flex; flex-direction: column; gap: 6px; }
 .oripa-modal-note { font-size: .74rem; color: var(--ink-soft); margin: 0 0 16px; line-height: 1.5; }
+/* 応募方法ポップアップの詳細セクション（手順・条件・当選確認・持ち物・注意点）。 */
+.oripa-modal-platform { font-size: .82rem; font-weight: 600; margin: 0 0 12px; color: var(--ink); }
+.oripa-modal-heading { font-size: .78rem; font-weight: 700; margin: 0 0 6px; color: var(--ink-soft); letter-spacing: .02em; }
+.oripa-modal-section { margin-bottom: 14px; }
+.oripa-modal-list { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 5px; font-size: .8rem; line-height: 1.55; }
+.oripa-modal-list.caution { color: #b42318; }
+.oripa-modal-text { margin: 0; font-size: .8rem; line-height: 1.55; }
+.oripa-modal-steps { font-size: .82rem; line-height: 1.55; }
 
 /* カード上の「応募方法をみる」テキストリンク（ボタンではなく控えめに）。 */
 .text-link { display: block; margin: 4px auto 0; background: none; border: none; padding: 2px 4px; font-size: .74rem; color: var(--ink-soft); text-decoration: underline; cursor: pointer; text-align: center; }
