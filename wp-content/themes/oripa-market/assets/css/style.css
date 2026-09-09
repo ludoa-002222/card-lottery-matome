@@ -111,9 +111,10 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .trust-stats-wrap .point-mascot {
   position: absolute;
   right: 40px;
-  /* 下端は平らに切れているので、その切り口がボックスに隠れるまで食い込ませる。
-     2pxだと縁に引っかかって見えた。 */
-  bottom: calc(100% - 14px);
+  /* 下端は平らに切れている。ボックスの手前に重ねると切り口の線がイラストを横切って見えるため、
+     z-index を下げてボックスの「後ろ」へ回し、フッターと同じ“顔を出している”見え方にする。 */
+  bottom: calc(100% - 12px);
+  z-index: -1;
   width: 84px;
   height: auto;
   pointer-events: none;
