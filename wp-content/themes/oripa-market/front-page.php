@@ -19,6 +19,7 @@ get_header();
 			<h1>公式情報のみを検証して届ける、トレカ抽選の信頼できる情報基盤</h1>
 			<p>AIによる一次収集と人による二重確認を経た抽選・予約情報だけを掲載。掲載後も定期的に再確認し、鮮度と正確性を保っています。</p>
 		</div>
+		<img class="hero-mascot" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/mascot-hero.webp?ver=' . ORIPA_THEME_VERSION ); ?>" alt="" loading="eager" decoding="async">
 		<div class="trust-stats" id="trust-stats"></div>
 	</section>
 
@@ -28,7 +29,9 @@ get_header();
 	</section>
 
 	<section class="section" style="padding-top:0;">
-		<div class="section-heading"><span class="bar"></span><h2>データの信頼性について</h2></div>
+		<div class="section-heading"><span class="bar"></span><h2>データの信頼性について</h2>
+			<img class="point-mascot" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/mascot-point.webp?ver=' . ORIPA_THEME_VERSION ); ?>" alt="" loading="lazy" decoding="async">
+		</div>
 		<div class="trust-badges">
 			<div class="trust-badge"><span class="ico">🛡️</span><div><h3>二重チェック体制</h3><p>AIが一次収集した情報を、人が公式ページと突合して確認してから掲載します。</p></div></div>
 			<div class="trust-badge"><span class="ico">🕒</span><div><h3>継続的な鮮度管理</h3><p>掲載後も定期的に再確認し、締切変更や終了を検知次第すぐに反映します。</p></div></div>

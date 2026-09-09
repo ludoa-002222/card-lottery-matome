@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <footer id="site-footer" class="site-footer">
+	<img class="footer-mascot" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/mascot-footer.webp?ver=' . ORIPA_THEME_VERSION ); ?>" alt="" loading="lazy" decoding="async">
 	<div class="wrap">
 		<div class="footer-trust-row">
 			<span>🛡️ AI一次チェック＋人による二重確認</span>
