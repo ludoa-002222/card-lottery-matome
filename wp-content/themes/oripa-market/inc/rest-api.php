@@ -276,6 +276,7 @@ function oripa_rest_releases() {
 			'releaseDate' => $date,
 			'genre'       => get_post_meta( $p->ID, 'genre', true ) ?: '',
 			'productType' => get_post_meta( $p->ID, 'product_type', true ) ?: '',
+			'image'       => get_post_meta( $p->ID, 'image_url', true ) ?: '',
 			'officialUrl' => get_post_meta( $p->ID, 'official_url', true ) ?: '',
 			'sourceSite'  => get_post_meta( $p->ID, 'source_site', true ) ?: '',
 		);
