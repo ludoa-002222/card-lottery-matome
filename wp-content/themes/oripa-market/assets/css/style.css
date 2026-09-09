@@ -57,6 +57,8 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .site-header .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
 .logo { font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
 .logo img.mark { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--cyan)); padding: 6px; }
+/* マスコットはキャラクターの輪郭をそのまま見せるので、背景・角丸・余白は付けない。 */
+.logo img.mascot-mark { width: 44px; height: auto; border-radius: 0; background: none; padding: 0; }
 .logo .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .logo .logo-text small { font-size: .6rem; font-weight: 500; opacity: .6; letter-spacing: .06em; color: #9fb0d0; }
 .nav-links { display: flex; align-items: center; gap: 22px; font-size: .84rem; }
@@ -95,6 +97,8 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .section { padding: 32px 0; }
 .section-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .section-heading h2 { font-size: 1.15rem; margin: 0; }
+/* 見出し脇のワンポイント（虫眼鏡＝検証しているイメージ）。 */
+.section-heading .point-mascot { width: 46px; height: auto; margin-left: auto; }
 .section-heading .bar { width: 6px; height: 20px; background: linear-gradient(180deg, var(--accent), var(--cyan)); border-radius: 4px; display: inline-block; }
 
 /* ===== Hero (trust dashboard style) ===== */
@@ -108,6 +112,17 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
   overflow: hidden;
   box-shadow: var(--shadow-dark);
 }
+/* ヒーローのメインビジュアル。文章と重ならないよう右端に置き、狭い画面では隠す。 */
+.hero-mascot {
+  position: absolute;
+  right: 8px;
+  bottom: -6px;
+  width: min(280px, 30%);
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));
+}
+.hero-copy { position: relative; z-index: 1; }
 .hero-copy .kicker { font-size: .74rem; letter-spacing: .18em; color: var(--cyan); font-weight: 700; }
 .hero-copy h1 { font-size: 1.65rem; margin: 8px 0 10px; max-width: 22ch; }
 .hero-copy p { margin: 0 0 18px; font-size: .88rem; color: #b8c3dc; max-width: 42em; }
@@ -119,6 +134,8 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 @media (max-width: 720px) {
   .hero { padding: 26px 20px; }
   .trust-stats { grid-template-columns: repeat(2, 1fr); }
+  /* 狭い画面では文章に重なるため隠す。 */
+  .hero-mascot { display: none; }
 }
 
 /* Trust badges row */
@@ -303,7 +320,19 @@ body.oripa-modal-open { overflow: hidden; }
 .oauth-row .btn { flex: 1; background: none; color: var(--ink); border: 1px solid var(--border); }
 
 /* ===== Footer ===== */
-.site-footer { background: var(--header); color: #97a4c2; margin-top: 56px; padding: 34px 0 22px; font-size: .82rem; }
+.site-footer { background: var(--header); color: #97a4c2; margin-top: 56px; padding: 34px 0 22px; font-size: .82rem; position: relative; }
+/* フッターの覗き込みポーズ。フッター上辺から顔を出す形にするので、上方向へずらす。 */
+.footer-mascot {
+  position: absolute;
+  right: 24px;
+  bottom: 100%;
+  width: 108px;
+  height: auto;
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  .footer-mascot { width: 76px; right: 12px; }
+}
 .footer-trust-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
 .footer-trust-row span { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 999px; padding: 6px 13px; font-size: .72rem; color: #cfe0ff; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 18px; }

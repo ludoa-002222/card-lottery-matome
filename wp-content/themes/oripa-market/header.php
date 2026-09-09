@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <header id="site-header" class="site-header">
 	<div class="wrap">
 		<a class="logo" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-			<img class="mark" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/logo-mark.svg' ); ?>" alt="<?php bloginfo( 'name' ); ?>">
+			<img class="mark mascot-mark" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/mascot-guide.webp?ver=' . ORIPA_THEME_VERSION ); ?>" alt="<?php bloginfo( 'name' ); ?>" width="44" height="36" decoding="async">
 			<span class="logo-text"><?php bloginfo( 'name' ); ?><small>トレカ抽選・予約情報まとめ</small></span>
 		</a>
 		<nav class="nav-links">
