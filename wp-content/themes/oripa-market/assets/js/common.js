@@ -7,6 +7,17 @@ const REST_BASE = CFG.restBase || "/wp-json/oripa/v1/";
 const ASSETS = CFG.assetsBase || "/wp-content/themes/oripa-market/assets/img/";
 const CATEGORY_BASE = CFG.categoryBase || "/card-category/";
 const BOX_BASE = CFG.boxBase || "/card-box/";
+const THEME_VERSION = CFG.version || "0";
+
+/**
+ * テーマ内の画像URLを作る。
+ * 本番は静的ファイルに1年キャッシュ（max-age=31536000）がかかっており、
+ * 同名で画像を差し替えても古いものが返り続ける。CSS/JSはWordPressが付ける ?ver= で
+ * 回避できているが、JSから直接組み立てる画像URLには付かないため、ここで同じ値を付ける。
+ */
+function assetUrl(file) {
+  return `${ASSETS}${file}?v=${THEME_VERSION}`;
+}
 
 async function loadJSON(name) {
   const res = await fetch(REST_BASE + name, { headers: { "X-WP-Nonce": CFG.nonce || "" } });
@@ -113,7 +124,7 @@ const CATEGORY_PHOTOS = {
 function categoryThumbHtml(slug, cls) {
   const file = CATEGORY_PHOTOS[slug];
   // 未対応のジャンルが増えた場合に画像リンク切れにならないよう、既定画像へ退避する。
-  const src = `${ASSETS}${file || "icon-cards.svg"}`;
+  const src = assetUrl(file || "icon-cards.svg");
   // 呼び出し側が "cat-thumb" を渡してくる箇所があるため、クラスの重複を避ける。
   const extra = cls && cls !== "cat-thumb" ? ` ${cls}` : "";
   return `<img class="cat-thumb${extra}" src="${src}" alt="" loading="lazy" decoding="async">`;
@@ -230,7 +241,7 @@ function categoryRailHtml(categories, lotteries, activeSlug) {
 const DEFAULT_BOX_PHOTO = "30th-celebration.webp";
 
 function lotteryThumbHtml(l, box) {
-  const photo = box && box.image ? box.image : `${ASSETS}${DEFAULT_BOX_PHOTO}`;
+  const photo = box && box.image ? box.image : assetUrl(DEFAULT_BOX_PHOTO);
   const img = `<img class="lottery-thumb" src="${photo}" alt="" loading="lazy">`;
   // サムネイル画像タップでボックス別の抽選情報ページへ
   return l.box
@@ -413,7 +424,7 @@ function renderLotteryList(listElId, items, ctx, pageSize = 8) {
 
   function draw() {
     if (!items.length) {
-      listEl.innerHTML = `<div class="empty-state"><img src="${ASSETS}logo-mark.svg" alt=""><br>条件に合う抽選情報が見つかりませんでした。</div>`;
+      listEl.innerHTML = `<div class="empty-state"><img src="${assetUrl("logo-mark.svg")}" alt=""><br>条件に合う抽選情報が見つかりませんでした。</div>`;
       const w = document.getElementById(moreWrapId);
       if (w) w.innerHTML = "";
       return;
