@@ -19,11 +19,14 @@ $stats = oripa_trust_stats();
 	<h1>情報の正確性について</h1>
 	<p>オリパマーケットは「速報性」より「正確性」を優先します。掲載する抽選・予約情報は、以下のプロセスを経てから公開しています。</p>
 
-	<div class="trust-stats" style="margin:20px 0;background:var(--header);border-radius:var(--radius-lg);padding:6px;">
+	<div class="trust-stats-wrap">
+	<img class="point-mascot" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/mascot-point.webp?ver=' . ORIPA_THEME_VERSION ); ?>" alt="" width="286" height="320" loading="lazy" decoding="async">
+	<div class="trust-stats" style="margin:0;background:var(--header);border-radius:var(--radius-lg);padding:6px;">
 		<div class="stat"><div class="stat-num" style="color:#fff;"><?php echo (int) $stats['lotteries']; ?><span class="unit">件</span></div><div class="stat-label">検証済み掲載件数</div></div>
 		<div class="stat"><div class="stat-num" style="color:#fff;"><?php echo (int) $stats['verifiedShops']; ?><span class="unit">店舗</span></div><div class="stat-label">確認済み店舗数</div></div>
 		<div class="stat"><div class="stat-num" style="color:#fff;"><?php echo (int) $stats['totalShops']; ?><span class="unit">店舗</span></div><div class="stat-label">監視対象店舗数</div></div>
 		<div class="stat"><div class="stat-num" style="color:#fff;">0<span class="unit">件</span></div><div class="stat-label">未確認情報の掲載</div></div>
+	</div>
 	</div>
 
 	<div class="process-timeline">
