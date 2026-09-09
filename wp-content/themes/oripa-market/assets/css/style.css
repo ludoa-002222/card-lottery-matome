@@ -144,6 +144,8 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 /* ジャンルのサムネイルは背景透過の実写画像（genre-*.webp）。被写体が切れないよう contain。
    背景を透過にしたのでカード側の色をそのまま活かす（白を敷くと将来カード色を変えた時に浮く）。 */
 .category-card .cat-thumb { display: block; width: 100%; aspect-ratio: 4/3; object-fit: contain; padding: 10px 10px 4px; }
+/* ボックスの商品画像は写真そのもの（背景は元画像のまま）。切れないよう contain で全体を見せる。 */
+.category-card .box-thumb { padding: 6px; background: var(--surface-2); }
 .category-card .cat-body { padding: 12px 8px 16px; }
 .category-card .cat-name { font-weight: 700; font-size: 1.02rem; }
 .category-card .cat-count { font-size: .72rem; color: var(--ink-soft); margin-top: 4px; }
