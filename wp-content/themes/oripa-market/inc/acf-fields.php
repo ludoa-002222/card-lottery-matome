@@ -329,6 +329,19 @@ add_action(
 				'show_in_rest' => true,
 			)
 		);
+		// 新商品（release）用メタ（2026-09-10追加）。公式サイト由来の一次情報。
+		foreach ( array( 'release_date', 'genre', 'official_url', 'source_site', 'notion_page_id', 'product_type' ) as $key ) {
+			register_post_meta(
+				'release',
+				$key,
+				array(
+					'type'         => 'string',
+					'single'       => true,
+					'show_in_rest' => true,
+				)
+			);
+		}
+
 		// Notion「記事ソースDB」から同期するコラム用メタ（2026-09-09追加）。
 		// source_url / source_site は出典クレジットの表示に使う。
 		foreach ( array( 'source_url', 'source_site', 'notion_page_id' ) as $key ) {

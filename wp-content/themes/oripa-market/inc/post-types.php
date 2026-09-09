@@ -71,6 +71,32 @@ add_action(
 			)
 		);
 
+		// 新商品（release）。各TCG公式サイトから取得した発売予定。
+		// 【なぜ抽選と分けるか・2026-09-10】
+		// 発売日は公式が出す一次情報で、抽選（小売店が実施）とは出どころも更新の周期も違う。
+		// 同じ投稿タイプに混ぜると「抽選が何件」の集計が壊れる。
+		register_post_type(
+			'release',
+			array(
+				'label'         => '新商品',
+				'labels'        => array(
+					'name'          => '新商品',
+					'singular_name' => '新商品',
+					'menu_name'     => '新商品',
+				),
+				'public'        => true,
+				'has_archive'   => true,
+				'menu_icon'     => 'dashicons-calendar-alt',
+				'menu_position' => 8,
+				'supports'      => array( 'title', 'custom-fields' ),
+				'rewrite'       => array(
+					'slug'       => 'release',
+					'with_front' => false,
+				),
+				'show_in_rest'  => true,
+			)
+		);
+
 		// 攻略コラム（column）。
 		register_post_type(
 			'column',
