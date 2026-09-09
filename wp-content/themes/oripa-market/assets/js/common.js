@@ -97,14 +97,6 @@ function countdownParts(iso) {
   return { num: Math.floor(hours / 24), unit: "日", urgent: false };
 }
 
-// カテゴリ別のアイコン背景色
-const CATEGORY_TONES = {
-  pokeka: "#ffe9dc", onepiece: "#dbeeff", yugioh: "#f0e4ff", dragonball: "#fff2c9", duema: "#e2f3ec"
-};
-const CATEGORY_ICON_COLORS = {
-  pokeka: "#f2712f", onepiece: "#3a7bd5", yugioh: "#8b4fd1", dragonball: "#d19a1a", duema: "#2f8f6e"
-};
-
 /**
  * ジャンル別サムネイル（2026-09-09: 自作SVGイラスト → 指定の実写画像に差し替え）。
  *
@@ -128,18 +120,6 @@ function categoryThumbHtml(slug, cls) {
   // 呼び出し側が "cat-thumb" を渡してくる箇所があるため、クラスの重複を避ける。
   const extra = cls && cls !== "cat-thumb" ? ` ${cls}` : "";
   return `<img class="cat-thumb${extra}" src="${src}" alt="" loading="lazy" decoding="async">`;
-}
-
-function categoryIconHtml(slug) {
-  const bg = CATEGORY_TONES[slug] || "var(--gold-soft)";
-  const fg = CATEGORY_ICON_COLORS[slug] || "var(--gold)";
-  return `<span class="cat-icon" style="background:${bg};">
-    <svg width="24" height="24" viewBox="0 0 64 64">
-      <rect x="17" y="11" width="30" height="42" rx="4" transform="rotate(-10 32 32)" fill="#fff" stroke="${fg}" stroke-width="3"/>
-      <circle cx="32" cy="26" r="6" fill="${fg}" opacity=".85"/>
-      <rect x="24" y="38" width="16" height="4" rx="2" fill="${fg}" opacity=".55"/>
-    </svg>
-  </span>`;
 }
 
 // 記事カテゴリ別トーン
@@ -220,18 +200,6 @@ function badgeHtml(l) {
   return b.join("");
 }
 
-/** カテゴリの丸アイコン横スクロールレール */
-function categoryRailHtml(categories, lotteries, activeSlug) {
-  return categories.map(c => {
-    const count = lotteries.filter(l => l.category === c.slug).length;
-    const active = c.slug === activeSlug ? "active" : "";
-    return `<a class="cat-chip ${active}" href="${CATEGORY_BASE}${c.slug}/">
-      <span class="avatar">${categoryThumbHtml(c.slug, "")}</span>
-      <span class="cat-chip-name">${c.name}</span>
-      <span class="cat-chip-count">${count}件</span>
-    </a>`;
-  }).join("");
-}
 
 // 実写BOX画像。WordPress側（card_boxタクソノミーのimage_url term meta、
 // Notion「パック種類マスタ」DB由来）から取得したURLを最優先で使う。
