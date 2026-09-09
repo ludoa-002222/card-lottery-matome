@@ -157,17 +157,43 @@ function oripa_footer_link_items() {
 
 /**
  * 記事サムネイル（common.js の articleThumbHtml の PHP 版）。
+ *
+ * 画像は自社素材（ジャンルアイコン・マスコット）だけで構成する。
+ * 元記事・公式サイトの画像は他社の著作物のため使わない（common.js側のコメント参照）。
+ *
+ * @param string   $category カテゴリ名（配色の決定に使う）
+ * @param string   $cls      付与するclass
+ * @param string[] $tags     ジャンルアイコンの判定に使うタグ名
  */
-function articleThumbHtml_php( $category, $cls = 'article-detail-hero' ) {
+function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $tags = array() ) {
 	$tones = array(
-		'安く入手' => array( '#e8f0ff', '#2f6fed' ),
-		'高く売る' => array( '#e7f8ec', '#16a34a' ),
-		'応募方法' => array( '#f1e9fe', '#7c3aed' ),
+		'安く入手'     => array( '#e8f0ff', '#2f6fed' ),
+		'高く売る'     => array( '#e7f8ec', '#16a34a' ),
+		'応募方法'     => array( '#f1e9fe', '#7c3aed' ),
+		'デッキ解説'   => array( '#fff2e0', '#e07a1f' ),
+		'大会レポート' => array( '#ffe9ef', '#d63864' ),
+		'初心者ガイド' => array( '#e6f7f8', '#0e9aa7' ),
 	);
 	$pair = isset( $tones[ $category ] ) ? $tones[ $category ] : array( '#e8f0ff', '#2f6fed' );
 	$tone = $pair[0];
 	$fg   = $pair[1];
-	$gid  = 'art-g-php-' . wp_rand( 1000, 9999 );
+
+	$genre_map = array(
+		'ポケカ'             => 'genre-pokeka.webp',
+		'ワンピースカード'   => 'genre-onepiece.webp',
+		'遊戯王'             => 'genre-yugioh.webp',
+		'ドラゴンボール'     => 'genre-dragonball.webp',
+		'デュエマ'           => 'genre-duema.webp',
+	);
+	$file = 'mascot-point.webp';
+	foreach ( $genre_map as $tag => $genre_file ) {
+		if ( in_array( $tag, (array) $tags, true ) ) {
+			$file = $genre_file;
+			break;
+		}
+	}
+	$img = ORIPA_THEME_URI . '/assets/img/' . $file . '?ver=' . ORIPA_THEME_VERSION;
+	$gid = 'art-g-php-' . wp_rand( 1000, 9999 );
 	ob_start();
 	?>
 	<svg class="<?php echo esc_attr( $cls ); ?>" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -175,13 +201,9 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero' ) {
 			<stop offset="0%" stop-color="<?php echo esc_attr( $tone ); ?>"/><stop offset="100%" stop-color="#ffffff"/>
 		</linearGradient></defs>
 		<rect width="200" height="120" fill="url(#<?php echo esc_attr( $gid ); ?>)"/>
-		<g transform="translate(100 60)">
-			<rect x="-46" y="-32" width="92" height="64" rx="6" fill="#fff" stroke="<?php echo esc_attr( $fg ); ?>" stroke-width="3"/>
-			<line x1="-30" y1="-12" x2="30" y2="-12" stroke="<?php echo esc_attr( $fg ); ?>" stroke-width="3" opacity=".55"/>
-			<line x1="-30" y1="0" x2="18" y2="0" stroke="<?php echo esc_attr( $fg ); ?>" stroke-width="3" opacity=".35"/>
-			<line x1="-30" y1="12" x2="24" y2="12" stroke="<?php echo esc_attr( $fg ); ?>" stroke-width="3" opacity=".35"/>
-			<circle cx="34" cy="-20" r="12" fill="<?php echo esc_attr( $fg ); ?>"/>
-		</g>
+		<circle cx="158" cy="98" r="52" fill="<?php echo esc_attr( $fg ); ?>" opacity=".08"/>
+		<circle cx="34" cy="20" r="28" fill="<?php echo esc_attr( $fg ); ?>" opacity=".06"/>
+		<image href="<?php echo esc_url( $img ); ?>" x="52" y="10" width="96" height="100" preserveAspectRatio="xMidYMid meet"/>
 	</svg>
 	<?php
 	return ob_get_clean();

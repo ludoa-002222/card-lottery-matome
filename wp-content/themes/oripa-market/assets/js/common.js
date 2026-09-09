@@ -122,34 +122,60 @@ function categoryThumbHtml(slug, cls) {
   return `<img class="cat-thumb${extra}" src="${src}" alt="" loading="lazy" decoding="async">`;
 }
 
-// 記事カテゴリ別トーン
-const ARTICLE_TONES = { "安く入手": "#e8f0ff", "高く売る": "#e7f8ec", "応募方法": "#f1e9fe" };
-const ARTICLE_FG = { "安く入手": "#2f6fed", "高く売る": "#16a34a", "応募方法": "#7c3aed" };
+// 記事カテゴリ別トーン。
+// 【なぜ自前のサムネイルを描いているか・2026-09-09】
+// 元記事や公式サイトの画像を持ってくる案もあったが、画像は他社が撮影・制作した著作物そのもので、
+// 複製すると引用の要件（主従関係・必然性）を満たさない。本文はAIが独自に書き直しているため問題ないが、
+// 画像は別問題。そのため、サムネイルは自社素材（ジャンルアイコン・マスコット）と配色だけで組み立てる。
+const ARTICLE_TONES = {
+  "安く入手": "#e8f0ff", "高く売る": "#e7f8ec", "応募方法": "#f1e9fe",
+  "デッキ解説": "#fff2e0", "大会レポート": "#ffe9ef", "初心者ガイド": "#e6f7f8",
+};
+const ARTICLE_FG = {
+  "安く入手": "#2f6fed", "高く売る": "#16a34a", "応募方法": "#7c3aed",
+  "デッキ解説": "#e07a1f", "大会レポート": "#d63864", "初心者ガイド": "#0e9aa7",
+};
+
+// タグからジャンルを引き当て、そのジャンルの実写アイコンをサムネイルに載せる。
+const ARTICLE_TAG_GENRE = [
+  ["ポケカ", "genre-pokeka.webp"],
+  ["ワンピースカード", "genre-onepiece.webp"],
+  ["遊戯王", "genre-yugioh.webp"],
+  ["ドラゴンボール", "genre-dragonball.webp"],
+  ["デュエマ", "genre-duema.webp"],
+];
+function articleGenreImage(tags) {
+  if (!tags || !tags.length) return null;
+  const hit = ARTICLE_TAG_GENRE.find(([tag]) => tags.includes(tag));
+  return hit ? assetUrl(hit[1]) : null;
+}
 
 let _artThumbSeq = 0;
-function articleThumbHtml(category, cls) {
+/**
+ * 記事サムネイル。カテゴリ配色の下地に、ジャンルアイコン（無ければマスコット）を重ねる。
+ * @param {string} category
+ * @param {string} cls
+ * @param {string[]} [tags] ジャンルアイコンの判定に使う
+ */
+function articleThumbHtml(category, cls, tags) {
   const fg = ARTICLE_FG[category] || "#2f6fed";
   const tone = ARTICLE_TONES[category] || "#e8f0ff";
   const gid = `art-g-${_artThumbSeq++}`;
+  const img = articleGenreImage(tags) || assetUrl("mascot-point.webp");
   return `<svg class="${cls}" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="${tone}"/><stop offset="100%" stop-color="#ffffff"/>
     </linearGradient></defs>
     <rect width="200" height="120" fill="url(#${gid})"/>
-    <g transform="translate(100 60)">
-      <rect x="-46" y="-32" width="92" height="64" rx="6" fill="#fff" stroke="${fg}" stroke-width="3"/>
-      <line x1="-30" y1="-12" x2="30" y2="-12" stroke="${fg}" stroke-width="3" opacity=".55"/>
-      <line x1="-30" y1="0" x2="18" y2="0" stroke="${fg}" stroke-width="3" opacity=".35"/>
-      <line x1="-30" y1="12" x2="24" y2="12" stroke="${fg}" stroke-width="3" opacity=".35"/>
-      <circle cx="34" cy="-20" r="12" fill="${fg}"/>
-      <path d="M29 -20l3.4 3.4L40 -25" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
+    <circle cx="158" cy="98" r="52" fill="${fg}" opacity=".08"/>
+    <circle cx="34" cy="20" r="28" fill="${fg}" opacity=".06"/>
+    <image href="${img}" x="52" y="10" width="96" height="100" preserveAspectRatio="xMidYMid meet"/>
   </svg>`;
 }
 
 function articleCardHtml(a) {
   return `<a class="article-card" href="${a.permalink}">
-    ${articleThumbHtml(a.category, "art-thumb")}
+    ${a.thumbnail ? `<img class="art-thumb" src="${a.thumbnail}" alt="" loading="lazy" decoding="async">` : articleThumbHtml(a.category, "art-thumb", a.tags)}
     <div class="art-body">
       <span class="art-cat">${a.category}</span>
       <div class="art-title">${a.title}</div>
