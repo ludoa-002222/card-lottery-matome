@@ -512,3 +512,19 @@ body.oripa-modal-open { overflow: hidden; }
   color: var(--ink-soft);
   margin-top: 1px;
 }
+
+/* ===== 購入導線（PR）・2026-09-10 =====
+   応募ボタンとは明確に別物として見せる。応募先と紛らわしくしないための区別。 */
+.pr-link { color: var(--ink-soft); font-size: .72rem; margin-top: 6px; }
+.pr-mark {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 0 5px;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 3px;
+  font-size: .62rem;
+  letter-spacing: .04em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  vertical-align: middle;
+}

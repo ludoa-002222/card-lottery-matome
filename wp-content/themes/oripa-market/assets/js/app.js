@@ -110,6 +110,9 @@
 
       // 受付中 = 購入導線リンク（アフィリエイト）を持つ抽選を先頭に、その中では締切が近い順。
       // 終了済 = 直近に終わった順。
+      // 【並び順と応募先は別物・2026-09-10】
+      // ここで上位に出すのは並び順の話であって、応募ボタンの飛び先には影響しない。
+      // 応募ボタンは必ず本当の応募先へ飛ぶ（common.js の lotteryCtaUrl）。
       const activeAll = sortByDeadline(filtered.filter(l => !isEnded(l)));
       const withLink = activeAll.filter(l => l.purchaseLinkUrl);
       const withoutLink = activeAll.filter(l => !l.purchaseLinkUrl);

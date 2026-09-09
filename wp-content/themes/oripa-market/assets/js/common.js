@@ -267,8 +267,30 @@ function lotteryThumbHtml(l, box) {
 // 「抽選に応募する！」の遷移先優先順位:
 // ①購入導線リンク（アフィリエイト） → ②店舗のX（旧Twitter） → ③店舗の公式サイト → ④応募URL（実際の応募フォーム）。
 // 個別詳細ページを廃止したため、最終手段として必ず応募URLへフォールバックする（2026-09-09）。
+/**
+ * 「抽選に応募する！」の飛び先。
+ *
+ * 【絶対に守ること・2026-09-10】
+ * **応募先を名乗るボタンは、必ず本当の応募先へ飛ばす。**
+ * 以前はアフィリエイトリンクを最優先にしていたため、
+ * ファミマオンラインの抽選を押すとオリパ販売サイトへ飛んでいた（受付中54件すべて）。
+ * 応募できない場所へ「応募する」と書いて送るのは、掲載情報が嘘になるということ。
+ *
+ * 優先順位は「応募先そのもの → 店舗の公式X/公式サイト → 無ければ押させない」。
+ * アフィリエイトは別枠（PR表記つき）で出す。混ぜない。
+ */
 function lotteryCtaUrl(l, shop) {
-  return l.purchaseLinkUrl || (shop && (shop.snsUrl || shop.officialUrl)) || l.applyUrl || "";
+  return l.applyUrl || (shop && (shop.snsUrl || shop.officialUrl)) || "";
+}
+
+/**
+ * 購入導線（アフィリエイト）のリンク。応募ボタンとは別枠で、PRであることを明示して出す。
+ * 応募先と紛らわしい文言にしない。
+ */
+function purchaseLinkHtml(l) {
+  if (!l.purchaseLinkUrl) return "";
+  const service = l.purchaseLinkService || "オリパ";
+  return `<a class="text-link pr-link" href="${l.purchaseLinkUrl}" target="_blank" rel="noopener nofollow sponsored">${service}でカードを探す<span class="pr-mark">PR</span></a>`;
 }
 
 /**
@@ -321,6 +343,7 @@ function lotteryCardHtml(l, ctx) {
       <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
       ${ctaHtml}
       ${methodLinkHtml}
+      ${purchaseLinkHtml(l)}
     </div>
   </div>`;
 }
@@ -480,6 +503,7 @@ function lotteryRowHtml(l, ctx) {
     <div class="row-verified"><span class="check">✓</span>運営確認済み・${freshnessLabel(l.updatedAt)}</div>
     ${ctaHtml}
     ${methodLinkHtml}
+    ${purchaseLinkHtml(l)}
   </div>`;
 }
 
