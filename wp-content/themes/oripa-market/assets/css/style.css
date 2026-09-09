@@ -58,7 +58,7 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .logo { font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
 .logo img.mark { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--cyan)); padding: 6px; }
 /* マスコットはキャラクターの輪郭をそのまま見せるので、背景・角丸・余白は付けない。 */
-.logo img.mascot-mark { width: 44px; height: auto; border-radius: 0; background: none; padding: 0; }
+.logo img.mascot-mark { width: 52px; height: auto; border-radius: 0; background: none; padding: 0; }
 .logo .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .logo .logo-text small { font-size: .6rem; font-weight: 500; opacity: .6; letter-spacing: .06em; color: #9fb0d0; }
 .nav-links { display: flex; align-items: center; gap: 22px; font-size: .84rem; }
@@ -115,9 +115,9 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 /* ヒーローのメインビジュアル。文章と重ならないよう右端に置き、狭い画面では隠す。 */
 .hero-mascot {
   position: absolute;
-  right: 10px;
-  top: 6px;
-  width: min(210px, 24%);
+  right: 18px;
+  top: 10px;
+  width: min(200px, 22%);
   height: auto;
   pointer-events: none;
   filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));
@@ -325,7 +325,8 @@ body.oripa-modal-open { overflow: hidden; }
 .footer-mascot {
   position: absolute;
   right: 24px;
-  bottom: 100%;
+  /* 画像下端の透明な余白ぶん、フッターの上辺へ食い込ませて浮きを消す。 */
+  bottom: calc(100% - 7px);
   width: 108px;
   height: auto;
   pointer-events: none;
