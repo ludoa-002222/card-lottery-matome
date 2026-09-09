@@ -58,7 +58,16 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .logo { font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
 .logo img.mark { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--cyan)); padding: 6px; }
 /* マスコットはキャラクターの輪郭をそのまま見せるので、背景・角丸・余白は付けない。 */
-.logo img.mascot-mark { width: 52px; height: auto; border-radius: 0; background: none; padding: 0; }
+.logo img.mascot-mark {
+  width: 56px;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  padding: 0;
+  /* 中央揃えのままだと文字列より上にずれて浮いて見えるため、文字の下端に合わせる。 */
+  align-self: flex-end;
+  margin-bottom: -4px;
+}
 .logo .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .logo .logo-text small { font-size: .6rem; font-weight: 500; opacity: .6; letter-spacing: .06em; color: #9fb0d0; }
 .nav-links { display: flex; align-items: center; gap: 22px; font-size: .84rem; }
@@ -97,8 +106,20 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .section { padding: 32px 0; }
 .section-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .section-heading h2 { font-size: 1.15rem; margin: 0; }
-/* 見出し脇のワンポイント（虫眼鏡＝検証しているイメージ）。 */
-.section-heading .point-mascot { width: 46px; height: auto; margin-left: auto; }
+/* ワンポイント（虫眼鏡＝検証しているイメージ）。統計ボックスの上端に座らせる。 */
+.trust-stats-wrap { position: relative; margin: 20px 0; }
+.trust-stats-wrap .point-mascot {
+  position: absolute;
+  right: 40px;
+  /* ボックス上辺に接地させ、浮いて見えないよう2px食い込ませる。 */
+  bottom: calc(100% - 2px);
+  width: 84px;
+  height: auto;
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  .trust-stats-wrap .point-mascot { width: 60px; right: 14px; }
+}
 .section-heading .bar { width: 6px; height: 20px; background: linear-gradient(180deg, var(--accent), var(--cyan)); border-radius: 4px; display: inline-block; }
 
 /* ===== Hero (trust dashboard style) ===== */
@@ -115,9 +136,9 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 /* ヒーローのメインビジュアル。文章と重ならないよう右端に置き、狭い画面では隠す。 */
 .hero-mascot {
   position: absolute;
-  right: 18px;
-  top: 10px;
-  width: min(200px, 22%);
+  right: 5%;
+  top: 18px;
+  width: min(300px, 27%);
   height: auto;
   pointer-events: none;
   filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));

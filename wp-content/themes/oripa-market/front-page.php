@@ -29,9 +29,7 @@ get_header();
 	</section>
 
 	<section class="section" style="padding-top:0;">
-		<div class="section-heading"><span class="bar"></span><h2>データの信頼性について</h2>
-			<img class="point-mascot" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/mascot-point.webp?ver=' . ORIPA_THEME_VERSION ); ?>" alt="" width="286" height="320" loading="lazy" decoding="async">
-		</div>
+		<div class="section-heading"><span class="bar"></span><h2>データの信頼性について</h2></div>
 		<div class="trust-badges">
 			<div class="trust-badge"><span class="ico">🛡️</span><div><h3>二重チェック体制</h3><p>AIが一次収集した情報を、人が公式ページと突合して確認してから掲載します。</p></div></div>
 			<div class="trust-badge"><span class="ico">🕒</span><div><h3>継続的な鮮度管理</h3><p>掲載後も定期的に再確認し、締切変更や終了を検知次第すぐに反映します。</p></div></div>
