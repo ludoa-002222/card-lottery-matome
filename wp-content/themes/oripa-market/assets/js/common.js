@@ -271,6 +271,24 @@ function lotteryCtaUrl(l, shop) {
   return l.purchaseLinkUrl || (shop && (shop.snsUrl || shop.officialUrl)) || l.applyUrl || "";
 }
 
+/**
+ * カードに出す商品名。
+ *
+ * 【なぜパック種類だけでは足りないか・2026-09-10】
+ * これまでカードにはパック種類（例: 30th CELEBRATION BOX）しか出しておらず、
+ * 同じBOXに紐づく別商品（デッキケース・スリーブ・プレイマット等）が
+ * 一覧上でまったく同じ見た目になり、どれがどれか分からなかった。
+ * 商品名を主、パック種類を従にして並べる。
+ */
+function lotteryProductName(l, box) {
+  const title = (l.title || "").trim();
+  const boxName = box ? box.name : "";
+  if (!title) return boxName;
+  // 商品名がパック種類とほぼ同じなら、二重に出さない
+  if (boxName && title.replace(/\s/g, "").includes(boxName.replace(/\s/g, ""))) return title;
+  return boxName ? `${title}<span class="product-box">${boxName}</span>` : title;
+}
+
 function lotteryCardHtml(l, ctx) {
   const shop = ctx.shops.find(s => s.id === l.shopId);
   const box = ctx.boxes.find(b => b.slug === l.box);
@@ -299,7 +317,7 @@ function lotteryCardHtml(l, ctx) {
       <div class="verified-row"><span class="check">✓</span>運営確認済み・<span class="freshness">${freshnessLabel(l.updatedAt)}</span></div>
       <div class="badges">${badgeHtml(l)}</div>
       <div class="shop-name">${shop ? shop.name : "店舗名未定"}</div>
-      <div class="meta">${box ? box.name : ""}</div>
+      <div class="product-name">${lotteryProductName(l, box)}</div>
       <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
       ${ctaHtml}
       ${methodLinkHtml}
@@ -457,7 +475,8 @@ function lotteryRowHtml(l, ctx) {
       <span class="row-countdown ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
     </div>
     <div class="row-shop">${shop ? shop.name : "店舗名未定"}</div>
-    <div class="row-meta">${box ? box.name : ""}${box ? "・" : ""}締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
+    <div class="row-product">${lotteryProductName(l, box)}</div>
+    <div class="row-meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
     <div class="row-verified"><span class="check">✓</span>運営確認済み・${freshnessLabel(l.updatedAt)}</div>
     ${ctaHtml}
     ${methodLinkHtml}

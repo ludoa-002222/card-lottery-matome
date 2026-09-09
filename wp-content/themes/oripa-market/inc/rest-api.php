@@ -175,6 +175,9 @@ function oripa_rest_lotteries() {
 
 		$out[] = array(
 			'id'             => (string) $p->ID,
+			// 商品名。一覧カードではパック種類しか出しておらず、
+			// 同じBOXの別商品（デッキケース／スリーブ等）が見分けられなかったため追加した。
+			'title'          => $p->post_title,
 			'category'       => $cat && ! is_wp_error( $cat ) ? $cat[0] : '',
 			'box'            => $box_slug,
 			'shopId'         => (string) ( (int) get_post_meta( $p->ID, 'shop', true ) ),
