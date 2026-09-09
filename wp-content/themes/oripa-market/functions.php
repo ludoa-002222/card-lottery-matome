@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ORIPA_THEME_VERSION', '0.5.1' );
+define( 'ORIPA_THEME_VERSION', '0.5.2' );
 define( 'ORIPA_THEME_DIR', get_template_directory() );
 define( 'ORIPA_THEME_URI', get_template_directory_uri() );
 
