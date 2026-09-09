@@ -16,7 +16,7 @@ get_header();
 	<section class="hero">
 		<div class="hero-copy">
 			<span class="kicker">TRUSTED LOTTERY DATA PLATFORM</span>
-			<h1>公式情報のみを検証して届ける、トレカ抽選の信頼できる情報基盤</h1>
+			<h1>公式情報のみを検証して届ける、<br>トレカ抽選の信頼できる情報基盤</h1>
 			<p>AIによる一次収集と人による二重確認を経た抽選・予約情報だけを掲載。掲載後も定期的に再確認し、鮮度と正確性を保っています。</p>
 		</div>
 		<img class="hero-mascot" src="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/mascot-hero.webp?ver=' . ORIPA_THEME_VERSION ); ?>" alt="" width="900" height="793" loading="eager" decoding="async">
