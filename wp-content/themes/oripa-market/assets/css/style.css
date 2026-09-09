@@ -136,8 +136,9 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 /* ヒーローのメインビジュアル。文章と重ならないよう右端に置き、狭い画面では隠す。 */
 .hero-mascot {
   position: absolute;
-  right: 5%;
-  top: 18px;
+  /* 位置は指定画像（赤丸）に合わせている。右端・下寄りだと統計行にかかるため、左へ寄せて上げる。 */
+  right: 8%;
+  top: 6px;
   width: min(300px, 27%);
   height: auto;
   pointer-events: none;
