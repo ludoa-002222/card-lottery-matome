@@ -150,7 +150,7 @@
     const hero = document.getElementById("box-hero");
     if (hero && boxSlugParam) {
       const heroBox = boxes.find(b => b.slug === boxSlugParam);
-      const heroImg = heroBox && heroBox.image ? heroBox.image : `${ASSETS}${DEFAULT_BOX_PHOTO}`;
+      const heroImg = heroBox && heroBox.image ? heroBox.image : assetUrl(DEFAULT_BOX_PHOTO);
       hero.innerHTML = `<img class="box-hero-img" src="${heroImg}" alt="${heroBox ? heroBox.name : ""}">`;
       hero.hidden = false;
     }

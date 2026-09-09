@@ -46,6 +46,9 @@ add_action(
 				'nonce'       => wp_create_nonce( 'wp_rest' ),
 				'themeUri'    => ORIPA_THEME_URI,
 				'assetsBase'  => ORIPA_THEME_URI . '/assets/img/',
+				// テーマ内画像のキャッシュ破棄に使う。画像URLには ?ver= が付かないため、
+				// 差し替えても本番の1年キャッシュが古い画像を返し続ける問題があった（2026-09-09）。
+				'version'     => ORIPA_THEME_VERSION,
 				'homeUrl'     => home_url( '/' ),
 				'categoryBase' => home_url( '/card-category/' ),
 				'boxBase'     => home_url( '/card-box/' ),
