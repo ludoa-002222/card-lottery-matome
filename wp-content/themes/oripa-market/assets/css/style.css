@@ -66,7 +66,7 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
   padding: 0;
   /* 中央揃えのままだと文字列より上にずれて浮いて見えるため、文字の下端に合わせる。 */
   align-self: flex-end;
-  margin-bottom: -4px;
+  margin-bottom: 5px;
 }
 .logo .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .logo .logo-text small { font-size: .6rem; font-weight: 500; opacity: .6; letter-spacing: .06em; color: #9fb0d0; }
@@ -145,7 +145,7 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 }
 .hero-copy { position: relative; z-index: 1; }
 .hero-copy .kicker { font-size: .74rem; letter-spacing: .18em; color: var(--cyan); font-weight: 700; }
-.hero-copy h1 { font-size: 1.65rem; margin: 8px 0 10px; max-width: 22ch; }
+.hero-copy h1 { font-size: 1.65rem; margin: 8px 0 10px; max-width: 34ch; line-height: 1.45; }
 .hero-copy p { margin: 0 0 18px; font-size: .88rem; color: #b8c3dc; max-width: 42em; }
 .trust-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,.08); border-radius: var(--radius-md); overflow: hidden; margin-top: 6px; }
 .trust-stats .stat { background: rgba(255,255,255,.03); padding: 14px 12px; }
