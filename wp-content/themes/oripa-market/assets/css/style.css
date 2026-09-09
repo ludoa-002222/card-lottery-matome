@@ -69,7 +69,7 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
   margin-bottom: 5px;
 }
 .logo .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
-.logo .logo-text small { font-size: .6rem; font-weight: 500; opacity: .6; letter-spacing: .06em; color: #9fb0d0; }
+.logo .logo-text small { font-size: .6rem; font-weight: 500; opacity: .6; letter-spacing: .06em; color: #9fb0d0; margin-top: 5px; }
 .nav-links { display: flex; align-items: center; gap: 22px; font-size: .84rem; }
 .nav-links a { opacity: .82; letter-spacing: .01em; }
 .nav-links a:hover { opacity: 1; color: var(--cyan); }
