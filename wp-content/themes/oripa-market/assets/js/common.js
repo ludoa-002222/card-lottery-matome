@@ -284,16 +284,6 @@ function lotteryCtaUrl(l, shop) {
 }
 
 /**
- * 購入導線（アフィリエイト）のリンク。応募ボタンとは別枠で、PRであることを明示して出す。
- * 応募先と紛らわしい文言にしない。
- */
-function purchaseLinkHtml(l) {
-  if (!l.purchaseLinkUrl) return "";
-  const service = l.purchaseLinkService || "オリパ";
-  return `<a class="text-link pr-link" href="${l.purchaseLinkUrl}" target="_blank" rel="noopener nofollow sponsored">${service}でカードを探す<span class="pr-mark">PR</span></a>`;
-}
-
-/**
  * カードに出す商品名。
  *
  * 【なぜパック種類だけでは足りないか・2026-09-10】
@@ -343,7 +333,6 @@ function lotteryCardHtml(l, ctx) {
       <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
       ${ctaHtml}
       ${methodLinkHtml}
-      ${purchaseLinkHtml(l)}
     </div>
   </div>`;
 }
@@ -503,7 +492,6 @@ function lotteryRowHtml(l, ctx) {
     <div class="row-verified"><span class="check">✓</span>運営確認済み・${freshnessLabel(l.updatedAt)}</div>
     ${ctaHtml}
     ${methodLinkHtml}
-    ${purchaseLinkHtml(l)}
   </div>`;
 }
 
