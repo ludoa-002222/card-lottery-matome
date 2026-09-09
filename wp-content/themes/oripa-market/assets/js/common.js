@@ -238,11 +238,14 @@ function categoryRailHtml(categories, lotteries, activeSlug) {
 // 未設定のボックスのみ、テーマ内蔵のデフォルト画像にフォールバックする
 // （2026-09-07: 従来はここに全パック共通のハードコード対応表しかなく、
 // ほぼ全ての商品が同じデフォルト画像になっていた）。
-const DEFAULT_BOX_PHOTO = "30th-celebration.webp";
-
 function lotteryThumbHtml(l, box) {
-  const photo = box && box.image ? box.image : assetUrl(DEFAULT_BOX_PHOTO);
-  const img = `<img class="lottery-thumb" src="${photo}" alt="" loading="lazy">`;
+  // 商品画像が未登録のボックスは、ジャンルのアイコンにフォールバックする。
+  // 2026-09-09修正: 以前は既定のBOX写真（30th CELEBRATION BOX）を出していたため、
+  // 「その他」など別のボックスの抽選に無関係な商品の写真が付き、
+  // どの商品の抽選なのか誤認させる状態だった（ボックス一覧側は先に同じ修正済み）。
+  const img = box && box.image
+    ? `<img class="lottery-thumb" src="${box.image}" alt="" loading="lazy">`
+    : categoryThumbHtml(l.category, "lottery-thumb");
   // サムネイル画像タップでボックス別の抽選情報ページへ
   return l.box
     ? `<a class="lottery-thumb-link" href="${BOX_BASE}${l.box}/" aria-label="このボックスの抽選一覧を見る">${img}</a>`

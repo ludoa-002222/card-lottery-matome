@@ -150,8 +150,10 @@
     const hero = document.getElementById("box-hero");
     if (hero && boxSlugParam) {
       const heroBox = boxes.find(b => b.slug === boxSlugParam);
-      const heroImg = heroBox && heroBox.image ? heroBox.image : assetUrl(DEFAULT_BOX_PHOTO);
-      hero.innerHTML = `<img class="box-hero-img" src="${heroImg}" alt="${heroBox ? heroBox.name : ""}">`;
+      // 商品画像が未登録なら、別商品の写真ではなくジャンルのアイコンを出す（カード側と同じ扱い）。
+      hero.innerHTML = heroBox && heroBox.image
+        ? `<img class="box-hero-img" src="${heroBox.image}" alt="${heroBox.name}">`
+        : categoryThumbHtml(cat.slug, "box-hero-img");
       hero.hidden = false;
     }
 
