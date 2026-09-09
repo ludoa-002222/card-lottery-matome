@@ -329,5 +329,18 @@ add_action(
 				'show_in_rest' => true,
 			)
 		);
+		// Notion「記事ソースDB」から同期するコラム用メタ（2026-09-09追加）。
+		// source_url / source_site は出典クレジットの表示に使う。
+		foreach ( array( 'source_url', 'source_site', 'notion_page_id' ) as $key ) {
+			register_post_meta(
+				'column',
+				$key,
+				array(
+					'type'         => 'string',
+					'single'       => true,
+					'show_in_rest' => true,
+				)
+			);
+		}
 	}
 );
