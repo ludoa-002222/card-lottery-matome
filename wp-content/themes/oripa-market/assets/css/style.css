@@ -457,3 +457,36 @@ body.oripa-modal-open { overflow: hidden; }
 .article-tag:hover { background: #e6ebf5; }
 .article-credit { margin-top: 16px; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: var(--radius-sm); font-size: .76rem; line-height: 1.6; }
 .article-credit span { color: var(--ink-soft); }
+
+/* ===== 記事内のデータ表現（表・横棒グラフ・要点ボックス）・2026-09-09 =====
+   画像ではなくHTMLで描く。更新のたびに作り直す必要がなく、本文として検索にも読まれるため。 */
+.article-table { margin: 18px 0; overflow-x: auto; }
+.article-table table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.article-table th, .article-table td { border: 1px solid var(--line, #e2e8f0); padding: 8px 10px; text-align: left; }
+.article-table th { background: var(--surface-2); font-weight: 700; white-space: nowrap; }
+.article-table tr:nth-child(even) td { background: #fbfcfe; }
+
+.article-bars { list-style: none; margin: 18px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.article-bar-row { display: grid; grid-template-columns: minmax(80px, 30%) 1fr auto; align-items: center; gap: 10px; font-size: .82rem; }
+.article-bar-label { color: var(--ink); }
+.article-bar-track { background: var(--surface-2); border-radius: 999px; height: 14px; overflow: hidden; }
+.article-bar-fill { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 999px; }
+.article-bar-value { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+.article-callout { margin: 18px 0; padding: 12px 14px; background: var(--surface-2); border-left: 4px solid var(--accent); border-radius: var(--radius-sm); font-size: .85rem; line-height: 1.7; }
+
+/* ===== ガイドハブ（/guide） ===== */
+.guide-section { margin-bottom: 32px; }
+.guide-cat-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.guide-cat { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--line, #e2e8f0); border-radius: 999px; padding: 6px 14px; font-size: .82rem; text-decoration: none; color: var(--ink); }
+.guide-cat b { color: var(--accent); font-variant-numeric: tabular-nums; }
+.guide-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: gs; }
+.guide-step { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; background: var(--surface); border-radius: var(--radius-md); padding: 12px 14px; text-decoration: none; color: inherit; }
+.guide-step:hover { box-shadow: var(--shadow); }
+.guide-step .no { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .84rem; }
+.guide-step h3 { margin: 0 0 3px; font-size: .92rem; }
+.guide-step p { margin: 0; font-size: .78rem; color: var(--ink-soft); }
+.guide-table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.guide-table th, .guide-table td { border-bottom: 1px solid var(--line, #e2e8f0); padding: 9px 10px; text-align: left; }
+.guide-table th { color: var(--ink-soft); font-weight: 600; font-size: .76rem; }
+.guide-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }

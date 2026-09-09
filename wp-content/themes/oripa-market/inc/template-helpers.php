@@ -97,6 +97,10 @@ function oripa_header_nav_items() {
 			'url'   => home_url( '/calendar/' ),
 		),
 		array(
+			'label' => '攻略ガイド',
+			'url'   => home_url( '/guide/' ),
+		),
+		array(
 			'label' => '攻略コラム',
 			'url'   => get_post_type_archive_link( 'column' ),
 		),
@@ -233,4 +237,99 @@ function oripa_trust_stats() {
 		'verifiedShops' => count( $shop_ids ),
 		'totalShops'    => (int) wp_count_posts( 'shop' )->publish,
 	);
+}
+
+/**
+ * ガイドハブ用：受付中の抽選が多い店舗を数える。
+ *
+ * 「受付中」は締切が現在時刻より後のもの。締切が入っていない抽選は数えない
+ * （終わったのか続いているのか判断できないため、数字に混ぜない）。
+ *
+ * @param int $limit 返す件数
+ * @return array{name:string,count:int,url:string}[]
+ */
+function oripa_guide_active_shops( $limit = 12 ) {
+	$now   = current_time( 'mysql' );
+	$posts = get_posts(
+		array(
+			'post_type'      => 'lottery',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		)
+	);
+	$counts = array();
+	foreach ( $posts as $id ) {
+		$deadline = get_post_meta( $id, 'deadline', true );
+		if ( ! $deadline || $deadline <= $now ) {
+			continue;
+		}
+		$shop_id = (int) get_post_meta( $id, 'shop', true );
+		if ( ! $shop_id ) {
+			continue;
+		}
+		$counts[ $shop_id ] = isset( $counts[ $shop_id ] ) ? $counts[ $shop_id ] + 1 : 1;
+	}
+	arsort( $counts );
+	$out = array();
+	foreach ( array_slice( $counts, 0, $limit, true ) as $shop_id => $count ) {
+		$title = get_the_title( $shop_id );
+		if ( ! $title ) {
+			continue;
+		}
+		$out[] = array(
+			'name'  => $title,
+			'count' => $count,
+			'url'   => get_permalink( $shop_id ),
+		);
+	}
+	return $out;
+}
+
+/**
+ * ガイドハブ用：受付中の抽選が多いパック（card_box）を数える。
+ *
+ * @param int $limit 返す件数
+ * @return array{name:string,count:int,url:string}[]
+ */
+function oripa_guide_active_boxes( $limit = 12 ) {
+	$now   = current_time( 'mysql' );
+	$posts = get_posts(
+		array(
+			'post_type'      => 'lottery',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		)
+	);
+	$counts = array();
+	foreach ( $posts as $id ) {
+		$deadline = get_post_meta( $id, 'deadline', true );
+		if ( ! $deadline || $deadline <= $now ) {
+			continue;
+		}
+		$terms = wp_get_post_terms( $id, 'card_box' );
+		if ( is_wp_error( $terms ) ) {
+			continue;
+		}
+		foreach ( $terms as $t ) {
+			// 親（ジャンル名の器）は数えない。実際のパックだけを対象にする。
+			if ( 0 === (int) $t->parent ) {
+				continue;
+			}
+			$counts[ $t->term_id ] = isset( $counts[ $t->term_id ] ) ? $counts[ $t->term_id ] + 1 : 1;
+		}
+	}
+	arsort( $counts );
+	$out = array();
+	foreach ( array_slice( $counts, 0, $limit, true ) as $term_id => $count ) {
+		$term = get_term( $term_id );
+		if ( ! $term || is_wp_error( $term ) ) {
+			continue;
+		}
+		$out[] = array(
+			'name'  => $term->name,
+			'count' => $count,
+			'url'   => get_term_link( $term ),
+		);
+	}
+	return $out;
 }
