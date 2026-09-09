@@ -50,7 +50,16 @@ while ( have_posts() ) :
 					<span class="verified-row" style="margin-left:6px;"><span class="check">✓</span>編集部確認済み</span>
 				</div>
 
-				<div><?php echo articleThumbHtml_php( $cat_name ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+				<div>
+				<?php
+				if ( has_post_thumbnail() ) {
+					the_post_thumbnail( 'large', array( 'class' => 'article-detail-hero' ) );
+				} else {
+					$tag_names = ( $tags && ! is_wp_error( $tags ) ) ? wp_list_pluck( $tags, 'name' ) : array();
+					echo articleThumbHtml_php( $cat_name, 'article-detail-hero', $tag_names ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
+				?>
+				</div>
 
 				<?php if ( has_excerpt() ) : ?>
 				<div class="toc-box">

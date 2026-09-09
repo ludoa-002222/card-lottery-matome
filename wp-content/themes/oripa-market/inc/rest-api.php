@@ -224,6 +224,7 @@ function oripa_rest_articles() {
 			'slug'       => $p->post_name,
 			'category'   => $cats && ! is_wp_error( $cats ) ? $cats[0] : '',
 			'tags'       => $tags && ! is_wp_error( $tags ) ? array_values( $tags ) : array(),
+			'thumbnail'  => get_the_post_thumbnail_url( $p->ID, 'medium_large' ) ?: '',
 			'sourceUrl'  => get_post_meta( $p->ID, 'source_url', true ) ?: '',
 			'sourceSite' => get_post_meta( $p->ID, 'source_site', true ) ?: '',
 			'title'     => $p->post_title,
