@@ -528,3 +528,45 @@ body.oripa-modal-open { overflow: hidden; }
   text-decoration: none;
   vertical-align: middle;
 }
+
+/* ===== 新商品カレンダー（/release/）・2026-09-10 ===== */
+.release-month { padding-top: 0; }
+.release-count { margin-left: auto; font-size: .76rem; color: var(--ink-soft); }
+.release-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.release-item {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.release-date { font-size: 1.3rem; font-weight: 700; color: var(--ink); text-align: center; line-height: 1; }
+.release-date small { display: block; font-size: .6rem; font-weight: 500; color: var(--ink-soft); margin-top: 2px; }
+.release-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.release-genre {
+  align-self: flex-start;
+  font-size: .66rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--genre-color, #8a93a6);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.release-title { font-size: .85rem; font-weight: 600; line-height: 1.4; }
+.release-type { font-size: .72rem; color: var(--ink-soft); }
+.release-link {
+  font-size: .74rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.release-link:hover { background: var(--surface-2); }
+@media (max-width: 560px) {
+  .release-item { grid-template-columns: 44px 1fr; }
+  .release-link { grid-column: 2; justify-self: start; }
+}

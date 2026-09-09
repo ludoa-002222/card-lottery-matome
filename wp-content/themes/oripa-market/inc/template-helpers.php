@@ -97,6 +97,10 @@ function oripa_header_nav_items() {
 			'url'   => home_url( '/calendar/' ),
 		),
 		array(
+			'label' => '新商品カレンダー',
+			'url'   => home_url( '/release/' ),
+		),
+		array(
 			'label' => '攻略ガイド',
 			'url'   => home_url( '/guide/' ),
 		),

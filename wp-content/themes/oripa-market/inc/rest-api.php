@@ -33,6 +33,7 @@ add_action(
 		register_rest_route( $ns, '/shops', $ro + array( 'callback' => 'oripa_rest_shops' ) );
 		register_rest_route( $ns, '/lotteries', $ro + array( 'callback' => 'oripa_rest_lotteries' ) );
 		register_rest_route( $ns, '/articles', $ro + array( 'callback' => 'oripa_rest_articles' ) );
+		register_rest_route( $ns, '/releases', $ro + array( 'callback' => 'oripa_rest_releases' ) );
 		register_rest_route(
 			$ns,
 			'/bootstrap',
@@ -236,6 +237,47 @@ function oripa_rest_articles() {
 			'readMin'   => (int) ( get_post_meta( $p->ID, 'read_min', true ) ?: 5 ),
 			'body'      => $paras,
 			'permalink' => get_permalink( $p ),
+		);
+	}
+	return $out;
+}
+
+/**
+ * 新商品（発売予定）の一覧。各TCG公式サイトから取得した一次情報。
+ *
+ * 発売済みのものまで返すと一覧が過去で埋まるため、既定では
+ * 「昨日以降に発売するもの」だけを返す。過去分は ?past=1 で取れる。
+ */
+function oripa_rest_releases() {
+	$posts = get_posts(
+		array(
+			'post_type'      => 'release',
+			'posts_per_page' => -1,
+			'meta_key'       => 'release_date',
+			'orderby'        => 'meta_value',
+			'order'          => 'ASC',
+		)
+	);
+	$include_past = isset( $_GET['past'] ) && '1' === $_GET['past']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$today        = gmdate( 'Y-m-d', current_time( 'timestamp' ) - DAY_IN_SECONDS );
+
+	$out = array();
+	foreach ( $posts as $p ) {
+		$date = get_post_meta( $p->ID, 'release_date', true );
+		if ( ! $date ) {
+			continue;
+		}
+		if ( ! $include_past && $date < $today ) {
+			continue;
+		}
+		$out[] = array(
+			'id'          => (string) $p->ID,
+			'title'       => $p->post_title,
+			'releaseDate' => $date,
+			'genre'       => get_post_meta( $p->ID, 'genre', true ) ?: '',
+			'productType' => get_post_meta( $p->ID, 'product_type', true ) ?: '',
+			'officialUrl' => get_post_meta( $p->ID, 'official_url', true ) ?: '',
+			'sourceSite'  => get_post_meta( $p->ID, 'source_site', true ) ?: '',
 		);
 	}
 	return $out;
