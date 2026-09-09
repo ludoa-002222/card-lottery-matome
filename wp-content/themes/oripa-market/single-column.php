@@ -55,8 +55,7 @@ while ( have_posts() ) :
 				if ( has_post_thumbnail() ) {
 					the_post_thumbnail( 'large', array( 'class' => 'article-detail-hero' ) );
 				} else {
-					$tag_names = ( $tags && ! is_wp_error( $tags ) ) ? wp_list_pluck( $tags, 'name' ) : array();
-					echo articleThumbHtml_php( $cat_name, 'article-detail-hero', $tag_names ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo articleThumbHtml_php( $cat_name, 'article-detail-hero', get_the_title() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 				?>
 				</div>

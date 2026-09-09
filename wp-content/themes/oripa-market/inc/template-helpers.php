@@ -162,14 +162,14 @@ function oripa_footer_link_items() {
 /**
  * 記事サムネイル（common.js の articleThumbHtml の PHP 版）。
  *
- * 画像は自社素材（ジャンルアイコン・マスコット）だけで構成する。
- * 元記事・公式サイトの画像は他社の著作物のため使わない（common.js側のコメント参照）。
+ * マスコット・ジャンルアイコン・箱画像は使わない（記事の中身と関係がなく、
+ * 一覧に並べると全部同じ絵に見えるため）。記事タイトルそのものを図版にする。
  *
- * @param string   $category カテゴリ名（配色の決定に使う）
- * @param string   $cls      付与するclass
- * @param string[] $tags     ジャンルアイコンの判定に使うタグ名
+ * @param string $category カテゴリ名（配色に使う）
+ * @param string $cls      付与するclass
+ * @param string $title    記事タイトル
  */
-function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $tags = array() ) {
+function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title = '' ) {
 	$tones = array(
 		'安く入手'     => array( '#e8f0ff', '#2f6fed' ),
 		'高く売る'     => array( '#e7f8ec', '#16a34a' ),
@@ -182,32 +182,40 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $tags = 
 	$tone = $pair[0];
 	$fg   = $pair[1];
 
-	$genre_map = array(
-		'ポケカ'             => 'genre-pokeka.webp',
-		'ワンピースカード'   => 'genre-onepiece.webp',
-		'遊戯王'             => 'genre-yugioh.webp',
-		'ドラゴンボール'     => 'genre-dragonball.webp',
-		'デュエマ'           => 'genre-duema.webp',
-	);
-	$file = 'mascot-point.webp';
-	foreach ( $genre_map as $tag => $genre_file ) {
-		if ( in_array( $tag, (array) $tags, true ) ) {
-			$file = $genre_file;
-			break;
-		}
+	// 【】の煽り文句はサムネイルでは邪魔なので落とし、本題だけ残す。
+	$core = trim( preg_replace( '/【[^】]*】/u', '', (string) $title ) );
+	if ( '' === $core ) {
+		$core = (string) $title;
 	}
-	$img = ORIPA_THEME_URI . '/assets/img/' . $file . '?ver=' . ORIPA_THEME_VERSION;
-	$gid = 'art-g-php-' . wp_rand( 1000, 9999 );
+	$per_line  = 13;
+	$max_lines = 3;
+	$lines     = array();
+	$len       = mb_strlen( $core, 'UTF-8' );
+	for ( $i = 0; $i < $len && count( $lines ) < $max_lines; $i += $per_line ) {
+		$lines[] = mb_substr( $core, $i, $per_line, 'UTF-8' );
+	}
+	if ( $len > $per_line * $max_lines && $lines ) {
+		$last              = count( $lines ) - 1;
+		$lines[ $last ]    = mb_substr( $lines[ $last ], 0, $per_line - 1, 'UTF-8' ) . '…';
+	}
+	$start_y = 62 - ( count( $lines ) - 1 ) * 9;
+	$gid     = 'art-g-php-' . wp_rand( 1000, 9999 );
 	ob_start();
 	?>
-	<svg class="<?php echo esc_attr( $cls ); ?>" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+	<svg class="<?php echo esc_attr( $cls ); ?>" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="<?php echo esc_attr( $title ); ?>">
 		<defs><linearGradient id="<?php echo esc_attr( $gid ); ?>" x1="0" y1="0" x2="1" y2="1">
 			<stop offset="0%" stop-color="<?php echo esc_attr( $tone ); ?>"/><stop offset="100%" stop-color="#ffffff"/>
 		</linearGradient></defs>
 		<rect width="200" height="120" fill="url(#<?php echo esc_attr( $gid ); ?>)"/>
-		<circle cx="158" cy="98" r="52" fill="<?php echo esc_attr( $fg ); ?>" opacity=".08"/>
-		<circle cx="34" cy="20" r="28" fill="<?php echo esc_attr( $fg ); ?>" opacity=".06"/>
-		<image href="<?php echo esc_url( $img ); ?>" x="52" y="10" width="96" height="100" preserveAspectRatio="xMidYMid meet"/>
+		<rect x="0" y="0" width="5" height="120" fill="<?php echo esc_attr( $fg ); ?>"/>
+		<circle cx="182" cy="108" r="46" fill="<?php echo esc_attr( $fg ); ?>" opacity=".07"/>
+		<text x="16" y="24" font-size="9" font-weight="700" fill="<?php echo esc_attr( $fg ); ?>" letter-spacing="0.5"><?php echo esc_html( $category ? $category : 'COLUMN' ); ?></text>
+		<text font-size="13" font-weight="700" fill="#1c2536">
+			<?php foreach ( $lines as $i => $line ) : ?>
+				<tspan x="16" y="<?php echo (int) ( $start_y + $i * 18 ); ?>"><?php echo esc_html( $line ); ?></tspan>
+			<?php endforeach; ?>
+		</text>
+		<text x="16" y="108" font-size="7.5" fill="#8a93a6">oripa-market.com</text>
 	</svg>
 	<?php
 	return ob_get_clean();

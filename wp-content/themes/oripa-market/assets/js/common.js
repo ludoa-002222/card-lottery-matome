@@ -123,10 +123,12 @@ function categoryThumbHtml(slug, cls) {
 }
 
 // 記事カテゴリ別トーン。
-// 【なぜ自前のサムネイルを描いているか・2026-09-09】
-// 元記事や公式サイトの画像を持ってくる案もあったが、画像は他社が撮影・制作した著作物そのもので、
-// 複製すると引用の要件（主従関係・必然性）を満たさない。本文はAIが独自に書き直しているため問題ないが、
-// 画像は別問題。そのため、サムネイルは自社素材（ジャンルアイコン・マスコット）と配色だけで組み立てる。
+// 【サムネイルの方針・2026-09-09】
+// マスコットやジャンルアイコン（ボール等）、箱画像は使わない。記事の中身と関係がなく、
+// 一覧に並べたとき全部同じ絵に見えてしまうため。
+// 代わりに「記事タイトルそのもの」を図版にする。記事ごとに必ず違う絵になり、
+// タイトルが読めるぶん一覧での判別も速い。
+// 元記事・公式サイトの画像は他社の著作物なので使わない（引用の要件を満たさない）。
 const ARTICLE_TONES = {
   "安く入手": "#e8f0ff", "高く売る": "#e7f8ec", "応募方法": "#f1e9fe",
   "デッキ解説": "#fff2e0", "大会レポート": "#ffe9ef", "初心者ガイド": "#e6f7f8",
@@ -136,46 +138,61 @@ const ARTICLE_FG = {
   "デッキ解説": "#e07a1f", "大会レポート": "#d63864", "初心者ガイド": "#0e9aa7",
 };
 
-// タグからジャンルを引き当て、そのジャンルの実写アイコンをサムネイルに載せる。
-const ARTICLE_TAG_GENRE = [
-  ["ポケカ", "genre-pokeka.webp"],
-  ["ワンピースカード", "genre-onepiece.webp"],
-  ["遊戯王", "genre-yugioh.webp"],
-  ["ドラゴンボール", "genre-dragonball.webp"],
-  ["デュエマ", "genre-duema.webp"],
-];
-function articleGenreImage(tags) {
-  if (!tags || !tags.length) return null;
-  const hit = ARTICLE_TAG_GENRE.find(([tag]) => tags.includes(tag));
-  return hit ? assetUrl(hit[1]) : null;
+/**
+ * サムネイルに載せるタイトルを整える。
+ * 【】で囲まれた煽り文句はサムネイルでは邪魔になるので落とし、本題だけを残す。
+ */
+function thumbTitleLines(title, perLine = 13, maxLines = 3) {
+  const core = String(title || "")
+    .replace(/【[^】]*】/g, "")
+    .replace(/[｜|]/g, " ")
+    .trim() || String(title || "");
+  const lines = [];
+  for (let i = 0; i < core.length && lines.length < maxLines; i += perLine) {
+    lines.push(core.slice(i, i + perLine));
+  }
+  if (core.length > perLine * maxLines && lines.length) {
+    lines[lines.length - 1] = lines[lines.length - 1].slice(0, perLine - 1) + "…";
+  }
+  return lines;
+}
+
+function escapeXml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 let _artThumbSeq = 0;
 /**
- * 記事サムネイル。カテゴリ配色の下地に、ジャンルアイコン（無ければマスコット）を重ねる。
+ * 記事サムネイル。カテゴリ配色の下地に、記事タイトルを組んで描く。
  * @param {string} category
  * @param {string} cls
- * @param {string[]} [tags] ジャンルアイコンの判定に使う
+ * @param {string} title
  */
-function articleThumbHtml(category, cls, tags) {
+function articleThumbHtml(category, cls, title) {
   const fg = ARTICLE_FG[category] || "#2f6fed";
   const tone = ARTICLE_TONES[category] || "#e8f0ff";
   const gid = `art-g-${_artThumbSeq++}`;
-  const img = articleGenreImage(tags) || assetUrl("mascot-point.webp");
-  return `<svg class="${cls}" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  const lines = thumbTitleLines(title);
+  const startY = 62 - (lines.length - 1) * 9;
+  const text = lines
+    .map((l, i) => `<tspan x="16" y="${startY + i * 18}">${escapeXml(l)}</tspan>`)
+    .join("");
+  return `<svg class="${cls}" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(title || "")}">
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="${tone}"/><stop offset="100%" stop-color="#ffffff"/>
     </linearGradient></defs>
     <rect width="200" height="120" fill="url(#${gid})"/>
-    <circle cx="158" cy="98" r="52" fill="${fg}" opacity=".08"/>
-    <circle cx="34" cy="20" r="28" fill="${fg}" opacity=".06"/>
-    <image href="${img}" x="52" y="10" width="96" height="100" preserveAspectRatio="xMidYMid meet"/>
+    <rect x="0" y="0" width="5" height="120" fill="${fg}"/>
+    <circle cx="182" cy="108" r="46" fill="${fg}" opacity=".07"/>
+    <text x="16" y="24" font-size="9" font-weight="700" fill="${fg}" letter-spacing="0.5">${escapeXml(category || "COLUMN")}</text>
+    <text font-size="13" font-weight="700" fill="#1c2536" style="line-height:1.4">${text}</text>
+    <text x="16" y="108" font-size="7.5" fill="#8a93a6">oripa-market.com</text>
   </svg>`;
 }
 
 function articleCardHtml(a) {
   return `<a class="article-card" href="${a.permalink}">
-    ${a.thumbnail ? `<img class="art-thumb" src="${a.thumbnail}" alt="" loading="lazy" decoding="async">` : articleThumbHtml(a.category, "art-thumb", a.tags)}
+    ${a.thumbnail ? `<img class="art-thumb" src="${a.thumbnail}" alt="" loading="lazy" decoding="async">` : articleThumbHtml(a.category, "art-thumb", a.title)}
     <div class="art-body">
       <span class="art-cat">${a.category}</span>
       <div class="art-title">${a.title}</div>
