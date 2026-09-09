@@ -330,7 +330,7 @@ add_action(
 			)
 		);
 		// 新商品（release）用メタ（2026-09-10追加）。公式サイト由来の一次情報。
-		foreach ( array( 'release_date', 'genre', 'official_url', 'source_site', 'notion_page_id', 'product_type' ) as $key ) {
+		foreach ( array( 'release_date', 'genre', 'official_url', 'source_site', 'notion_page_id', 'product_type', 'image_url' ) as $key ) {
 			register_post_meta(
 				'release',
 				$key,

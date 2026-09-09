@@ -60,6 +60,9 @@ $genre_colors = array(
 					<?php foreach ( $items as $r ) : ?>
 						<li class="release-item">
 							<span class="release-date"><?php echo esc_html( substr( $r['releaseDate'], 8, 2 ) ); ?><small>日</small></span>
+							<?php if ( ! empty( $r['image'] ) ) : ?>
+								<img class="release-thumb" src="<?php echo esc_url( $r['image'] ); ?>" alt="" loading="lazy" decoding="async" width="64" height="64">
+							<?php endif; ?>
 							<span class="release-body">
 								<span class="release-genre" style="--genre-color:<?php echo esc_attr( $genre_colors[ $r['genre'] ] ?? '#8a93a6' ); ?>"><?php echo esc_html( $r['genre'] ); ?></span>
 								<span class="release-title"><?php echo esc_html( $r['title'] ); ?></span>
