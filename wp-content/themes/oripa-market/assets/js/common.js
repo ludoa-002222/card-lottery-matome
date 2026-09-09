@@ -156,6 +156,7 @@ function articleCardHtml(a) {
       <p class="art-excerpt">${a.excerpt}</p>
       <div class="verified-row" style="margin-top:2px;"><span class="check">✓</span>編集部確認済み</div>
       <div class="art-meta">更新 ${fmtDateSlash(a.updatedAt)}・${a.readMin}分で読める</div>
+      ${(a.tags && a.tags.length) ? `<div class="art-tags">${a.tags.slice(0, 4).map(t => `<span class="art-tag">#${t}</span>`).join("")}</div>` : ""}
     </div>
   </a>`;
 }

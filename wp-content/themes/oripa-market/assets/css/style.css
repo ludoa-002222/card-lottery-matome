@@ -448,3 +448,12 @@ body.oripa-modal-open { overflow: hidden; }
 .lottery-card.is-ended .badges { display: none; }
 .lottery-card.is-ended .btn.primary { background: var(--surface-2); color: var(--ink-soft); border-color: var(--border); pointer-events: auto; }
 .ribbon.ended { background: var(--ink-soft); }
+
+/* ===== コラムのタグと出典クレジット（Notion記事ソースDB連携・2026-09-09） ===== */
+.art-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.art-tag { font-size: .66rem; color: var(--ink-soft); background: var(--surface-2); border-radius: 999px; padding: 2px 8px; }
+.article-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+.article-tag { font-size: .72rem; color: var(--ink-soft); background: var(--surface-2); border-radius: 999px; padding: 4px 10px; text-decoration: none; }
+.article-tag:hover { background: #e6ebf5; }
+.article-credit { margin-top: 16px; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: var(--radius-sm); font-size: .76rem; line-height: 1.6; }
+.article-credit span { color: var(--ink-soft); }

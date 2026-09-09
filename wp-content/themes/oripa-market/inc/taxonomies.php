@@ -89,6 +89,28 @@ add_action(
 			)
 		);
 
+		// コラムの検索用タグ（分類より細かい粒度。カード名・パック名などを入れる）。
+		register_taxonomy(
+			'column_tag',
+			array( 'column' ),
+			array(
+				'label'             => 'コラムタグ',
+				'labels'            => array(
+					'name'          => 'コラムタグ',
+					'singular_name' => 'コラムタグ',
+					'menu_name'     => 'コラムタグ',
+				),
+				'public'            => true,
+				'hierarchical'      => false,
+				'show_admin_column' => true,
+				'show_in_rest'      => true,
+				'rewrite'           => array(
+					'slug'       => 'column-tag',
+					'with_front' => false,
+				),
+			)
+		);
+
 		register_taxonomy(
 			'shop_area',
 			array( 'shop' ),

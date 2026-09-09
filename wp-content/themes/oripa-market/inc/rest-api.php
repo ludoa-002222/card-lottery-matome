@@ -218,9 +218,14 @@ function oripa_rest_articles() {
 			$paras = array( $content );
 		}
 
+		$tags = wp_get_post_terms( $p->ID, 'column_tag', array( 'fields' => 'names' ) );
+
 		$out[] = array(
-			'slug'      => $p->post_name,
-			'category'  => $cats && ! is_wp_error( $cats ) ? $cats[0] : '',
+			'slug'       => $p->post_name,
+			'category'   => $cats && ! is_wp_error( $cats ) ? $cats[0] : '',
+			'tags'       => $tags && ! is_wp_error( $tags ) ? array_values( $tags ) : array(),
+			'sourceUrl'  => get_post_meta( $p->ID, 'source_url', true ) ?: '',
+			'sourceSite' => get_post_meta( $p->ID, 'source_site', true ) ?: '',
 			'title'     => $p->post_title,
 			'excerpt'   => has_excerpt( $p ) ? get_the_excerpt( $p ) : wp_trim_words( $content, 60, '…' ),
 			'updatedAt' => oripa_to_iso( $p->post_modified ),

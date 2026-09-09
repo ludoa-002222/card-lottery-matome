@@ -20,6 +20,9 @@ while ( have_posts() ) :
 	$cat_name  = $cats && ! is_wp_error( $cats ) ? $cats[0]->name : '';
 	$read_min  = (int) ( get_post_meta( $post_id, 'read_min', true ) ?: 5 );
 	$updated   = get_the_modified_date( 'Y/m/d' );
+	$tags        = get_the_terms( $post_id, 'column_tag' );
+	$source_url  = get_post_meta( $post_id, 'source_url', true );
+	$source_site = get_post_meta( $post_id, 'source_site', true );
 	?>
 	<main class="wrap" data-slug="<?php echo esc_attr( get_post_field( 'post_name', $post_id ) ); ?>">
 		<?php
@@ -57,6 +60,21 @@ while ( have_posts() ) :
 				<?php endif; ?>
 
 				<div class="article-body"><?php the_content(); ?></div>
+
+				<?php if ( $tags && ! is_wp_error( $tags ) ) : ?>
+				<div class="article-tags">
+					<?php foreach ( $tags as $tag ) : ?>
+						<a class="article-tag" href="<?php echo esc_url( get_term_link( $tag ) ); ?>">#<?php echo esc_html( $tag->name ); ?></a>
+					<?php endforeach; ?>
+				</div>
+				<?php endif; ?>
+
+				<?php if ( $source_url ) : ?>
+				<p class="article-credit">
+					参考元：<a href="<?php echo esc_url( $source_url ); ?>" target="_blank" rel="noopener nofollow"><?php echo esc_html( $source_site ? $source_site : $source_url ); ?></a>
+					<br><span>本記事は上記の記事を参考に、当サイトが独自に構成・執筆したものです。画像・本文の転載はしていません。</span>
+				</p>
+				<?php endif; ?>
 
 				<p class="footer-note" style="margin-top:24px;">本記事は当サイトが収集した抽選・予約情報の傾向をもとにした参考情報です。実際の当落・相場を保証するものではありません。最新情報は必ず各店舗・公式サイトでご確認ください。</p>
 
