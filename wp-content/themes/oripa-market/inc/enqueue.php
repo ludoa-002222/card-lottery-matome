@@ -22,10 +22,18 @@ add_action(
 			ORIPA_THEME_VERSION
 		);
 
+		// 応募方法ガイド（プラットフォーム別の定数）。common.js より先に読み込む。
+		wp_enqueue_script(
+			'oripa-apply-guides',
+			ORIPA_THEME_URI . '/assets/js/apply-guides.js',
+			array(),
+			ORIPA_THEME_VERSION,
+			true
+		);
 		wp_enqueue_script(
 			'oripa-common',
 			ORIPA_THEME_URI . '/assets/js/common.js',
-			array(),
+			array( 'oripa-apply-guides' ),
 			ORIPA_THEME_VERSION,
 			true
 		);

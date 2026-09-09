@@ -283,8 +283,26 @@ function ensureDynamicMethodModal() {
         <span class="oripa-modal-shop-name" data-slot="shop"></span>
         <span class="method-chip" data-slot="method-chip"></span>
       </div>
+      <p class="oripa-modal-platform" data-slot="platform"></p>
+      <h3 class="oripa-modal-heading">応募の手順</h3>
       <ol class="oripa-modal-steps" data-slot="steps"></ol>
-      <p class="oripa-modal-note">※ 応募内容は送信後に修正できないことが多いです。会員登録は不要な場合がほとんどです。応募条件・締切は変更される場合があるため、応募前に必ず店舗の公式ページでご確認ください。</p>
+      <div class="oripa-modal-section" data-slot="requirements-wrap">
+        <h3 class="oripa-modal-heading">応募に必要なもの・条件</h3>
+        <ul class="oripa-modal-list" data-slot="requirements"></ul>
+      </div>
+      <div class="oripa-modal-section" data-slot="result-wrap">
+        <h3 class="oripa-modal-heading">当選発表の確認方法</h3>
+        <p class="oripa-modal-text" data-slot="result"></p>
+      </div>
+      <div class="oripa-modal-section" data-slot="bring-wrap">
+        <h3 class="oripa-modal-heading">当選後・購入時に必要なもの</h3>
+        <ul class="oripa-modal-list" data-slot="bring"></ul>
+      </div>
+      <div class="oripa-modal-section" data-slot="cautions-wrap">
+        <h3 class="oripa-modal-heading">注意点</h3>
+        <ul class="oripa-modal-list caution" data-slot="cautions"></ul>
+      </div>
+      <p class="oripa-modal-note">※ この案内は応募先サイトの記載をまとめたものです。応募条件・締切は回や店舗によって変わるため、応募前に必ず応募先の公式ページでご確認ください。</p>
       <a class="btn primary" data-slot="apply-link" target="_blank" rel="noopener nofollow" style="display:block;">抽選に応募する！</a>
     </div>`;
   document.body.appendChild(el);
@@ -292,10 +310,18 @@ function ensureDynamicMethodModal() {
   return el;
 }
 
-const ORIPA_METHOD_STEPS = {
-  online: ["応募フォームを開く", "必要事項を入力して送信する", "お店からの連絡（当選メールなど）を待つ", "当選したら期限内にお店で購入する"],
-  store: ["店頭の抽選券・応募用紙を受け取る", "必要事項を記入して応募箱へ入れる", "抽選結果の発表を待つ（店頭掲示・呼出等）", "当選したら期限内にお店で購入する"],
-};
+/** 文字列の配列をリスト要素へ流し込む。空なら見出しごと隠す。 */
+function fillModalList(modal, slot, items) {
+  const list = modal.querySelector(`[data-slot="${slot}"]`);
+  const wrap = modal.querySelector(`[data-slot="${slot}-wrap"]`);
+  list.textContent = "";
+  (items || []).forEach((text) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    list.appendChild(li);
+  });
+  if (wrap) wrap.hidden = !(items && items.length);
+}
 
 function openDynamicMethodModal(l, shop) {
   if (!l.applyUrl) return;
@@ -304,8 +330,18 @@ function openDynamicMethodModal(l, shop) {
   const chip = modal.querySelector('[data-slot="method-chip"]');
   chip.textContent = l.method === "online" ? "オンライン" : "店頭";
   chip.className = `method-chip ${l.method}`;
-  const steps = ORIPA_METHOD_STEPS[l.method] || ORIPA_METHOD_STEPS.online;
-  modal.querySelector('[data-slot="steps"]').innerHTML = steps.map(s => `<li>${s}</li>`).join("");
+
+  // 応募先のプラットフォームごとに、実際の手順・条件を出し分ける（apply-guides.js）。
+  const guide = window.ORIPA_APPLY_GUIDES.resolve(l.applyUrl, l.method);
+  modal.querySelector('[data-slot="platform"]').textContent = `応募先：${guide.label}`;
+  fillModalList(modal, "steps", guide.steps);
+  fillModalList(modal, "requirements", guide.requirements);
+  fillModalList(modal, "bring", guide.bring);
+  fillModalList(modal, "cautions", guide.cautions);
+  const resultWrap = modal.querySelector('[data-slot="result-wrap"]');
+  modal.querySelector('[data-slot="result"]').textContent = guide.result || "";
+  resultWrap.hidden = !guide.result;
+
   modal.querySelector('[data-slot="apply-link"]').href = l.applyUrl;
   openModal(modal);
 }
