@@ -784,3 +784,14 @@ body.oripa-modal-open { overflow: hidden; }
    記事を読んだ流れで応募できるようにする。中身は毎日入れ替わる。 */
 .related-lotteries { padding-top: 26px; margin-top: 26px; border-top: 1px solid var(--border); }
 .related-more { display: inline-block; margin-top: 12px; }
+
+/* 3列のギャラリー表示。
+   既定の .lottery-list は auto-fill なので、記事本文の幅では2列になったり
+   3列になったりして揃わない。ここは列数を固定する。 */
+.related-lotteries .related-list { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 860px) {
+  .related-lotteries .related-list { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .related-lotteries .related-list { grid-template-columns: 1fr; }
+}
