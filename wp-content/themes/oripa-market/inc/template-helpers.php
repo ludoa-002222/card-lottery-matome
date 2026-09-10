@@ -236,9 +236,11 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	$hero      = ( false !== strpos( $cls, 'hero' ) );
 	$w         = $hero ? 210 : 200;
 	$h         = $hero ? 90 : 120;
-	$per_line  = $hero ? 13 : 10;
-	$max_lines = $hero ? 2 : 3;
-	$font_size = $hero ? 13 : 12.5;
+	// 行の右端 = 14 + per_line × font_size。これが図案の左端(142)を越えると重なる。
+	// 2行では「…」で切れてタイトルが読めなかったため3行にした。
+	$per_line  = 10;
+	$max_lines = 3;
+	$font_size = $hero ? 12 : 12.5;
 
 	// 【】は記号だけ外して中身は残す。トレカ記事では【アブソルガルーラ】のように
 	// デッキ名そのものが【】で書かれており、中身を消すと何の記事か分からなくなる（2026-09-11）。
@@ -261,11 +263,11 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 		$lines[ count( $lines ) - 1 ] .= $tail;
 	}
 
-	$start_y = $hero ? 52 : 68 - ( count( $lines ) - 1 ) * 9;
-	$halo_x  = $hero ? 168 : 163;
-	$halo_y  = $hero ? 45 : 58;
+	$start_y = $hero ? 48 - ( count( $lines ) - 1 ) * 8 : 68 - ( count( $lines ) - 1 ) * 9;
+	$halo_x  = $hero ? 172 : 163;
+	$halo_y  = $hero ? 44 : 58;
 	// 図案は中心(144,52)付近に描かれているので、移動と縮小で位置を合わせる
-	$motif_t = $hero ? 'translate(38,-8) scale(.82)' : 'translate(16,4) scale(.86)';
+	$motif_t = $hero ? 'translate(60,-4) scale(.72)' : 'translate(16,4) scale(.86)';
 
 	$label   = $category ? $category : 'コラム';
 	// バッジの幅は文字数から見積もる（日本語1文字ぶんを約7pxとして左右に余白）
@@ -285,7 +287,7 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 		<text x="<?php echo (int) ( 14 + $badge_w / 2 ); ?>" y="23.5" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle"><?php echo esc_html( $label ); ?></text>
 		<text font-size="<?php echo esc_attr( $font_size ); ?>" font-weight="700" fill="#1c2536">
 			<?php foreach ( $lines as $i => $line ) : ?>
-				<tspan x="14" y="<?php echo esc_attr( $start_y + $i * ( $font_size + 5 ) ); ?>"><?php echo esc_html( $line ); ?></tspan>
+				<tspan x="14" y="<?php echo esc_attr( $start_y + $i * ( $font_size + 4 ) ); ?>"><?php echo esc_html( $line ); ?></tspan>
 			<?php endforeach; ?>
 		</text>
 		<text x="14" y="<?php echo (int) ( $h - 9 ); ?>" font-size="7" fill="#8a93a6">oripa-market.com</text>

@@ -249,21 +249,26 @@ function articleThumbHtml(category, cls, title) {
 
   // テキストは図案に重ならない幅で折り返す。
   // 1文字ぶんの幅はフォントサイズとほぼ同じとみて、行の右端が図案の左端を越えないようにする。
-  const perLine = hero ? 13 : 10;
-  const maxLines = hero ? 2 : 3;
-  const fontSize = hero ? 13 : 12.5;
+  // 【幅の計算・2026-09-11】
+  // 1文字の幅はフォントサイズとほぼ同じ。行の右端 = 14 + perLine × fontSize。
+  // これが図案の左端を越えると文字と図が重なる。
+  // ヒーローは図案が x=142 から始まるので 14 + 10×12 = 134 に収める。
+  // 2行では「…」で切れてタイトルが読めなかったため3行にした。
+  const perLine = hero ? 10 : 10;
+  const maxLines = 3;
+  const fontSize = hero ? 12 : 12.5;
   const lines = thumbTitleLines(title, perLine, maxLines);
 
   // 図案は右側。motifは中心(144,52)付近に描かれているので、移動と縮小で位置を合わせる。
   const motif = hero
-    ? `<g transform="translate(38,-8) scale(.82)">${categoryMotif(category, fg)}</g>`
+    ? `<g transform="translate(60,-4) scale(.72)">${categoryMotif(category, fg)}</g>`
     : `<g transform="translate(16,4) scale(.86)">${categoryMotif(category, fg)}</g>`;
-  const haloX = hero ? 168 : 163;
-  const haloY = hero ? 45 : 58;
+  const haloX = hero ? 172 : 163;
+  const haloY = hero ? 44 : 58;
 
-  const startY = hero ? 52 : 68 - (lines.length - 1) * 9;
+  const startY = hero ? 48 - (lines.length - 1) * 8 : 68 - (lines.length - 1) * 9;
   const text = lines
-    .map((l, i) => `<tspan x="14" y="${startY + i * (fontSize + 5)}">${escapeXml(l)}</tspan>`)
+    .map((l, i) => `<tspan x="14" y="${startY + i * (fontSize + 4)}">${escapeXml(l)}</tspan>`)
     .join("");
 
   const label = category || "コラム";
