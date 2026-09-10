@@ -267,24 +267,28 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	// 全角と半角では幅が倍ちがう。文字数で折ると半角の多い行だけ短くなり、
 	// あふれたぶんが「…」になっていた。全角を1、半角を0.55として数える。
 	// JS版 assets/js/common.js の thumbTitleLines() と同じ計算にすること。
-	$lines = array();
-	$buf   = '';
-	$w     = 0;
-	$chars = preg_split( '//u', $core, -1, PREG_SPLIT_NO_EMPTY );
-	$rest  = 0;
+	// 【変数名に注意・2026-09-11】
+	// ここを $w にしていたため、viewBoxの幅を入れた $w を上書きしてしまい、
+	// **viewBox が "0 0 2 90" になってSVGが極端に拡大表示された。**
+	// 行の幅は $line_w、viewBoxの幅は $w と分ける。
+	$lines  = array();
+	$buf    = '';
+	$line_w = 0;
+	$chars  = preg_split( '//u', $core, -1, PREG_SPLIT_NO_EMPTY );
+	$rest   = 0;
 	foreach ( $chars as $idx => $ch ) {
 		$cw = preg_match( '/[\x20-\x7E]|[\x{FF61}-\x{FF9F}]/u', $ch ) ? 0.55 : 1;
-		if ( $w + $cw > $per_line && '' !== $buf ) {
+		if ( $line_w + $cw > $per_line && '' !== $buf ) {
 			$lines[] = $buf;
 			if ( count( $lines ) >= $max_lines ) {
 				$rest = count( $chars ) - $idx;
 				break;
 			}
-			$buf = '';
-			$w   = 0;
+			$buf    = '';
+			$line_w = 0;
 		}
-		$buf .= $ch;
-		$w   += $cw;
+		$buf    .= $ch;
+		$line_w += $cw;
 	}
 	if ( '' !== $buf && count( $lines ) < $max_lines ) {
 		$lines[] = $buf;
