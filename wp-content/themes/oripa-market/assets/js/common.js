@@ -286,9 +286,9 @@ function articleThumbHtml(category, cls, title) {
   // これが図案の左端を越えると文字と図が重なる。
   // ヒーローは図案が x=142 から始まるので 14 + 10×12 = 134 に収める。
   // 2行では「…」で切れてタイトルが読めなかったため3行にした。
-  const perLine = hero ? 10 : 10;
-  const maxLines = 3;
-  const fontSize = hero ? 12 : 12.5;
+  const perLine = hero ? 11 : 10;
+  const maxLines = hero ? 4 : 3;
+  const fontSize = hero ? 11 : 12.5;
   const lines = thumbTitleLines(title, perLine, maxLines);
 
   // 図案は右側。motifは中心(144,52)付近に描かれているので、移動と縮小で位置を合わせる。
@@ -298,7 +298,7 @@ function articleThumbHtml(category, cls, title) {
   const haloX = hero ? 172 : 163;
   const haloY = hero ? 44 : 58;
 
-  const startY = hero ? 48 - (lines.length - 1) * 8 : 68 - (lines.length - 1) * 9;
+  const startY = hero ? 46 - (lines.length - 1) * 7 : 68 - (lines.length - 1) * 9;
   const text = lines
     .map((l, i) => `<tspan x="14" y="${startY + i * (fontSize + 4)}">${escapeXml(l)}</tspan>`)
     .join("");
@@ -318,7 +318,7 @@ function articleThumbHtml(category, cls, title) {
     <rect x="14" y="12" width="${badgeW}" height="16" rx="8" fill="${fg}"/>
     <text x="${14 + badgeW / 2}" y="23.5" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle">${escapeXml(label)}</text>
     <text font-size="${fontSize}" font-weight="700" fill="#1c2536">${text}</text>
-    <text x="14" y="${H - 9}" font-size="7" fill="#8a93a6">oripa-market.com</text>
+    ${hero ? "" : `<text x="14" y="${H - 9}" font-size="7" fill="#8a93a6">oripa-market.com</text>`}
   </svg>`;
 }
 
