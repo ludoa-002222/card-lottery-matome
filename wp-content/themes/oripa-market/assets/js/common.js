@@ -194,9 +194,20 @@ function thumbTitleLines(title, perLine = 13, maxLines = 3) {
     lines[lines.length - 1] = `${lines[lines.length - 1].slice(0, -1)}…`;
   }
 
-  // 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける
+  // 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける。
+  // ただし**くっつけた結果が幅を超えるなら、そのまま別行にする。**
+  // 無条件に結合していたため「勝デッキから考える環境分析」のように
+  // 1行が13文字になり、図案に重なっていた（2026-09-11）。
   if (lines.length > 1 && lines[lines.length - 1].length <= 2) {
-    lines[lines.length - 2] += lines.pop();
+    const tail = lines[lines.length - 1];
+    const prev = lines[lines.length - 2];
+    const merged = prev + tail;
+    let mw = 0;
+    for (const ch of merged) mw += widthOf(ch);
+    if (mw <= perLine) {
+      lines.pop();
+      lines[lines.length - 1] = merged;
+    }
   }
   return lines;
 }

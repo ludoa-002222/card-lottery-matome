@@ -304,10 +304,17 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 		$last           = count( $lines ) - 1;
 		$lines[ $last ] = mb_substr( $lines[ $last ], 0, mb_strlen( $lines[ $last ], 'UTF-8' ) - 1, 'UTF-8' ) . '…';
 	}
-	// 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける
+	// 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける。
+	// ただし**くっつけた結果が幅を超えるなら、そのまま別行にする。**
+	// 無条件に結合していたため1行が13文字になり、図案に重なっていた（2026-09-11）。
 	if ( count( $lines ) > 1 && mb_strlen( end( $lines ), 'UTF-8' ) <= 2 ) {
-		$tail                          = array_pop( $lines );
-		$lines[ count( $lines ) - 1 ] .= $tail;
+		$tail   = end( $lines );
+		$prev   = $lines[ count( $lines ) - 2 ];
+		$merged = $prev . $tail;
+		if ( mb_strwidth( $merged, 'UTF-8' ) / 2 <= $per_line ) {
+			array_pop( $lines );
+			$lines[ count( $lines ) - 1 ] = $merged;
+		}
 	}
 
 	$start_y = $hero ? 46 - ( count( $lines ) - 1 ) * 7 : 68 - ( count( $lines ) - 1 ) * 9;
