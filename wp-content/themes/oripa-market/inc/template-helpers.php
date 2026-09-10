@@ -228,16 +228,26 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	$tone = $pair[0];
 	$fg   = $pair[1];
 
+	// 【用途で縦横比を変える・2026-09-11】
+	// 記事ページのヒーローはCSSで 21/9、一覧のカードは 16/10。
+	// どちらも 200×120（1.67:1）のviewBoxを slice で表示していたため、
+	// **ヒーローでは上下が切られてバッジと最終行が欠けていた**。
+	// JS版 assets/js/common.js の articleThumbHtml() と同じ値を使うこと。
+	$hero      = ( false !== strpos( $cls, 'hero' ) );
+	$w         = $hero ? 210 : 200;
+	$h         = $hero ? 90 : 120;
+	$per_line  = $hero ? 13 : 10;
+	$max_lines = $hero ? 2 : 3;
+	$font_size = $hero ? 13 : 12.5;
+
 	// 【】は記号だけ外して中身は残す。トレカ記事では【アブソルガルーラ】のように
 	// デッキ名そのものが【】で書かれており、中身を消すと何の記事か分からなくなる（2026-09-11）。
 	$core = trim( preg_replace( '/\s+/u', ' ', preg_replace( '/[【】｜|]/u', ' ', (string) $title ) ) );
 	if ( '' === $core ) {
 		$core = (string) $title;
 	}
-	$per_line  = 11;
-	$max_lines = 3;
-	$lines     = array();
-	$len       = mb_strlen( $core, 'UTF-8' );
+	$lines = array();
+	$len   = mb_strlen( $core, 'UTF-8' );
 	for ( $i = 0; $i < $len && count( $lines ) < $max_lines; $i += $per_line ) {
 		$lines[] = mb_substr( $core, $i, $per_line, 'UTF-8' );
 	}
@@ -250,31 +260,35 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 		$tail                          = array_pop( $lines );
 		$lines[ count( $lines ) - 1 ] .= $tail;
 	}
-	$start_y = 66 - ( count( $lines ) - 1 ) * 9;
+
+	$start_y = $hero ? 52 : 68 - ( count( $lines ) - 1 ) * 9;
+	$halo_x  = $hero ? 168 : 163;
+	$halo_y  = $hero ? 45 : 58;
+	// 図案は中心(144,52)付近に描かれているので、移動と縮小で位置を合わせる
+	$motif_t = $hero ? 'translate(38,-8) scale(.82)' : 'translate(16,4) scale(.86)';
+
+	$label   = $category ? $category : 'コラム';
+	// バッジの幅は文字数から見積もる（日本語1文字ぶんを約7pxとして左右に余白）
+	$badge_w = max( 38, mb_strlen( $label, 'UTF-8' ) * 7 + 14 );
 	$gid     = 'art-g-php-' . wp_rand( 1000, 9999 );
 	ob_start();
 	?>
-	<svg class="<?php echo esc_attr( $cls ); ?>" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="<?php echo esc_attr( $title ); ?>">
+	<svg class="<?php echo esc_attr( $cls ); ?>" viewBox="0 0 <?php echo (int) $w; ?> <?php echo (int) $h; ?>" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="<?php echo esc_attr( $title ); ?>">
 		<defs><linearGradient id="<?php echo esc_attr( $gid ); ?>" x1="0" y1="0" x2="1" y2="1">
 			<stop offset="0%" stop-color="<?php echo esc_attr( $tone ); ?>"/><stop offset="100%" stop-color="#ffffff"/>
 		</linearGradient></defs>
-		<rect width="200" height="120" fill="url(#<?php echo esc_attr( $gid ); ?>)"/>
-		<circle cx="152" cy="56" r="44" fill="<?php echo esc_attr( $fg ); ?>" opacity=".10"/>
-		<?php echo oripa_category_motif( $category, $fg ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<rect x="0" y="0" width="5" height="120" fill="<?php echo esc_attr( $fg ); ?>"/>
-		<?php
-		$label   = $category ? $category : 'コラム';
-		// バッジの幅は文字数から見積もる（日本語1文字ぶんを約7pxとして左右に余白）
-		$badge_w = max( 38, mb_strlen( $label, 'UTF-8' ) * 7 + 14 );
-		?>
+		<rect width="<?php echo (int) $w; ?>" height="<?php echo (int) $h; ?>" fill="url(#<?php echo esc_attr( $gid ); ?>)"/>
+		<circle cx="<?php echo (int) $halo_x; ?>" cy="<?php echo (int) $halo_y; ?>" r="40" fill="<?php echo esc_attr( $fg ); ?>" opacity=".10"/>
+		<g transform="<?php echo esc_attr( $motif_t ); ?>"><?php echo oripa_category_motif( $category, $fg ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></g>
+		<rect x="0" y="0" width="5" height="<?php echo (int) $h; ?>" fill="<?php echo esc_attr( $fg ); ?>"/>
 		<rect x="14" y="12" width="<?php echo (int) $badge_w; ?>" height="16" rx="8" fill="<?php echo esc_attr( $fg ); ?>"/>
 		<text x="<?php echo (int) ( 14 + $badge_w / 2 ); ?>" y="23.5" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle"><?php echo esc_html( $label ); ?></text>
-		<text font-size="12.5" font-weight="700" fill="#1c2536">
+		<text font-size="<?php echo esc_attr( $font_size ); ?>" font-weight="700" fill="#1c2536">
 			<?php foreach ( $lines as $i => $line ) : ?>
-				<tspan x="14" y="<?php echo (int) ( $start_y + $i * 18 ); ?>"><?php echo esc_html( $line ); ?></tspan>
+				<tspan x="14" y="<?php echo esc_attr( $start_y + $i * ( $font_size + 5 ) ); ?>"><?php echo esc_html( $line ); ?></tspan>
 			<?php endforeach; ?>
 		</text>
-		<text x="14" y="110" font-size="7" fill="#8a93a6">oripa-market.com</text>
+		<text x="14" y="<?php echo (int) ( $h - 9 ); ?>" font-size="7" fill="#8a93a6">oripa-market.com</text>
 	</svg>
 	<?php
 	return ob_get_clean();
