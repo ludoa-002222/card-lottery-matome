@@ -186,8 +186,9 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	$tone = $pair[0];
 	$fg   = $pair[1];
 
-	// 【】の煽り文句はサムネイルでは邪魔なので落とし、本題だけ残す。
-	$core = trim( preg_replace( '/【[^】]*】/u', '', (string) $title ) );
+	// 【】は記号だけ外して中身は残す。トレカ記事では【アブソルガルーラ】のように
+	// デッキ名そのものが【】で書かれており、中身を消すと何の記事か分からなくなる（2026-09-11）。
+	$core = trim( preg_replace( '/\s+/u', ' ', preg_replace( '/[【】｜|]/u', ' ', (string) $title ) ) );
 	if ( '' === $core ) {
 		$core = (string) $title;
 	}

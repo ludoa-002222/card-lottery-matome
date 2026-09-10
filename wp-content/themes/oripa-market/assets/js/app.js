@@ -281,20 +281,77 @@
 
   // ---------------------------------------------------------------- shop
   async function initShop() {
-    const { lotteries, shops } = await loadAllData();
-    const rows = document.getElementById("shop-rows");
-    if (!rows) return;
-    rows.innerHTML = shops.map(s => {
-      const count = lotteries.filter(l => l.shopId === s.id).length;
-      return `<tr>
-        <td>${s.name}</td>
-        <td>${s.area || "-"}</td>
-        <td>${s.isOnline ? "◯" : "―"}</td>
-        <td>${s.isStore ? "◯" : "―"}</td>
-        <td>${count}件</td>
-        <td>${trustScoreBarHtml(trustScoreOf(s.id))}</td>
-      </tr>`;
-    }).join("");
+    const { lotteries, shops, categories } = await loadAllData();
+    const wrap = document.getElementById("shop-groups");
+    if (!wrap) return;
+
+    const nameBySlug = Object.fromEntries((categories || []).map(c => [c.slug, c.name]));
+    const groups = window.ORIPA_SHOP_GROUPS.groupShops(shops, lotteries, nameBySlug);
+
+    const summary = document.getElementById("shop-summary");
+    if (summary) {
+      const shopTotal = groups.reduce((n, g) => n + g.shops.length, 0);
+      summary.textContent = `${groups.length}系列・${shopTotal}店舗を掲載しています。`;
+    }
+
+    function render() {
+      const q = (document.getElementById("shop-q")?.value || "").trim().toLowerCase();
+      const area = document.getElementById("shop-area")?.value || "";
+
+      const view = groups
+        .map(g => ({
+          ...g,
+          // 検索・エリアの絞り込みは店舗単位でかける。
+          // 系列名が一致した場合は、その系列の店舗をすべて残す（探し方に合わせる）。
+          shops: g.shops.filter(s => {
+            if (area && s.area !== area) return false;
+            if (!q) return true;
+            return `${s.name} ${g.label}`.toLowerCase().includes(q);
+          }),
+        }))
+        .filter(g => g.shops.length > 0);
+
+      if (!view.length) {
+        wrap.innerHTML = `<div class="empty-state">条件に合う店舗がありません。</div>`;
+        return;
+      }
+
+      // 絞り込み中は中身を開いた状態にする（閉じたままだと結果が見えない）
+      const openAll = Boolean(q || area);
+
+      wrap.innerHTML = view.map(g => `
+        <details class="shop-group"${openAll ? " open" : ""}>
+          <summary class="shop-group-head">
+            <span class="shop-group-name">${g.label}<span class="shop-group-num">（${g.shops.length}店舗）</span></span>
+            <span class="shop-group-meta">
+              ${g.genres.length ? `<span class="shop-group-genres">${g.genres.map(x => `<span class="shop-genre">${x}</span>`).join("")}</span>` : ""}
+              <span class="shop-group-count">掲載${g.lotteryCount}件</span>
+            </span>
+          </summary>
+          <table class="shop-table">
+            <thead><tr><th>店舗名</th><th>エリア</th><th>オンライン</th><th>店頭</th><th>掲載件数</th></tr></thead>
+            <tbody>
+              ${g.shops.map(s => `<tr>
+                <td>${s.name}</td>
+                <td>${s.area || "-"}</td>
+                <td>${s.isOnline ? "◯" : "―"}</td>
+                <td>${s.isStore ? "◯" : "―"}</td>
+                <td class="num">${s.lotteryCount}件</td>
+              </tr>`).join("")}
+            </tbody>
+          </table>
+        </details>`).join("");
+    }
+
+    const areaSel = document.getElementById("shop-area");
+    if (areaSel) {
+      const areas = [...new Set(groups.flatMap(g => g.shops.map(s => s.area).filter(Boolean)))].sort();
+      areaSel.innerHTML = `<option value="">すべてのエリア</option>` +
+        areas.map(a => `<option value="${a}">${a}</option>`).join("");
+      areaSel.addEventListener("change", render);
+    }
+    document.getElementById("shop-q")?.addEventListener("input", render);
+    render();
   }
 
   // -------------------------------------------------- online / store page
@@ -342,18 +399,32 @@
 
   // ------------------------------------------------------------ calendar
   async function initCalendar() {
-    const { lotteries, shops, boxes } = await loadAllData();
+    const { lotteries, shops, boxes, categories } = await loadAllData();
     const ctx = { shops, boxes };
     const dow = ["日", "月", "火", "水", "木", "金", "土"];
     document.getElementById("cal-dow").innerHTML = dow.map(d => `<div class="cal-dow">${d}</div>`).join("");
 
     const view = new Date();
     view.setDate(1);
+    let selected = null;   // 選択中の日付 {y,m,d}
+    let showAll = false;   // 件数が多い日の「すべて表示」
 
-    const countByDay = (y, m, d) => lotteries.filter(l => {
+    const DAY_PAGE_SIZE = 8; // 一度に見せる件数。これを超えたら折りたたむ
+
+    const onDay = (l, y, m, d) => {
       const dl = new Date(l.deadline);
       return dl.getFullYear() === y && dl.getMonth() === m && dl.getDate() === d;
-    }).length;
+    };
+    const countByDay = (y, m, d) => lotteries.filter(l => onDay(l, y, m, d)).length;
+
+    // 絞り込みの入力。ジャンルは実際に抽選があるものだけ出す。
+    const catSelect = document.getElementById("day-cat");
+    if (catSelect) {
+      const used = new Set(lotteries.map(l => l.category));
+      const opts = (categories || []).filter(c => used.has(c.slug));
+      catSelect.innerHTML = `<option value="">すべてのジャンル</option>` +
+        opts.map(c => `<option value="${c.slug}">${c.name}</option>`).join("");
+    }
 
     function drawCalendar() {
       const y = view.getFullYear(), m = view.getMonth();
@@ -366,28 +437,83 @@
       for (let d = 1; d <= daysInMonth; d++) {
         const cnt = countByDay(y, m, d);
         const isToday = today.getFullYear() === y && today.getMonth() === m && today.getDate() === d;
-        cells.push(`<div class="cal-cell ${isToday ? "today" : ""}" data-y="${y}" data-m="${m}" data-d="${d}">
-          <div class="d">${d}</div>
+        const isSel = selected && selected.y === y && selected.m === m && selected.d === d;
+        cells.push(`<button type="button" class="cal-cell${isToday ? " today" : ""}${isSel ? " selected" : ""}" data-y="${y}" data-m="${m}" data-d="${d}" aria-pressed="${isSel ? "true" : "false"}">
+          <span class="d">${d}</span>
           ${cnt > 0 ? `<span class="count">${cnt}件</span>` : ""}
-        </div>`);
+        </button>`);
       }
       document.getElementById("cal-grid").innerHTML = cells.join("");
       document.querySelectorAll(".cal-cell:not(.empty)").forEach(c =>
-        c.addEventListener("click", () => showDay(+c.dataset.y, +c.dataset.m, +c.dataset.d)));
+        c.addEventListener("click", () => {
+          showAll = false;
+          selectDay(+c.dataset.y, +c.dataset.m, +c.dataset.d);
+        }));
     }
 
-    function showDay(y, m, d) {
-      const list = lotteries.filter(l => {
-        const dl = new Date(l.deadline);
-        return dl.getFullYear() === y && dl.getMonth() === m && dl.getDate() === d;
-      });
-      document.getElementById("day-section").style.display = "block";
-      document.getElementById("day-title").textContent = `${m + 1}/${d} 締切の抽選（${list.length}件）`;
-      document.getElementById("day-list").innerHTML = list.length
-        ? list.map(l => lotteryCardHtml(l, ctx)).join("")
-        : `<div class="empty-state">この日に締め切られる抽選はありません。</div>`;
-      document.getElementById("day-section").scrollIntoView({ behavior: "smooth" });
+    /** 日付を選ぶ。押した日をカレンダー上でも目立たせる（押し間違いに気づけるように）。 */
+    function selectDay(y, m, d) {
+      const isFirstOpen = selected === null;
+      selected = { y, m, d };
+      drawCalendar();
+      renderDay();
+      // 初回だけスクロールする。開いている状態で毎回動かすと、
+      // スクロール中に次のタップが隣の日付へ当たってしまう（押した日と違う日が出る原因）。
+      if (isFirstOpen) {
+        document.getElementById("day-section").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
+
+    /** 選択中の日のリストを、検索語とジャンルで絞って描く。 */
+    function renderDay() {
+      if (!selected) return;
+      const { y, m, d } = selected;
+      const q = (document.getElementById("day-q")?.value || "").trim().toLowerCase();
+      const cat = document.getElementById("day-cat")?.value || "";
+
+      const all = lotteries.filter(l => onDay(l, y, m, d));
+      const filtered = all.filter(l => {
+        if (cat && l.category !== cat) return false;
+        if (!q) return true;
+        const shop = shops.find(s => String(s.id) === String(l.shopId));
+        return `${l.title || ""} ${shop ? shop.name : ""}`.toLowerCase().includes(q);
+      });
+
+      document.getElementById("day-section").hidden = false;
+      document.getElementById("day-title").textContent = `${m + 1}月${d}日 締切の抽選`;
+
+      const countEl = document.getElementById("day-count");
+      if (countEl) {
+        countEl.textContent = filtered.length === all.length
+          ? `${all.length}件`
+          : `${all.length}件中 ${filtered.length}件を表示`;
+      }
+      // 絞り込みの入力欄は、件数が少ない日では出す意味がないので隠す。
+      const tools = document.getElementById("day-tools");
+      if (tools) tools.hidden = all.length <= 3;
+
+      const shown = showAll ? filtered : filtered.slice(0, DAY_PAGE_SIZE);
+      const list = document.getElementById("day-list");
+      list.innerHTML = shown.length
+        ? shown.map(l => lotteryCardHtml(l, ctx)).join("")
+        : `<div class="empty-state">${all.length ? "条件に合う抽選がありません。" : "この日に締め切られる抽選はありません。"}</div>`;
+
+      const more = document.getElementById("day-more");
+      if (more) {
+        const rest = filtered.length - shown.length;
+        more.hidden = rest <= 0;
+        more.textContent = `残り${rest}件を表示`;
+      }
+    }
+
+    document.getElementById("day-q")?.addEventListener("input", () => { showAll = false; renderDay(); });
+    document.getElementById("day-cat")?.addEventListener("change", () => { showAll = false; renderDay(); });
+    document.getElementById("day-more")?.addEventListener("click", () => { showAll = true; renderDay(); });
+    document.getElementById("day-close")?.addEventListener("click", () => {
+      selected = null;
+      document.getElementById("day-section").hidden = true;
+      drawCalendar();
+    });
 
     document.getElementById("prev").addEventListener("click", () => { view.setMonth(view.getMonth() - 1); drawCalendar(); });
     document.getElementById("next").addEventListener("click", () => { view.setMonth(view.getMonth() + 1); drawCalendar(); });
