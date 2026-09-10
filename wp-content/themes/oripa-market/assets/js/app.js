@@ -322,7 +322,8 @@
       .sort((a, b) => b.score - a.score || new Date(a.l.deadline) - new Date(b.l.deadline));
 
     const matched = scored.filter(x => x.score > 0);
-    const items = (matched.length ? matched : scored).slice(0, 4).map(x => x.l);
+    // 3列で並べるので、半端な段が出ないよう6件（2段）にする。
+    const items = (matched.length ? matched : scored).slice(0, 6).map(x => x.l);
 
     document.getElementById("related-heading").textContent = matched.length
       ? "この記事に関連する、いま応募できる抽選"

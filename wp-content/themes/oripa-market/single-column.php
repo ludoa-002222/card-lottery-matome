@@ -93,7 +93,7 @@ while ( have_posts() ) :
 				<!-- 記事に関連する、いま応募できる抽選。中身は app.js が描く（毎日入れ替わるため）。 -->
 				<section class="section related-lotteries" id="related-lotteries" hidden>
 					<div class="section-heading"><span class="bar"></span><h2 id="related-heading"></h2></div>
-					<div class="lottery-list lottery-list--rows" id="related-list"></div>
+					<div class="lottery-list related-list" id="related-list"></div>
 					<a class="btn ghost related-more" href="<?php echo esc_url( get_post_type_archive_link( 'lottery' ) ); ?>">受付中の抽選をすべて見る</a>
 				</section>
 
