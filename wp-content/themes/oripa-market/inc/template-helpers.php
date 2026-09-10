@@ -244,9 +244,19 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 
 	// 【】は記号だけ外して中身は残す。トレカ記事では【アブソルガルーラ】のように
 	// デッキ名そのものが【】で書かれており、中身を消すと何の記事か分からなくなる（2026-09-11）。
-	$core = trim( preg_replace( '/\s+/u', ' ', preg_replace( '/[【】｜|]/u', ' ', (string) $title ) ) );
+	$core = trim( preg_replace( '/\s+/u', ' ', preg_replace( '/[【】]/u', ' ', (string) $title ) ) );
 	if ( '' === $core ) {
 		$core = (string) $title;
+	}
+	// 【副題は落とす・2026-09-11】
+	// 「｜」で主題と副題を分けているタイトルがある。両方入れると3行に収まらず、
+	// **主題の途中で「…」になって何の記事か分からなくなる。**
+	// ただし主題が短すぎるときは切らない。
+	$head = trim( preg_split( '/[｜|]/u', $core )[0] );
+	if ( mb_strlen( $head, 'UTF-8' ) >= 8 ) {
+		$core = $head;
+	} else {
+		$core = trim( preg_replace( '/\s+/u', ' ', preg_replace( '/[｜|]/u', ' ', $core ) ) );
 	}
 	// 【末尾の年月はサムネイルから落とす・2026-09-11】
 	// 「…上位9枚 2026年9月」のように末尾まで入れると1〜2文字あふれて「…」で切れ、
