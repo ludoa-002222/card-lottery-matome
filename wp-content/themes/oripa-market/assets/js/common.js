@@ -237,26 +237,51 @@ function articleThumbHtml(category, cls, title) {
   const fg = ARTICLE_FG[category] || "#2f6fed";
   const tone = ARTICLE_TONES[category] || "#e8f0ff";
   const gid = `art-g-${_artThumbSeq++}`;
-  const lines = thumbTitleLines(title, 11, 3);
-  const startY = 66 - (lines.length - 1) * 9;
+
+  // 【用途で縦横比を変える・2026-09-11】
+  // 記事ページのヒーローはCSSで 21/9、一覧のカードは 16/10。
+  // どちらも同じ 200×120（1.67:1）のviewBoxを slice で表示していたため、
+  // **ヒーローでは上下が切られてバッジと最終行が欠けていた**。
+  // 表示する箱の比率に合わせたviewBoxを使う。
+  const hero = /hero/.test(cls);
+  const W = hero ? 210 : 200;
+  const H = hero ? 90 : 120;
+
+  // テキストは図案に重ならない幅で折り返す。
+  // 1文字ぶんの幅はフォントサイズとほぼ同じとみて、行の右端が図案の左端を越えないようにする。
+  const perLine = hero ? 13 : 10;
+  const maxLines = hero ? 2 : 3;
+  const fontSize = hero ? 13 : 12.5;
+  const lines = thumbTitleLines(title, perLine, maxLines);
+
+  // 図案は右側。motifは中心(144,52)付近に描かれているので、移動と縮小で位置を合わせる。
+  const motif = hero
+    ? `<g transform="translate(38,-8) scale(.82)">${categoryMotif(category, fg)}</g>`
+    : `<g transform="translate(16,4) scale(.86)">${categoryMotif(category, fg)}</g>`;
+  const haloX = hero ? 168 : 163;
+  const haloY = hero ? 45 : 58;
+
+  const startY = hero ? 52 : 68 - (lines.length - 1) * 9;
   const text = lines
-    .map((l, i) => `<tspan x="14" y="${startY + i * 18}">${escapeXml(l)}</tspan>`)
+    .map((l, i) => `<tspan x="14" y="${startY + i * (fontSize + 5)}">${escapeXml(l)}</tspan>`)
     .join("");
+
   const label = category || "コラム";
   // バッジの幅は文字数から見積もる（日本語1文字ぶんを約7pxとして左右に余白）
   const badgeW = Math.max(38, label.length * 7 + 14);
-  return `<svg class="${cls}" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(title || "")}">
+
+  return `<svg class="${cls}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(title || "")}">
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="${tone}"/><stop offset="100%" stop-color="#ffffff"/>
     </linearGradient></defs>
-    <rect width="200" height="120" fill="url(#${gid})"/>
-    <circle cx="152" cy="56" r="44" fill="${fg}" opacity=".10"/>
-    ${categoryMotif(category, fg)}
-    <rect x="0" y="0" width="5" height="120" fill="${fg}"/>
+    <rect width="${W}" height="${H}" fill="url(#${gid})"/>
+    <circle cx="${haloX}" cy="${haloY}" r="40" fill="${fg}" opacity=".10"/>
+    ${motif}
+    <rect x="0" y="0" width="5" height="${H}" fill="${fg}"/>
     <rect x="14" y="12" width="${badgeW}" height="16" rx="8" fill="${fg}"/>
     <text x="${14 + badgeW / 2}" y="23.5" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle">${escapeXml(label)}</text>
-    <text font-size="12.5" font-weight="700" fill="#1c2536">${text}</text>
-    <text x="14" y="110" font-size="7" fill="#8a93a6">oripa-market.com</text>
+    <text font-size="${fontSize}" font-weight="700" fill="#1c2536">${text}</text>
+    <text x="14" y="${H - 9}" font-size="7" fill="#8a93a6">oripa-market.com</text>
   </svg>`;
 }
 
