@@ -200,8 +200,13 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 		$lines[] = mb_substr( $core, $i, $per_line, 'UTF-8' );
 	}
 	if ( $len > $per_line * $max_lines && $lines ) {
-		$last              = count( $lines ) - 1;
-		$lines[ $last ]    = mb_substr( $lines[ $last ], 0, $per_line - 1, 'UTF-8' ) . '…';
+		$last           = count( $lines ) - 1;
+		$lines[ $last ] = mb_substr( $lines[ $last ], 0, $per_line - 1, 'UTF-8' ) . '…';
+	}
+	// 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける（2026-09-11）。
+	if ( count( $lines ) > 1 && mb_strlen( end( $lines ), 'UTF-8' ) <= 2 ) {
+		$tail                          = array_pop( $lines );
+		$lines[ count( $lines ) - 1 ] .= $tail;
 	}
 	$start_y = 62 - ( count( $lines ) - 1 ) * 9;
 	$gid     = 'art-g-php-' . wp_rand( 1000, 9999 );

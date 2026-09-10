@@ -161,6 +161,11 @@ function thumbTitleLines(title, perLine = 13, maxLines = 3) {
   if (core.length > perLine * maxLines && lines.length) {
     lines[lines.length - 1] = lines[lines.length - 1].slice(0, perLine - 1) + "…";
   }
+  // 「…紹介！／！」のように最後の1〜2文字だけが next 行に落ちると読みにくい。
+  // 少しだけはみ出させて前の行にくっつける（2026-09-11）。
+  if (lines.length > 1 && lines[lines.length - 1].length <= 2) {
+    lines[lines.length - 2] += lines.pop();
+  }
   return lines;
 }
 
