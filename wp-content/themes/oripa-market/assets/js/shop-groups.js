@@ -131,11 +131,17 @@
         areas: [...g.areas].sort(),
         shops: g.shops.sort((a, b) => b.lotteryCount - a.lotteryCount || a.name.localeCompare(b.name, "ja")),
       }))
-      // 「その他の店舗」は個別店が集まるだけなので必ず最後に置く
       .sort((a, b) => {
+        // 「その他の店舗」は個別店が集まるだけなので必ず最後
         if (a.key === "other") return 1;
         if (b.key === "other") return -1;
-        return b.shops.length - a.shops.length || b.lotteryCount - a.lotteryCount;
+        // 掲載中の抽選がある系列を先に出す。
+        // 店舗数だけで並べると「掲載0件」の系列が上位を占め、
+        // 探しに来た人が空振りする（2026-09-11）。
+        const aHas = a.lotteryCount > 0 ? 1 : 0;
+        const bHas = b.lotteryCount > 0 ? 1 : 0;
+        if (aHas !== bHas) return bHas - aHas;
+        return b.lotteryCount - a.lotteryCount || b.shops.length - a.shops.length;
       });
   }
 
