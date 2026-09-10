@@ -240,7 +240,9 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	// 2行では「…」で切れてタイトルが読めなかったため3行にした。
 	// ヒーローは横に広いので行数を増やし、文字を小さくして省略を減らす。
 	// 表示幅700pxに対しviewBoxは210なので3.3倍に拡大される。11pxでも実質36px相当。
-	$per_line  = $hero ? 11 : 10;
+	// 半角の実幅は全角の0.55前後。mb_strwidth は0.5として数えるので、
+	// 折り返し幅を少し狭めに取って、半角の多い行がはみ出さないようにする。
+	$per_line  = $hero ? 10.5 : 10;
 	$max_lines = $hero ? 4 : 3;
 	$font_size = $hero ? 11 : 12.5;
 
