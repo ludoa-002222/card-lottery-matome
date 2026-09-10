@@ -779,3 +779,8 @@ body.oripa-modal-open { overflow: hidden; }
   .reco-grid { grid-template-columns: 1fr; }
   .reco-source { margin-left: 0; width: 100%; margin-top: 4px; }
 }
+
+/* ===== 記事末尾「いま応募できる抽選」・2026-09-11 =====
+   記事を読んだ流れで応募できるようにする。中身は毎日入れ替わる。 */
+.related-lotteries { padding-top: 26px; margin-top: 26px; border-top: 1px solid var(--border); }
+.related-more { display: inline-block; margin-top: 12px; }
