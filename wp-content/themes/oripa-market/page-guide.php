@@ -143,8 +143,8 @@ $box_rows  = oripa_guide_active_boxes( 12 );
 	</section>
 
 	<?php
-	// 当サイトが扱っていない「当たりカード・相場・環境」を補う外部記事。
-	echo oripa_recommended_articles_html( 0, '', 'カードの相場・環境を調べる' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	// 自サイトのコラムへ回遊させる。外部メディアへは送らない（2026-09-11）。
+	echo oripa_related_columns_html( 0, 6, '新着のコラム' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
 </main>
 <?php

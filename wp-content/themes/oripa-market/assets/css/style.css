@@ -795,3 +795,49 @@ body.oripa-modal-open { overflow: hidden; }
 @media (max-width: 520px) {
   .related-lotteries .related-list { grid-template-columns: 1fr; }
 }
+
+/* ===== 記事内の図版とクレジット（2026-09-11）=====
+   自社で描いた図や、商品を特定するために必要な画像を置く。
+   出典はテキストで示し、**リンクにはしない**（読者を他社サイトへ送らないため）。 */
+.article-figure { margin: 22px 0; }
+.article-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.article-figure figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  margin-top: 8px;
+  font-size: .76rem;
+  line-height: 1.7;
+}
+.article-figure-caption { color: var(--ink); }
+.article-figure-credit { color: var(--ink-soft); font-size: .72rem; }
+
+/* ===== 記事本文の読みやすさ（2026-09-11）=====
+   見出しの階層が見た目で分からず、長い記事が読みにくかった。 */
+.article-body h2 {
+  margin: 34px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent);
+  font-size: 1.18rem;
+  line-height: 1.5;
+}
+.article-body h3 {
+  margin: 28px 0 12px;
+  padding-left: 11px;
+  /* 色だけでなく、左の線という形の差でも階層を示す */
+  border-left: 4px solid var(--accent);
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+.article-body h4 { margin: 22px 0 10px; font-size: .93rem; color: var(--ink); }
+.article-body ul, .article-body ol { margin: 0 0 1.2em; padding-left: 1.4em; }
+.article-body li { margin-bottom: .5em; line-height: 1.85; }
+.article-body strong { font-weight: 700; }
