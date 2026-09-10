@@ -297,7 +297,9 @@ function articleThumbHtml(category, cls, title) {
   // これが図案の左端を越えると文字と図が重なる。
   // ヒーローは図案が x=142 から始まるので 14 + 10×12 = 134 に収める。
   // 2行では「…」で切れてタイトルが読めなかったため3行にした。
-  const perLine = hero ? 11 : 10;
+  // 半角の実幅は全角の0.55前後。mb_strwidth は0.5として数えるので、
+  // 折り返し幅を少し狭めに取って、半角の多い行がはみ出さないようにする。
+  const perLine = hero ? 10.5 : 10;
   const maxLines = hero ? 4 : 3;
   const fontSize = hero ? 11 : 12.5;
   const lines = thumbTitleLines(title, perLine, maxLines);
