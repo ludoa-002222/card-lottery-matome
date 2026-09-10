@@ -180,25 +180,83 @@ let _artThumbSeq = 0;
  * @param {string} cls
  * @param {string} title
  */
+/**
+ * カテゴリごとの図案。サムネイルの右側に置く。
+ *
+ * 【なぜ自分で描くか・2026-09-11】
+ * 記事のサムネイルが文字だけで、一覧に並んだときに見分けがつかなかった。
+ * 公式サイトの画像やイラストを持ってくる案もあったが、
+ * 記事の装飾として使うと引用の要件（主従関係・必然性）を満たさない。
+ * **図形で描けば権利の問題が無く、記事が増えても自動で付く。**
+ *
+ * 図案は「そのカテゴリで読者が何を得るか」を表す。
+ * 装飾のための飾りは置かない。
+ *
+ * @param {string} category
+ * @param {string} fg 前景色
+ * @returns {string} SVGの断片。原点は右側の図案エリア（中心 x=152, y=56 付近）。
+ */
+function categoryMotif(category, fg) {
+  switch (category) {
+    // 応募が通る＝重ねたカードにチェック
+    case "応募方法":
+      return `<rect x="112" y="34" width="30" height="42" rx="4" fill="${fg}" opacity=".30"/>
+        <rect x="123" y="28" width="30" height="42" rx="4" fill="${fg}" opacity=".55"/>
+        <rect x="134" y="22" width="30" height="42" rx="4" fill="${fg}"/>
+        <path d="M142 42 l5 6 l11 -12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    // 段階を踏んで安く手に入れる＝右肩上がりの棒
+    case "安く入手":
+      return `<rect x="116" y="60" width="14" height="18" rx="2" fill="${fg}" opacity=".35"/>
+        <rect x="137" y="46" width="14" height="32" rx="2" fill="${fg}" opacity=".6"/>
+        <rect x="158" y="30" width="14" height="48" rx="2" fill="${fg}"/>`;
+    // 相場が動く＝上昇する折れ線
+    case "高く売る":
+      return `<path d="M114 70 L131 54 L144 63 L168 34" stroke="${fg}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="168" cy="34" r="4.5" fill="${fg}"/>`;
+    // 順位が付く＝表彰台
+    case "大会レポート":
+      return `<rect x="116" y="56" width="16" height="22" rx="2" fill="${fg}" opacity=".4"/>
+        <rect x="138" y="42" width="16" height="36" rx="2" fill="${fg}"/>
+        <rect x="160" y="62" width="16" height="16" rx="2" fill="${fg}" opacity=".55"/>
+        <circle cx="146" cy="31" r="6.5" fill="${fg}"/>`;
+    // デッキ＝広げたカード
+    case "デッキ解説":
+      return `<g transform="rotate(-14 144 52)"><rect x="112" y="32" width="26" height="38" rx="3" fill="${fg}" opacity=".35"/></g>
+        <rect x="131" y="28" width="26" height="42" rx="3" fill="${fg}" opacity=".6"/>
+        <g transform="rotate(14 152 52)"><rect x="150" y="32" width="26" height="38" rx="3" fill="${fg}"/></g>`;
+    // 最初の一歩＝開いた本
+    case "初心者ガイド":
+      return `<path d="M114 36 Q144 28 144 34 L144 72 Q144 66 114 74 Z" fill="${fg}" opacity=".45"/>
+        <path d="M174 36 Q144 28 144 34 L144 72 Q144 66 174 74 Z" fill="${fg}"/>`;
+    default:
+      return `<circle cx="146" cy="52" r="26" fill="${fg}" opacity=".25"/>`;
+  }
+}
+
 function articleThumbHtml(category, cls, title) {
   const fg = ARTICLE_FG[category] || "#2f6fed";
   const tone = ARTICLE_TONES[category] || "#e8f0ff";
   const gid = `art-g-${_artThumbSeq++}`;
-  const lines = thumbTitleLines(title);
-  const startY = 62 - (lines.length - 1) * 9;
+  const lines = thumbTitleLines(title, 11, 3);
+  const startY = 66 - (lines.length - 1) * 9;
   const text = lines
-    .map((l, i) => `<tspan x="16" y="${startY + i * 18}">${escapeXml(l)}</tspan>`)
+    .map((l, i) => `<tspan x="14" y="${startY + i * 18}">${escapeXml(l)}</tspan>`)
     .join("");
+  const label = category || "コラム";
+  // バッジの幅は文字数から見積もる（日本語1文字ぶんを約7pxとして左右に余白）
+  const badgeW = Math.max(38, label.length * 7 + 14);
   return `<svg class="${cls}" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(title || "")}">
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="${tone}"/><stop offset="100%" stop-color="#ffffff"/>
     </linearGradient></defs>
     <rect width="200" height="120" fill="url(#${gid})"/>
+    <circle cx="152" cy="56" r="44" fill="${fg}" opacity=".10"/>
+    ${categoryMotif(category, fg)}
     <rect x="0" y="0" width="5" height="120" fill="${fg}"/>
-    <circle cx="182" cy="108" r="46" fill="${fg}" opacity=".07"/>
-    <text x="16" y="24" font-size="9" font-weight="700" fill="${fg}" letter-spacing="0.5">${escapeXml(category || "COLUMN")}</text>
-    <text font-size="13" font-weight="700" fill="#1c2536" style="line-height:1.4">${text}</text>
-    <text x="16" y="108" font-size="7.5" fill="#8a93a6">oripa-market.com</text>
+    <rect x="14" y="12" width="${badgeW}" height="16" rx="8" fill="${fg}"/>
+    <text x="${14 + badgeW / 2}" y="23.5" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle">${escapeXml(label)}</text>
+    <text font-size="12.5" font-weight="700" fill="#1c2536">${text}</text>
+    <text x="14" y="110" font-size="7" fill="#8a93a6">oripa-market.com</text>
   </svg>`;
 }
 

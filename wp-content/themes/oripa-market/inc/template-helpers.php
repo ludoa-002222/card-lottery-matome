@@ -173,6 +173,48 @@ function oripa_footer_link_items() {
  * @param string $cls      付与するclass
  * @param string $title    記事タイトル
  */
+/**
+ * カテゴリごとの図案（サムネイル右側）。
+ *
+ * JS版 assets/js/common.js の categoryMotif() と**同じ絵を返すこと**。
+ * 一覧はJSが、記事ページはPHPが描くので、片方だけ直すと見た目がズレる。
+ *
+ * @param string $category カテゴリ名。
+ * @param string $fg       前景色。
+ * @return string SVGの断片。
+ */
+function oripa_category_motif( $category, $fg ) {
+	$f = esc_attr( $fg );
+	switch ( $category ) {
+		case '応募方法':
+			return '<rect x="112" y="34" width="30" height="42" rx="4" fill="' . $f . '" opacity=".30"/>'
+				. '<rect x="123" y="28" width="30" height="42" rx="4" fill="' . $f . '" opacity=".55"/>'
+				. '<rect x="134" y="22" width="30" height="42" rx="4" fill="' . $f . '"/>'
+				. '<path d="M142 42 l5 6 l11 -12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+		case '安く入手':
+			return '<rect x="116" y="60" width="14" height="18" rx="2" fill="' . $f . '" opacity=".35"/>'
+				. '<rect x="137" y="46" width="14" height="32" rx="2" fill="' . $f . '" opacity=".6"/>'
+				. '<rect x="158" y="30" width="14" height="48" rx="2" fill="' . $f . '"/>';
+		case '高く売る':
+			return '<path d="M114 70 L131 54 L144 63 L168 34" stroke="' . $f . '" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+				. '<circle cx="168" cy="34" r="4.5" fill="' . $f . '"/>';
+		case '大会レポート':
+			return '<rect x="116" y="56" width="16" height="22" rx="2" fill="' . $f . '" opacity=".4"/>'
+				. '<rect x="138" y="42" width="16" height="36" rx="2" fill="' . $f . '"/>'
+				. '<rect x="160" y="62" width="16" height="16" rx="2" fill="' . $f . '" opacity=".55"/>'
+				. '<circle cx="146" cy="31" r="6.5" fill="' . $f . '"/>';
+		case 'デッキ解説':
+			return '<g transform="rotate(-14 144 52)"><rect x="112" y="32" width="26" height="38" rx="3" fill="' . $f . '" opacity=".35"/></g>'
+				. '<rect x="131" y="28" width="26" height="42" rx="3" fill="' . $f . '" opacity=".6"/>'
+				. '<g transform="rotate(14 152 52)"><rect x="150" y="32" width="26" height="38" rx="3" fill="' . $f . '"/></g>';
+		case '初心者ガイド':
+			return '<path d="M114 36 Q144 28 144 34 L144 72 Q144 66 114 74 Z" fill="' . $f . '" opacity=".45"/>'
+				. '<path d="M174 36 Q144 28 144 34 L144 72 Q144 66 174 74 Z" fill="' . $f . '"/>';
+		default:
+			return '<circle cx="146" cy="52" r="26" fill="' . $f . '" opacity=".25"/>';
+	}
+}
+
 function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title = '' ) {
 	$tones = array(
 		'安く入手'     => array( '#e8f0ff', '#2f6fed' ),
@@ -192,7 +234,7 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	if ( '' === $core ) {
 		$core = (string) $title;
 	}
-	$per_line  = 13;
+	$per_line  = 11;
 	$max_lines = 3;
 	$lines     = array();
 	$len       = mb_strlen( $core, 'UTF-8' );
@@ -208,7 +250,7 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 		$tail                          = array_pop( $lines );
 		$lines[ count( $lines ) - 1 ] .= $tail;
 	}
-	$start_y = 62 - ( count( $lines ) - 1 ) * 9;
+	$start_y = 66 - ( count( $lines ) - 1 ) * 9;
 	$gid     = 'art-g-php-' . wp_rand( 1000, 9999 );
 	ob_start();
 	?>
@@ -217,15 +259,22 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 			<stop offset="0%" stop-color="<?php echo esc_attr( $tone ); ?>"/><stop offset="100%" stop-color="#ffffff"/>
 		</linearGradient></defs>
 		<rect width="200" height="120" fill="url(#<?php echo esc_attr( $gid ); ?>)"/>
+		<circle cx="152" cy="56" r="44" fill="<?php echo esc_attr( $fg ); ?>" opacity=".10"/>
+		<?php echo oripa_category_motif( $category, $fg ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<rect x="0" y="0" width="5" height="120" fill="<?php echo esc_attr( $fg ); ?>"/>
-		<circle cx="182" cy="108" r="46" fill="<?php echo esc_attr( $fg ); ?>" opacity=".07"/>
-		<text x="16" y="24" font-size="9" font-weight="700" fill="<?php echo esc_attr( $fg ); ?>" letter-spacing="0.5"><?php echo esc_html( $category ? $category : 'COLUMN' ); ?></text>
-		<text font-size="13" font-weight="700" fill="#1c2536">
+		<?php
+		$label   = $category ? $category : 'コラム';
+		// バッジの幅は文字数から見積もる（日本語1文字ぶんを約7pxとして左右に余白）
+		$badge_w = max( 38, mb_strlen( $label, 'UTF-8' ) * 7 + 14 );
+		?>
+		<rect x="14" y="12" width="<?php echo (int) $badge_w; ?>" height="16" rx="8" fill="<?php echo esc_attr( $fg ); ?>"/>
+		<text x="<?php echo (int) ( 14 + $badge_w / 2 ); ?>" y="23.5" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle"><?php echo esc_html( $label ); ?></text>
+		<text font-size="12.5" font-weight="700" fill="#1c2536">
 			<?php foreach ( $lines as $i => $line ) : ?>
-				<tspan x="16" y="<?php echo (int) ( $start_y + $i * 18 ); ?>"><?php echo esc_html( $line ); ?></tspan>
+				<tspan x="14" y="<?php echo (int) ( $start_y + $i * 18 ); ?>"><?php echo esc_html( $line ); ?></tspan>
 			<?php endforeach; ?>
 		</text>
-		<text x="16" y="108" font-size="7.5" fill="#8a93a6">oripa-market.com</text>
+		<text x="14" y="110" font-size="7" fill="#8a93a6">oripa-market.com</text>
 	</svg>
 	<?php
 	return ob_get_clean();
