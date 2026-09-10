@@ -727,3 +727,41 @@ body.oripa-modal-open { overflow: hidden; }
   /* 表は横に長いので、はみ出すぶんだけ横スクロールさせる（ページ全体は動かさない）。 */
   .shop-group .shop-table { display: block; overflow-x: auto; white-space: nowrap; }
 }
+
+/* ===== おすすめ記事（外部サイト）・2026-09-11 =====
+   当サイトが扱っていない「当たりカード・相場・環境」を補う。
+   外部リンクだと分かる見た目にし、抽選の導線とは明確に分ける。 */
+.reco-source { margin-left: auto; font-size: .7rem; color: var(--ink-soft); }
+.reco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.reco-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 13px 15px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+.reco-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
+.reco-tag {
+  align-self: flex-start;
+  font-size: .64rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.reco-title { font-size: .86rem; font-weight: 700; line-height: 1.55; }
+.reco-desc { font-size: .74rem; line-height: 1.7; color: var(--ink-soft); }
+.reco-go { margin-top: 3px; font-size: .74rem; font-weight: 700; color: var(--accent); }
+/* 外部リンクであることを矢印で示す。文字だけだと内部リンクと区別がつかない。 */
+.reco-ext { margin-left: 3px; font-size: .8em; }
+.reco-note { margin-top: 12px; }
+@media (max-width: 560px) {
+  .reco-grid { grid-template-columns: 1fr; }
+  .reco-source { margin-left: 0; width: 100%; margin-top: 4px; }
+}
