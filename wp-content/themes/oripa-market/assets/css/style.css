@@ -625,7 +625,12 @@ body.oripa-modal-open { overflow: hidden; }
    暗背景の上に明るい箱が浮き、その中の灰文字が読めなかった。
    暗背景に馴染む半透明の箱＋明るい文字にする。
    親の .column-hero p が opacity:.8 を掛けているので、ここで打ち消す。 */
-.release-lead-note {
+/* 【セレクタの詳細度に注意・2026-09-11】
+   `.release-lead-note` だけだと詳細度(0,1,0)で、
+   `.column-hero p`(0,1,1) に負けて color も opacity も効かない。
+   実測してはじめて気づいた（指定した #dce4f5 ではなく #b8c3dc が出ていた）。
+   親を含めた `.column-hero .release-lead-note`(0,2,0) にする。 */
+.column-hero .release-lead-note {
   margin-top: 12px;
   padding: 10px 14px;
   background: rgba(255, 255, 255, .08);
@@ -637,7 +642,7 @@ body.oripa-modal-open { overflow: hidden; }
   color: #dce4f5;
   opacity: 1;
 }
-.release-lead-note strong { color: #fff; font-weight: 700; }
+.column-hero .release-lead-note strong { color: #fff; font-weight: 700; }
 
 /* 商品画像。公式サイトの商品写真をそのまま出すので、切り取らず全体を収める。 */
 .release-thumb {
