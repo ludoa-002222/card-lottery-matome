@@ -277,6 +277,59 @@
     const articles = await loadArticles();
     const rk = document.getElementById("ranking-slot");
     if (rk) rk.innerHTML = rankingBoxHtml(articles.filter(a => a.slug !== slug));
+
+    await renderRelatedLotteries(articles.find(a => a.slug === slug));
+  }
+
+  /**
+   * 記事に関連する「いま応募できる抽選」を本文の後に出す。
+   *
+   * 【なぜ入れるか・2026-09-11】
+   * 記事は読み終わっても行動につながらなかった。
+   * 当サイトの強みは抽選データなので、読んだ流れで応募できる導線を置く。
+   * 中身は毎日入れ替わるので、記事を書き直さなくても新しくなる。
+   *
+   * 【関連の決め方】
+   * 記事のタイトルとタグに、店舗名・パック名が含まれていればそれを優先する。
+   * 一致が無い記事（一般的な解説記事など）では、締切が近いものを出す。
+   * **無関係なものを「関連」と言わない**ため、一致の有無を見出しで書き分ける。
+   */
+  async function renderRelatedLotteries(article) {
+    const slot = document.getElementById("related-lotteries");
+    if (!slot) return;
+
+    const { lotteries, shops, boxes } = await loadAllData();
+    const live = lotteries.filter(l => !isEnded(l));
+    if (!live.length) { slot.hidden = true; return; }
+
+    const haystack = [
+      document.querySelector(".article-title, h1")?.textContent || "",
+      ...(article && article.tags ? article.tags : []),
+    ].join(" ");
+
+    const scoreOf = (l) => {
+      let score = 0;
+      const shop = shops.find(s => String(s.id) === String(l.shopId));
+      if (shop && shop.name && haystack.includes(shop.name)) score += 10;
+      const box = boxes.find(b => b.slug === l.box);
+      if (box && box.name && haystack.includes(box.name)) score += 8;
+      if (l.title && haystack.includes(String(l.title).slice(0, 10))) score += 4;
+      return score;
+    };
+
+    const scored = live
+      .map(l => ({ l, score: scoreOf(l) }))
+      .sort((a, b) => b.score - a.score || new Date(a.l.deadline) - new Date(b.l.deadline));
+
+    const matched = scored.filter(x => x.score > 0);
+    const items = (matched.length ? matched : scored).slice(0, 4).map(x => x.l);
+
+    document.getElementById("related-heading").textContent = matched.length
+      ? "この記事に関連する、いま応募できる抽選"
+      : "いま応募できる抽選（締切が近い順）";
+    document.getElementById("related-list").innerHTML =
+      items.map(l => lotteryCardHtml(l, { shops, boxes })).join("");
+    slot.hidden = false;
   }
 
   // ---------------------------------------------------------------- shop

@@ -90,6 +90,13 @@ while ( have_posts() ) :
 				</p>
 				<?php endif; ?>
 
+				<!-- 記事に関連する、いま応募できる抽選。中身は app.js が描く（毎日入れ替わるため）。 -->
+				<section class="section related-lotteries" id="related-lotteries" hidden>
+					<div class="section-heading"><span class="bar"></span><h2 id="related-heading"></h2></div>
+					<div class="lottery-list lottery-list--rows" id="related-list"></div>
+					<a class="btn ghost related-more" href="<?php echo esc_url( get_post_type_archive_link( 'lottery' ) ); ?>">受付中の抽選をすべて見る</a>
+				</section>
+
 				<p class="footer-note" style="margin-top:24px;">本記事は当サイトが収集した抽選・予約情報の傾向をもとにした参考情報です。実際の当落・相場を保証するものではありません。最新情報は必ず各店舗・公式サイトでご確認ください。</p>
 
 				<a href="<?php echo esc_url( get_post_type_archive_link( 'column' ) ); ?>" class="btn ghost" style="margin-top:10px;display:inline-block;">← 攻略コラム一覧へ戻る</a>
