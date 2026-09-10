@@ -64,6 +64,12 @@ get_header();
 		</div>
 	</section>
 
+	<?php
+	// このパックの「当たりカード」記事を先頭に出す。抽選を見ている人が次に知りたい情報。
+	$oripa_box_term = get_queried_object();
+	echo oripa_recommended_articles_html( 4, $oripa_box_term ? $oripa_box_term->name : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	?>
+
 	<?php get_template_part( 'template-parts/lottery-faq' ); ?>
 </main>
 <?php

@@ -141,6 +141,11 @@ $box_rows  = oripa_guide_active_boxes( 12 );
 		<div class="section-heading"><span class="bar"></span><h2>すべての攻略記事</h2></div>
 		<a class="btn primary" href="<?php echo esc_url( get_post_type_archive_link( 'column' ) ); ?>">攻略コラム一覧へ</a>
 	</section>
+
+	<?php
+	// 当サイトが扱っていない「当たりカード・相場・環境」を補う外部記事。
+	echo oripa_recommended_articles_html( 0, '', 'カードの相場・環境を調べる' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	?>
 </main>
 <?php
 get_footer();

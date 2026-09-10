@@ -93,6 +93,10 @@ while ( have_posts() ) :
 				<p class="footer-note" style="margin-top:24px;">本記事は当サイトが収集した抽選・予約情報の傾向をもとにした参考情報です。実際の当落・相場を保証するものではありません。最新情報は必ず各店舗・公式サイトでご確認ください。</p>
 
 				<a href="<?php echo esc_url( get_post_type_archive_link( 'column' ) ); ?>" class="btn ghost" style="margin-top:10px;display:inline-block;">← 攻略コラム一覧へ戻る</a>
+
+				<?php
+				echo oripa_recommended_articles_html( 6 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				?>
 			</article>
 			<aside id="ranking-slot"></aside>
 		</div>
