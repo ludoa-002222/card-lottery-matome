@@ -255,8 +255,15 @@ function lotteryThumbHtml(l, box) {
   // 2026-09-09修正: 以前は既定のBOX写真（30th CELEBRATION BOX）を出していたため、
   // 「その他」など別のボックスの抽選に無関係な商品の写真が付き、
   // どの商品の抽選なのか誤認させる状態だった（ボックス一覧側は先に同じ修正済み）。
-  const img = box && box.image
-    ? `<img class="lottery-thumb" src="${box.image}" alt="" loading="lazy">`
+  // 【画像の優先順位・2026-09-10】
+  //   1. 商品そのものの画像（新商品マスタ由来）… グッズも含めて一番具体的
+  //   2. ボックス（パック）の画像 … パック商品はこれで足りる
+  //   3. ジャンルのアイコン … 上2つが無いときだけ
+  // 2を先にしていたため、パック種類に当てはまらないグッズが
+  // すべてジャンルのアイコン（モンスターボール）になっていた。
+  const src = l.productImage || (box && box.image) || "";
+  const img = src
+    ? `<img class="lottery-thumb" src="${src}" alt="" loading="lazy">`
     : categoryThumbHtml(l.category, "lottery-thumb");
   // サムネイル画像タップでボックス別の抽選情報ページへ
   return l.box
