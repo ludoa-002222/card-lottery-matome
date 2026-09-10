@@ -299,9 +299,9 @@ function articleThumbHtml(category, cls, title) {
   // 2行では「…」で切れてタイトルが読めなかったため3行にした。
   // 半角の実幅は全角の0.55前後。mb_strwidth は0.5として数えるので、
   // 折り返し幅を少し狭めに取って、半角の多い行がはみ出さないようにする。
-  const perLine = hero ? 10.5 : 10;
+  const perLine = hero ? 11.5 : 10;
   const maxLines = hero ? 4 : 3;
-  const fontSize = hero ? 11 : 12.5;
+  const fontSize = hero ? 10.5 : 12.5;
   const lines = thumbTitleLines(title, perLine, maxLines);
 
   // 図案は右側。motifは中心(144,52)付近に描かれているので、移動と縮小で位置を合わせる。
@@ -311,9 +311,14 @@ function articleThumbHtml(category, cls, title) {
   const haloX = hero ? 172 : 163;
   const haloY = hero ? 44 : 58;
 
-  const startY = hero ? 46 - (lines.length - 1) * 7 : 68 - (lines.length - 1) * 9;
+  // 【バッジの下から始める・2026-09-11】
+  // ヒーローは行数を増やしたぶん、行数に応じて上へ伸ばすとバッジ(y=12〜28)に
+  // 文字が重なっていた。**上端を固定して下へ伸ばす。**
+  // 文字の上端 = startY - fontSize なので、44 - 10.5 = 33.5 でバッジの下端28より下。
+  const startY = hero ? 44 : 68 - (lines.length - 1) * 9;
+  const lineGap = hero ? 12 : fontSize + 4;
   const text = lines
-    .map((l, i) => `<tspan x="14" y="${startY + i * (fontSize + 4)}">${escapeXml(l)}</tspan>`)
+    .map((l, i) => `<tspan x="14" y="${startY + i * lineGap}">${escapeXml(l)}</tspan>`)
     .join("");
 
   const label = category || "コラム";
