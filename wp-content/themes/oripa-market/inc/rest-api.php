@@ -191,6 +191,7 @@ function oripa_rest_lotteries() {
 			'updatedAt'      => $updated_at,
 			'permalink'      => get_permalink( $p ),
 			'applyUrl'       => get_post_meta( $p->ID, 'apply_url', true ) ?: '',
+			'productImage'   => get_post_meta( $p->ID, 'product_image_url', true ) ?: '',
 			'confidence'     => (float) get_post_meta( $p->ID, 'confidence_score', true ),
 			'purchaseLinkUrl'     => get_post_meta( $p->ID, 'purchase_link_url', true ) ?: '',
 			'purchaseLinkService' => get_post_meta( $p->ID, 'purchase_link_service', true ) ?: '',

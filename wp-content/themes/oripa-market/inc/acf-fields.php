@@ -286,6 +286,8 @@ add_action(
 			// 購入導線リンク（2026-09-09追加）。
 			'purchase_link_url'     => 'string',
 			'purchase_link_service' => 'string',
+			// 商品そのものの画像（2026-09-10追加）。グッズなどパック種類に当てはまらない商品用。
+			'product_image_url'     => 'string',
 		);
 		foreach ( $lottery_meta as $key => $type ) {
 			register_post_meta(
