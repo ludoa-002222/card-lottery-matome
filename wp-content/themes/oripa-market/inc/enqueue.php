@@ -37,10 +37,18 @@ add_action(
 			ORIPA_THEME_VERSION,
 			true
 		);
+		// 店舗のチェーン系列まとめ（全店舗一覧で使う）。app.js より先に読み込む。
+		wp_enqueue_script(
+			'oripa-shop-groups',
+			ORIPA_THEME_URI . '/assets/js/shop-groups.js',
+			array(),
+			ORIPA_THEME_VERSION,
+			true
+		);
 		wp_enqueue_script(
 			'oripa-app',
 			ORIPA_THEME_URI . '/assets/js/app.js',
-			array( 'oripa-common' ),
+			array( 'oripa-common', 'oripa-shop-groups' ),
 			ORIPA_THEME_VERSION,
 			true
 		);

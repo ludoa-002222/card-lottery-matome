@@ -140,12 +140,19 @@ const ARTICLE_FG = {
 
 /**
  * サムネイルに載せるタイトルを整える。
- * 【】で囲まれた煽り文句はサムネイルでは邪魔になるので落とし、本題だけを残す。
+ *
+ * 【なぜ中身を消さないか・2026-09-11】
+ * 以前は 【】 を「煽り文句」とみなして中身ごと削除していた。
+ * ところがトレカの記事では 【アブソルガルーラ】 のように**デッキ名そのもの**が
+ * 【】 で書かれており、「海外で活躍し復権！？デッキ解説！」のように
+ * 何のデッキか分からないサムネイルになっていた。
+ * 記号だけを外し、中身は必ず残す。
  */
 function thumbTitleLines(title, perLine = 13, maxLines = 3) {
   const core = String(title || "")
-    .replace(/【[^】]*】/g, "")
+    .replace(/[【】]/g, " ")
     .replace(/[｜|]/g, " ")
+    .replace(/\s+/g, " ")
     .trim() || String(title || "");
   const lines = [];
   for (let i = 0; i < core.length && lines.length < maxLines; i += perLine) {

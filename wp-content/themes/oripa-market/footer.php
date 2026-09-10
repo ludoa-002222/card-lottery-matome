@@ -23,7 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<a href="<?php echo esc_url( $item['url'] ); ?>"><?php echo esc_html( $item['label'] ); ?></a>
 			<?php endforeach; ?>
 		</div>
-		<p class="footer-note">本サイトは情報まとめサイトであり、各抽選の実施主体ではありません。最新の応募条件は必ず各店舗・公式サイトでご確認ください。掲載データはAI一次チェック＋人による確認を経て随時更新しています。</p>
+		<p class="footer-note">本サイトは情報まとめサイトであり、各抽選の実施主体ではありません。<br>最新の応募条件は必ず各店舗・公式サイトでご確認ください。</p>
+		<p class="footer-note">掲載データはAI一次チェック＋人による確認を経て随時更新しています。</p>
 		<p class="footer-note">&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?></p>
 	</div>
 </footer>

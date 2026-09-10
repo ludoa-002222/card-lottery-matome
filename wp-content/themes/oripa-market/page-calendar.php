@@ -15,7 +15,7 @@ get_header();
 <main class="wrap">
 	<?php echo oripa_breadcrumb( array( array( 'label' => '抽選締切カレンダー' ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	<div class="page-title"><h1>抽選締切カレンダー</h1></div>
-	<p class="footer-note">日付をタップすると、その日に締め切られる抽選をチェックできます。</p>
+	<p class="footer-note">日付をタップすると、その日に締め切られる抽選をチェックできます。<br>選んだ日はカレンダー上で色が変わります。</p>
 
 	<section class="section" style="padding-top:0;">
 		<div class="cal-nav">
@@ -27,9 +27,23 @@ get_header();
 		<div class="cal-grid" id="cal-grid"></div>
 	</section>
 
-	<section class="section" id="day-section" style="display:none;">
-		<div class="section-heading"><span class="bar"></span><h2 id="day-title"></h2></div>
+	<section class="section" id="day-section" hidden>
+		<div class="section-heading">
+			<span class="bar"></span>
+			<h2 id="day-title"></h2>
+			<span class="day-count" id="day-count"></span>
+			<button type="button" class="btn ghost day-close" id="day-close">閉じる</button>
+		</div>
+
+		<!-- 締切が集中する日は数十件になるため、絞り込めるようにする。
+		     件数が3件以下の日では邪魔になるので JS 側で隠す。 -->
+		<div class="day-tools" id="day-tools" hidden>
+			<input type="search" id="day-q" class="day-q" placeholder="商品名・店舗名でしぼり込む" autocomplete="off">
+			<select id="day-cat" class="day-cat"></select>
+		</div>
+
 		<div class="lottery-list" id="day-list"></div>
+		<button type="button" class="btn ghost day-more" id="day-more" hidden></button>
 	</section>
 
 	<section class="section">

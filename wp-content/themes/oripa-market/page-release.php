@@ -44,6 +44,7 @@ $genre_colors = array(
 		<span class="kicker">OFFICIAL RELEASE CALENDAR</span>
 		<h1>トレカ新商品の発売日カレンダー</h1>
 		<p>ポケモンカード・ワンピースカード・遊戯王・デュエル・マスターズの発売予定を、各公式サイトの発表からまとめています。</p>
+		<p class="release-lead-note">掲載しているのは<strong>通常販売の新商品</strong>です。抽選販売ではありません。</p>
 	</section>
 
 	<?php if ( empty( $by_month ) ) : ?>
@@ -81,7 +82,10 @@ $genre_colors = array(
 	<?php endif; ?>
 
 	<p class="footer-note" style="margin-top:24px;">
-		発売日は各カードゲームの公式サイトの発表をもとに掲載しています。変更されることがあるため、応募・購入前に必ず公式ページでご確認ください。
+		発売日は各カードゲームの公式サイトの発表をもとに掲載しています。<br>変更されることがあるため、購入前に必ず公式ページでご確認ください。
+	</p>
+	<p class="footer-note" style="margin-top:8px;">
+		ここに載っているのは通常販売の新商品です。抽選販売の情報は<a href="<?php echo esc_url( get_post_type_archive_link( 'lottery' ) ); ?>">抽選・予約情報</a>にまとめています。
 	</p>
 
 	<section class="section">
