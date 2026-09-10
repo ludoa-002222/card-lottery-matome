@@ -618,17 +618,26 @@ body.oripa-modal-open { overflow: hidden; }
   .release-body { flex: 1 1 60%; }
 }
 
-/* リード文の注記。抽選一覧と混同されやすいので目立たせる。 */
+/* リード文の注記。抽選一覧と混同されやすいので目立たせる。
+   【配色の注意・2026-09-11】
+   ここは .column-hero の中＝**暗い背景**。
+   最初 --surface-2（明るい灰）＋ --ink-soft（灰文字）にしていたため、
+   暗背景の上に明るい箱が浮き、その中の灰文字が読めなかった。
+   暗背景に馴染む半透明の箱＋明るい文字にする。
+   親の .column-hero p が opacity:.8 を掛けているので、ここで打ち消す。 */
 .release-lead-note {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background: var(--surface-2);
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, .08);
+  /* 色だけに頼らず、左線という形の差でも「注記」だと分かるようにする */
+  border-left: 3px solid var(--cyan);
   border-radius: var(--radius-sm);
-  font-size: .78rem;
-  line-height: 1.7;
-  color: var(--ink-soft);
+  font-size: .8rem;
+  line-height: 1.75;
+  color: #dce4f5;
+  opacity: 1;
 }
-.release-lead-note strong { color: var(--ink); }
+.release-lead-note strong { color: #fff; font-weight: 700; }
 
 /* 商品画像。公式サイトの商品写真をそのまま出すので、切り取らず全体を収める。 */
 .release-thumb {
