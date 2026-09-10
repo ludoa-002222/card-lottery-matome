@@ -149,11 +149,17 @@ const ARTICLE_FG = {
  * 記号だけを外し、中身は必ず残す。
  */
 function thumbTitleLines(title, perLine = 13, maxLines = 3) {
-  let core = String(title || "")
-    .replace(/[【】]/g, " ")
-    .replace(/[｜|]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim() || String(title || "");
+  let core = String(title || "").replace(/[【】]/g, " ").replace(/\s+/g, " ").trim() || String(title || "");
+
+  // 【副題は落とす・2026-09-11】
+  // 「ポケモンセンターオンラインのトレカ抽選まとめ｜応募条件と締切の傾向」のように
+  // 「｜」で主題と副題を分けているタイトルがある。両方入れると3行に収まらず、
+  // **主題の途中で「…」になって何の記事か分からなくなる。**
+  // サムネイルは主題だけでよい（副題は記事ページの見出しに出る）。
+  // ただし主題が短すぎるときは切らない（情報が減りすぎるため）。
+  const head = core.split(/[｜|]/)[0].trim();
+  if (head.length >= 8) core = head;
+  else core = core.replace(/[｜|]/g, " ").replace(/\s+/g, " ").trim();
 
   // 【末尾の年月はサムネイルから落とす・2026-09-11】
   // 「…上位9枚 2026年9月」のように末尾の年月まで入れると、
