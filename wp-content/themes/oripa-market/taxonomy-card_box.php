@@ -65,9 +65,8 @@ get_header();
 	</section>
 
 	<?php
-	// このパックの「当たりカード」記事を先頭に出す。抽選を見ている人が次に知りたい情報。
-	$oripa_box_term = get_queried_object();
-	echo oripa_recommended_articles_html( 4, $oripa_box_term ? $oripa_box_term->name : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	// 自サイトのコラムへ回遊させる。外部メディアへは送らない（2026-09-11）。
+	echo oripa_related_columns_html( 0, 3, 'このパックの抽選について読む' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
 
 	<?php get_template_part( 'template-parts/lottery-faq' ); ?>

@@ -85,7 +85,8 @@ while ( have_posts() ) :
 
 				<?php if ( $source_url ) : ?>
 				<p class="article-credit">
-					参考元：<a href="<?php echo esc_url( $source_url ); ?>" target="_blank" rel="noopener nofollow"><?php echo esc_html( $source_site ? $source_site : $source_url ); ?></a>
+					<?php // 出典は明示するが、リンクにはしない。読者を他社サイトへ送らないため（2026-09-11）。 ?>
+					参考元：<?php echo esc_html( $source_site ? $source_site : wp_parse_url( $source_url, PHP_URL_HOST ) ); ?>
 					<br><span>本記事は上記の記事を参考に、当サイトが独自に構成・執筆したものです。画像・本文の転載はしていません。</span>
 				</p>
 				<?php endif; ?>
@@ -102,7 +103,7 @@ while ( have_posts() ) :
 				<a href="<?php echo esc_url( get_post_type_archive_link( 'column' ) ); ?>" class="btn ghost" style="margin-top:10px;display:inline-block;">← 攻略コラム一覧へ戻る</a>
 
 				<?php
-				echo oripa_recommended_articles_html( 6 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo oripa_related_columns_html( get_the_ID(), 6 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			</article>
 			<aside id="ranking-slot"></aside>
