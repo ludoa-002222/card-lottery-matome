@@ -22,6 +22,8 @@ while ( have_posts() ) :
 	$updated   = get_the_modified_date( 'Y/m/d' );
 	$tags        = get_the_terms( $post_id, 'column_tag' );
 	$source_url  = get_post_meta( $post_id, 'source_url', true );
+	// 広告を含む記事だけに注記を出す。含まない記事に出すとそれ自体が誤った表示になる。
+	$affiliates  = array_filter( explode( ',', (string) get_post_meta( $post_id, 'affiliate_services', true ) ) );
 	$source_site = get_post_meta( $post_id, 'source_site', true );
 	?>
 	<main class="wrap" data-slug="<?php echo esc_attr( get_post_field( 'post_name', $post_id ) ); ?>">
@@ -65,6 +67,10 @@ while ( have_posts() ) :
 					<div class="toc-title">この記事のポイント</div>
 					<p style="margin:0;color:var(--ink-soft);"><?php echo esc_html( get_the_excerpt() ); ?></p>
 				</div>
+				<?php endif; ?>
+
+				<?php if ( $affiliates ) : ?>
+					<p class="article-pr-notice">※本記事にはアフィリエイト広告（PR）が含まれます。掲載順や評価は広告の有無で変えていません。</p>
 				<?php endif; ?>
 
 				<div class="article-body"><?php the_content(); ?></div>

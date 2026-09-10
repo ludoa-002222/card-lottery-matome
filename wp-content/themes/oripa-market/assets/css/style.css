@@ -569,3 +569,27 @@ body.oripa-modal-open { overflow: hidden; }
   .release-item { grid-template-columns: 44px auto 1fr; }
   .release-thumb { width: 48px; height: 48px; }
 }
+
+/* ===== 記事のPR注記（2026-09-10）=====
+   広告を含む記事にだけ出す。読む前に分かる位置（本文の直前）へ置く。 */
+.article-pr-notice {
+  margin: 14px 0 0;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  font-size: .72rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+/* 記事本文中の広告リンクは、普通のリンクと同じ見た目にしない（どれが広告か分かるように） */
+.article-body a[rel~="sponsored"]::after {
+  content: "PR";
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 3px;
+  font-size: .6rem;
+  color: var(--ink-soft);
+  vertical-align: middle;
+}

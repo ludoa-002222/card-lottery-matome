@@ -344,7 +344,7 @@ add_action(
 
 		// Notion「記事ソースDB」から同期するコラム用メタ（2026-09-09追加）。
 		// source_url / source_site は出典クレジットの表示に使う。
-		foreach ( array( 'source_url', 'source_site', 'notion_page_id' ) as $key ) {
+		foreach ( array( 'source_url', 'source_site', 'notion_page_id', 'affiliate_services' ) as $key ) {
 			register_post_meta(
 				'column',
 				$key,
