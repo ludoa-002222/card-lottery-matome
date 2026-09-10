@@ -238,9 +238,11 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	$h         = $hero ? 90 : 120;
 	// 行の右端 = 14 + per_line × font_size。これが図案の左端(142)を越えると重なる。
 	// 2行では「…」で切れてタイトルが読めなかったため3行にした。
-	$per_line  = 10;
-	$max_lines = 3;
-	$font_size = $hero ? 12 : 12.5;
+	// ヒーローは横に広いので行数を増やし、文字を小さくして省略を減らす。
+	// 表示幅700pxに対しviewBoxは210なので3.3倍に拡大される。11pxでも実質36px相当。
+	$per_line  = $hero ? 11 : 10;
+	$max_lines = $hero ? 4 : 3;
+	$font_size = $hero ? 11 : 12.5;
 
 	// 【】は記号だけ外して中身は残す。トレカ記事では【アブソルガルーラ】のように
 	// デッキ名そのものが【】で書かれており、中身を消すと何の記事か分からなくなる（2026-09-11）。
@@ -277,7 +279,10 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	$chars  = preg_split( '//u', $core, -1, PREG_SPLIT_NO_EMPTY );
 	$rest   = 0;
 	foreach ( $chars as $idx => $ch ) {
-		$cw = preg_match( '/[\x20-\x7E]|[\x{FF61}-\x{FF9F}]/u', $ch ) ? 0.55 : 1;
+		// mb_strwidth は全角を2、半角を1で返す。半分にして「全角1文字ぶん」を単位にする。
+		// 以前は正規表現で半角を判定していたが、/u 修飾子との組み合わせで
+		// 期待どおりに動かず、折り返しが効いていなかった（2026-09-11）。
+		$cw = mb_strwidth( $ch, 'UTF-8' ) / 2;
 		if ( $line_w + $cw > $per_line && '' !== $buf ) {
 			$lines[] = $buf;
 			if ( count( $lines ) >= $max_lines ) {
@@ -305,7 +310,7 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 		$lines[ count( $lines ) - 1 ] .= $tail;
 	}
 
-	$start_y = $hero ? 48 - ( count( $lines ) - 1 ) * 8 : 68 - ( count( $lines ) - 1 ) * 9;
+	$start_y = $hero ? 46 - ( count( $lines ) - 1 ) * 7 : 68 - ( count( $lines ) - 1 ) * 9;
 	$halo_x  = $hero ? 172 : 163;
 	$halo_y  = $hero ? 44 : 58;
 	// 図案は中心(144,52)付近に描かれているので、移動と縮小で位置を合わせる
@@ -332,7 +337,9 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 				<tspan x="14" y="<?php echo esc_attr( $start_y + $i * ( $font_size + 4 ) ); ?>"><?php echo esc_html( $line ); ?></tspan>
 			<?php endforeach; ?>
 		</text>
+		<?php if ( ! $hero ) : ?>
 		<text x="14" y="<?php echo (int) ( $h - 9 ); ?>" font-size="7" fill="#8a93a6">oripa-market.com</text>
+		<?php endif; ?>
 	</svg>
 	<?php
 	return ob_get_clean();
