@@ -149,20 +149,46 @@ const ARTICLE_FG = {
  * 記号だけを外し、中身は必ず残す。
  */
 function thumbTitleLines(title, perLine = 13, maxLines = 3) {
-  const core = String(title || "")
+  let core = String(title || "")
     .replace(/[【】]/g, " ")
     .replace(/[｜|]/g, " ")
     .replace(/\s+/g, " ")
     .trim() || String(title || "");
+
+  // 【末尾の年月はサムネイルから落とす・2026-09-11】
+  // 「…上位9枚 2026年9月」のように末尾の年月まで入れると、
+  // 1〜2文字あふれて「…」で切れ、肝心の商品名まで読めなくなる。
+  // 年月は記事ページの見出しに出るので、サムネイルには要らない。
+  core = core.replace(/\s*20\d{2}年\s*\d{1,2}月\s*$/, "").trim();
+
+  // 【文字数ではなく幅で折る】
+  // 全角と半角では幅が倍ちがう。文字数で折ると、
+  // 半角の多い行だけ極端に短くなり、あふれたぶんが「…」になっていた。
+  // 全角を1、半角を0.55として数える。
+  const widthOf = (ch) => (/[\x20-\x7E\uFF61-\uFF9F]/.test(ch) ? 0.55 : 1);
   const lines = [];
-  for (let i = 0; i < core.length && lines.length < maxLines; i += perLine) {
-    lines.push(core.slice(i, i + perLine));
+  let buf = "";
+  let w = 0;
+  for (const ch of core) {
+    const cw = widthOf(ch);
+    if (w + cw > perLine && buf) {
+      lines.push(buf);
+      if (lines.length >= maxLines) break;
+      buf = "";
+      w = 0;
+    }
+    buf += ch;
+    w += cw;
   }
-  if (core.length > perLine * maxLines && lines.length) {
-    lines[lines.length - 1] = lines[lines.length - 1].slice(0, perLine - 1) + "…";
+  if (buf && lines.length < maxLines) lines.push(buf);
+
+  // 入りきらなかったぶんがある場合だけ、最後の行を「…」で締める
+  const used = lines.join("").length;
+  if (used < core.length && lines.length) {
+    lines[lines.length - 1] = `${lines[lines.length - 1].slice(0, -1)}…`;
   }
-  // 「…紹介！／！」のように最後の1〜2文字だけが next 行に落ちると読みにくい。
-  // 少しだけはみ出させて前の行にくっつける（2026-09-11）。
+
+  // 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける
   if (lines.length > 1 && lines[lines.length - 1].length <= 2) {
     lines[lines.length - 2] += lines.pop();
   }

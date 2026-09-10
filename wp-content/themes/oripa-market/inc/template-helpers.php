@@ -248,16 +248,44 @@ function articleThumbHtml_php( $category, $cls = 'article-detail-hero', $title =
 	if ( '' === $core ) {
 		$core = (string) $title;
 	}
+	// 【末尾の年月はサムネイルから落とす・2026-09-11】
+	// 「…上位9枚 2026年9月」のように末尾まで入れると1〜2文字あふれて「…」で切れ、
+	// 肝心の商品名まで読めなくなる。年月は記事ページの見出しに出るので要らない。
+	$core = trim( preg_replace( '/\s*20\d{2}年\s*\d{1,2}月\s*$/u', '', $core ) );
+
+	// 【文字数ではなく幅で折る】
+	// 全角と半角では幅が倍ちがう。文字数で折ると半角の多い行だけ短くなり、
+	// あふれたぶんが「…」になっていた。全角を1、半角を0.55として数える。
+	// JS版 assets/js/common.js の thumbTitleLines() と同じ計算にすること。
 	$lines = array();
-	$len   = mb_strlen( $core, 'UTF-8' );
-	for ( $i = 0; $i < $len && count( $lines ) < $max_lines; $i += $per_line ) {
-		$lines[] = mb_substr( $core, $i, $per_line, 'UTF-8' );
+	$buf   = '';
+	$w     = 0;
+	$chars = preg_split( '//u', $core, -1, PREG_SPLIT_NO_EMPTY );
+	$rest  = 0;
+	foreach ( $chars as $idx => $ch ) {
+		$cw = preg_match( '/[\x20-\x7E]|[\x{FF61}-\x{FF9F}]/u', $ch ) ? 0.55 : 1;
+		if ( $w + $cw > $per_line && '' !== $buf ) {
+			$lines[] = $buf;
+			if ( count( $lines ) >= $max_lines ) {
+				$rest = count( $chars ) - $idx;
+				break;
+			}
+			$buf = '';
+			$w   = 0;
+		}
+		$buf .= $ch;
+		$w   += $cw;
 	}
-	if ( $len > $per_line * $max_lines && $lines ) {
+	if ( '' !== $buf && count( $lines ) < $max_lines ) {
+		$lines[] = $buf;
+		$rest    = 0;
+	}
+	// 入りきらなかったぶんがある場合だけ、最後の行を「…」で締める
+	if ( $rest > 0 && $lines ) {
 		$last           = count( $lines ) - 1;
-		$lines[ $last ] = mb_substr( $lines[ $last ], 0, $per_line - 1, 'UTF-8' ) . '…';
+		$lines[ $last ] = mb_substr( $lines[ $last ], 0, mb_strlen( $lines[ $last ], 'UTF-8' ) - 1, 'UTF-8' ) . '…';
 	}
-	// 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける（2026-09-11）。
+	// 最後の1〜2文字だけが次の行に落ちると読みにくいので、前の行にくっつける
 	if ( count( $lines ) > 1 && mb_strlen( end( $lines ), 'UTF-8' ) <= 2 ) {
 		$tail                          = array_pop( $lines );
 		$lines[ count( $lines ) - 1 ] .= $tail;
