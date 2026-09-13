@@ -458,6 +458,25 @@ function lotteryProductName(l, box) {
   return boxName ? `${title}<span class="product-box">${boxName}</span>` : title;
 }
 
+/**
+ * 「PR この弾のオリパ」ボタン（2026-09-13追加）。
+ *
+ * 【守ること】
+ * - 応募ボタンとは**別のボタン**にする。応募ボタンの飛び先は変えない（lotteryCtaUrl 参照）。
+ * - 弾名が一致した提携オリパがあるときだけ出す。無ければ何も出さない（無理にアフィリエイトを入れない）。
+ * - 商品ページへ直接飛べない間（deep=false）は、トップへ送るので「探す」と書く。「見る」と書くと嘘になる。
+ * - 受付終了後も出してよい（外れた・間に合わなかった人の選択肢のため）。
+ */
+function oripaPrLinkHtml(l) {
+  const o = l.oripaLink;
+  if (!o || !o.url) return "";
+  const set = o.set ? `「${escapeXml(o.set)}」の` : "";
+  const label = o.deep
+    ? `${escapeXml(o.service)}で${set}オリパを見る`
+    : `${escapeXml(o.service)}で${set}オリパを探す`;
+  return `<a class="btn oripa-pr-link block" href="${escapeXml(o.url)}" target="_blank" rel="sponsored noopener"><span class="pr-mark">PR</span>${label}</a>`;
+}
+
 function lotteryCardHtml(l, ctx) {
   const shop = ctx.shops.find(s => s.id === l.shopId);
   const box = ctx.boxes.find(b => b.slug === l.box);
@@ -490,6 +509,7 @@ function lotteryCardHtml(l, ctx) {
       <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
       ${ctaHtml}
       ${methodLinkHtml}
+      ${oripaPrLinkHtml(l)}
     </div>
   </div>`;
 }
@@ -649,6 +669,7 @@ function lotteryRowHtml(l, ctx) {
     <div class="row-verified"><span class="check">✓</span>運営確認済み・${freshnessLabel(l.updatedAt)}</div>
     ${ctaHtml}
     ${methodLinkHtml}
+    ${oripaPrLinkHtml(l)}
   </div>`;
 }
 

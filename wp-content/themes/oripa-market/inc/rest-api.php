@@ -195,6 +195,15 @@ function oripa_rest_lotteries() {
 			'confidence'     => (float) get_post_meta( $p->ID, 'confidence_score', true ),
 			'purchaseLinkUrl'     => get_post_meta( $p->ID, 'purchase_link_url', true ) ?: '',
 			'purchaseLinkService' => get_post_meta( $p->ID, 'purchase_link_service', true ) ?: '',
+			// 弾名で紐付けた提携オリパ。空なら PR ボタンを出さない（2026-09-13）。
+			'oripaLink'           => get_post_meta( $p->ID, 'oripa_link_url', true )
+				? array(
+					'url'     => get_post_meta( $p->ID, 'oripa_link_url', true ),
+					'service' => get_post_meta( $p->ID, 'oripa_link_service', true ) ?: '',
+					'set'     => get_post_meta( $p->ID, 'oripa_link_set', true ) ?: '',
+					'deep'    => (bool) get_post_meta( $p->ID, 'oripa_link_deep', true ),
+				)
+				: null,
 		);
 	}
 	return $out;
