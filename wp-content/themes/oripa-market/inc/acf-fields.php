@@ -288,6 +288,11 @@ add_action(
 			'purchase_link_service' => 'string',
 			// 商品そのものの画像（2026-09-10追加）。グッズなどパック種類に当てはまらない商品用。
 			'product_image_url'     => 'string',
+			// 弾名で紐付けた提携オリパ（2026-09-13追加）。応募URL・購入導線リンクとは別物。
+			'oripa_link_url'        => 'string',
+			'oripa_link_service'    => 'string',
+			'oripa_link_set'        => 'string',
+			'oripa_link_deep'       => 'boolean',
 		);
 		foreach ( $lottery_meta as $key => $type ) {
 			register_post_meta(
