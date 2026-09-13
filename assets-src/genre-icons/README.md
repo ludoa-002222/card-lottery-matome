@@ -40,7 +40,7 @@ python3 remove-bg.py dragonball.jpeg /tmp/dragonball.png 60
 5枚で被写体の大きさをそろえるための処理。
 
 ```bash
-cwebp -q 84 -alpha_q 100 /tmp/pokeka.png \
+cwebp -q 78 -m 6 -alpha_q 92 -alpha_filter best /tmp/pokeka.png \
   -o ../../wp-content/themes/oripa-market/assets/img/genre-pokeka.webp
 ```
 

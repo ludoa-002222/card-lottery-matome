@@ -94,7 +94,10 @@ def main():
         png = src_dir / f"{out_name}.png"
         rgba.save(png)
         webp = OUT_DIR / f"{out_name}.webp"
-        subprocess.run(["cwebp", "-quiet", "-q", "88", "-alpha_q", "100", str(png), "-o", str(webp)], check=True)
+        subprocess.run(
+            ["cwebp", "-quiet", "-q", "82", "-m", "6", "-alpha_q", "95", "-alpha_filter", "best", str(png), "-o", str(webp)],
+            check=True,
+        )
         png.unlink()
         print(f"  {out_name:14s} {rgba.size[0]}x{rgba.size[1]}  {webp.stat().st_size // 1024}KB")
 
