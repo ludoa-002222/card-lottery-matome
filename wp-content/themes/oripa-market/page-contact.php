@@ -6,6 +6,10 @@
  * シンプルな実装（DB保存やプラグインは使わない）。
  * スパム対策はハニーポット＋nonceのみ（reCAPTCHA等は未導入）。
  *
+ * 管理者宛の送信に成功したら、入力されたメールアドレスへ受付確認メールも送る
+ * （2026-09-15追加）。確認メールが失敗しても管理者へは届いているので、
+ * $success の判定には影響させない（お問い合わせ自体は受け付けているため）。
+ *
  * @package oripa-market
  */
 
@@ -15,14 +19,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$errors  = array();
-$success = false;
-$values  = array(
+$errors             = array();
+$success            = false;
+$confirmation_sent  = false;
+$values             = array(
 	'name'    => '',
 	'email'   => '',
 	'subject' => 'correction',
 	'message' => '',
 );
+
+// oripa-market.com のドメインで統一する（SPF/DKIMがこのドメインに設定済みのため）。
+// WordPress既定の From（wordpress@ドメイン・表示名 "WordPress"）のままだと
+// 受信側にそっけなく見えるので、サイト名を名乗る。
+$from_header = 'From: オリパマーケット <noreply@' . wp_parse_url( home_url(), PHP_URL_HOST ) . '>';
 
 if ( isset( $_POST['oripa_contact_submit'] ) ) {
 	if ( ! isset( $_POST['oripa_contact_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['oripa_contact_nonce'] ) ), 'oripa_contact' ) ) {
@@ -63,12 +73,34 @@ if ( isset( $_POST['oripa_contact_submit'] ) ) {
 					. "お名前: {$values['name']}\n"
 					. "メールアドレス: {$values['email']}\n\n"
 					. "お問い合わせ内容:\n{$values['message']}\n",
-				array( 'Reply-To: ' . $values['name'] . ' <' . $values['email'] . '>' )
+				array(
+					$from_header,
+					'Reply-To: ' . $values['name'] . ' <' . $values['email'] . '>',
+				)
 			);
 
 			if ( $sent ) {
 				$success = true;
-				$values  = array(
+
+				// 受付確認メール（ユーザー宛）。失敗しても管理者へは届いているので
+				// エラー扱いにはせず、$confirmation_sent で完了メッセージの文言だけ変える。
+				$confirmation_sent = wp_mail(
+					$values['email'],
+					'[オリパマーケット] お問い合わせを受け付けました',
+					"{$values['name']} 様\n\n"
+						. "この度はオリパマーケットへお問い合わせいただき、誠にありがとうございます。\n"
+						. "以下の内容で受け付けました。内容を確認のうえ、担当より順次ご連絡いたします。\n\n"
+						. "----------------------------------------\n"
+						. "種別: {$subject_label}\n"
+						. "お問い合わせ内容:\n{$values['message']}\n"
+						. "----------------------------------------\n\n"
+						. "※このメールは送信専用アドレスから配信しています。ご返信いただいても対応できません。\n"
+						. "追加のご連絡は、お手数ですが改めてお問い合わせフォームよりお願いいたします。\n\n"
+						. "オリパマーケット " . home_url( '/' ) . "\n",
+					array( $from_header )
+				);
+
+				$values = array(
 					'name'    => '',
 					'email'   => '',
 					'subject' => 'correction',
@@ -87,7 +119,12 @@ if ( isset( $_POST['oripa_contact_submit'] ) ) {
 	<p>掲載情報の誤り・修正依頼や、その他のお問い合わせは以下のフォームからご連絡ください。内容を確認のうえ、担当より順次対応いたします。</p>
 
 	<?php if ( $success ) : ?>
-		<div class="form-notice is-success">お問い合わせを受け付けました。内容を確認のうえ、必要に応じてご連絡いたします。</div>
+		<div class="form-notice is-success">
+			お問い合わせを受け付けました。内容を確認のうえ、必要に応じてご連絡いたします。
+			<?php if ( $confirmation_sent ) : ?>
+				ご入力いただいたメールアドレスに受付確認メールをお送りしました。
+			<?php endif; ?>
+		</div>
 	<?php else : ?>
 		<?php if ( $errors ) : ?>
 			<div class="form-notice is-error">
