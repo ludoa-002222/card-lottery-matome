@@ -129,15 +129,11 @@
         return true;
       });
 
-      // 受付中 = 購入導線リンク（アフィリエイト）を持つ抽選を先頭に、その中では締切が近い順。
+      // 受付中 = 提携先（アフィリエイト）のカードを先頭に、その中では締切が近い順（sortByDeadline）。
       // 終了済 = 直近に終わった順。
-      // 【並び順と応募先は別物・2026-09-10】
-      // ここで上位に出すのは並び順の話であって、応募ボタンの飛び先には影響しない。
-      // 応募ボタンは必ず本当の応募先へ飛ぶ（common.js の lotteryCtaUrl）。
-      const activeAll = sortByDeadline(filtered.filter(l => !isEnded(l)));
-      const withLink = activeAll.filter(l => l.purchaseLinkUrl);
-      const withoutLink = activeAll.filter(l => !l.purchaseLinkUrl);
-      const active = [...withLink, ...withoutLink];
+      // 【2026-09-15 修正】以前は purchaseLinkUrl の有無で分けていたが、ジャンル別のリンクが全件に入るため
+      // 実質どれも「リンクあり」で並び替えが効いていなかった。実際に提携先へ送るカード（ctaType）で判定する。
+      const active = sortByDeadline(filtered.filter(l => !isEnded(l)));
       const ended = filtered.filter(isEnded).sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
 
       const cnt = document.getElementById("result-count");
@@ -319,7 +315,11 @@
 
     const scored = live
       .map(l => ({ l, score: scoreOf(l) }))
-      .sort((a, b) => b.score - a.score || new Date(a.l.deadline) - new Date(b.l.deadline));
+      // 提携先のカードを先頭に（2026-09-15）。次に記事との関連度、最後に締切が近い順
+      .sort((a, b) =>
+        (b.l.ctaType === "affiliate") - (a.l.ctaType === "affiliate") ||
+        b.score - a.score ||
+        new Date(a.l.deadline) - new Date(b.l.deadline));
 
     const matched = scored.filter(x => x.score > 0);
     // 3列で並べるので、半端な段が出ないよう6件（2段）にする。
@@ -445,7 +445,8 @@
       });
       const cnt = document.getElementById("cnt");
       if (cnt) cnt.innerHTML = `全<b>${f.length}</b>件`;
-      renderLotteryList("list", f, ctx, 8);
+      // 提携先のカードを先頭に、次に締切が近い順（2026-09-15。それまではAPIの順のままだった）
+      renderLotteryList("list", sortByDeadline(f), ctx, 8);
     }
     [catSel, boxSel, areaSel].forEach(s => s.addEventListener("change", draw));
     draw();
