@@ -73,7 +73,7 @@ npm run static:serve   # 依存なし: python3 -m http.server（static/ を配�
   - `inc/rest-api.php` … `/wp-json/oripa/v1/{categories,boxes,shops,lotteries,articles,bootstrap}` 。静的版 `data/*.json` と同じ形を返す
   - `inc/enqueue.php` … `assets/css/style.css` + `assets/js/common.js` + `app.js` を読み込み、`window.ORIPA` にREST URL等を渡す
   - `inc/members.php` … 会員登録・ログインを WP 標準フローに接続（ログイン後 `/mypage/` へ）
-- テンプレート: `front-page.php` / `taxonomy-card_category.php` / `taxonomy-card_box.php` / `archive-lottery.php` / `single-lottery.php` / `archive-column.php` / `single-column.php` / `archive-shop.php` / `page-{online,store,calendar,trust,register,mypage}.php` / `page.php`
+- テンプレート: `front-page.php` / `taxonomy-card_category.php` / `taxonomy-card_box.php` / `archive-lottery.php` / `single-lottery.php` / `archive-column.php` / `single-column.php` / `archive-shop.php` / `page-{online,store,calendar,trust,contact,register,mypage}.php` / `page.php`
 - 動的表示（カウントダウン・「◯分前に確認」・信頼スコア・絞り込み）は `assets/js/{common,app}.js` が担当。データ取得先は `window.ORIPA.restBase`
 
 ## データ更新運用（想定）

@@ -134,8 +134,13 @@ GET /wp-json/oripa/v1/bootstrap    → {categories,boxes,shops,lotteries,article
 `bin/seed-data/*.json`（`static/data/*.json` のコピー）を読み、CPT・タクソノミー・ACF値・固定ページを作成。
 **slug で冪等** なので何度実行してもよい（コラムは更新日時も上書き）。
 
-固定ページ11件を作成: `online` `store` `calendar` `trust` `about` `faq` `company` `terms` `privacy` `mypage` `register`
-（`online/store/calendar/trust/register/mypage` は `page-<slug>.php` が自動採用、`about/faq/company/terms/privacy` は `page.php` ＋ 本文HTML）。
+固定ページ12件を作成: `online` `store` `calendar` `trust` `contact` `about` `faq` `company` `terms` `privacy` `mypage` `register`
+（`online/store/calendar/trust/contact/register/mypage` は `page-<slug>.php` が自動採用、`about/faq/company/terms/privacy` は `page.php` ＋ 本文HTML）。
+
+`contact` はサイト独自のお問い合わせフォーム（`page-contact.php`）。`wp_mail()` で `admin_email` 宛に送信するだけの
+シンプルな実装で、DB保存やプラグインは使わない。スパム対策はハニーポット＋nonceのみ（reCAPTCHA等は未導入）。
+本番でメールが届かないときは、まず `wp_mail()` が実際に配送されているか（SMTPプラグイン未導入だとサーバーの
+標準メール送信に依存し、迷惑メール判定や未達になりやすい）を疑うこと。
 
 ## ACF フィールド
 

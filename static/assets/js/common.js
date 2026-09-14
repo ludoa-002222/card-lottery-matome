@@ -133,6 +133,7 @@ function renderFooter() {
         <a href="${ROOT}/pages/trust.html">情報の正確性について</a>
         <a href="${ROOT}/pages/about.html">運営者について</a>
         <a href="${ROOT}/pages/faq.html">よくある質問</a>
+        <a href="${ROOT}/pages/contact.html">お問い合わせ</a>
         <a href="${ROOT}/pages/shop.html">全店舗一覧</a>
         <a href="${ROOT}/pages/company.html">会社概要</a>
         <a href="${ROOT}/pages/terms.html">利用規約</a>
