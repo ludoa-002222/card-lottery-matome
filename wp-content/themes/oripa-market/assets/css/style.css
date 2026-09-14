@@ -841,18 +841,3 @@ body.oripa-modal-open { overflow: hidden; }
 .article-body ul, .article-body ol { margin: 0 0 1.2em; padding-left: 1.4em; }
 .article-body li { margin-bottom: .5em; line-height: 1.85; }
 .article-body strong { font-weight: 700; }
-
-/* ===== 提携先で直接買える商品のボタン（2026-09-15）=====
-   形は応募ボタンと同じ。PRの印で「提携先への広告リンク」だと分かるようにする。 */
-.affiliate-cta { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.affiliate-cta .pr-mark {
-  flex: 0 0 auto;
-  font-size: .62rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  border: 1px solid currentColor;
-  border-radius: 3px;
-  padding: 0 4px;
-  line-height: 1.5;
-  opacity: .9;
-}
