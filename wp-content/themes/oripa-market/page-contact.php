@@ -10,6 +10,12 @@
  * （2026-09-15追加）。確認メールが失敗しても管理者へは届いているので、
  * $success の判定には影響させない（お問い合わせ自体は受け付けているため）。
  *
+ * 【POSTフィールド名に注意・2026-09-15】
+ * name="name"（値ありの状態でPOST）だとXserverのサーバー側WAFに一律で
+ * 404にされる（このページに限らず全ページで再現。$_POSTの中身は無関係で
+ * パラメータ名だけが問題）。フィールド名は your_name にしてある。他の
+ * フィールド名を増やすときも "name" 単体は避けること。
+ *
  * @package oripa-market
  */
 
@@ -42,7 +48,7 @@ if ( isset( $_POST['oripa_contact_submit'] ) ) {
 		// 何もせず成功したふりをして送信ループを止めさせる。
 		$success = true;
 	} else {
-		$values['name']    = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+		$values['name']    = isset( $_POST['your_name'] ) ? sanitize_text_field( wp_unslash( $_POST['your_name'] ) ) : '';
 		$values['email']   = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
 		$values['subject'] = isset( $_POST['subject'] ) ? sanitize_key( wp_unslash( $_POST['subject'] ) ) : 'correction';
 		$values['message'] = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
@@ -144,7 +150,7 @@ if ( isset( $_POST['oripa_contact_submit'] ) ) {
 			</div>
 
 			<label for="contact-name">お名前<span class="req">必須</span></label>
-			<input type="text" id="contact-name" name="name" value="<?php echo esc_attr( $values['name'] ); ?>" required>
+			<input type="text" id="contact-name" name="your_name" value="<?php echo esc_attr( $values['name'] ); ?>" required>
 
 			<label for="contact-email">メールアドレス<span class="req">必須</span></label>
 			<input type="email" id="contact-email" name="email" value="<?php echo esc_attr( $values['email'] ); ?>" required>
