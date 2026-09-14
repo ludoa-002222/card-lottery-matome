@@ -60,15 +60,15 @@
 
     const grid = document.getElementById("category-grid");
     if (grid) {
-      // 【受付中があるジャンルだけ出す・2026-09-10】
-      // 全ジャンルを常に並べると「0件」のタイルが並び、探しに来た人が空振りする。
-      // 件数も掲載総数ではなく受付中の数を出す（押した先で応募できる数と一致させる）。
-      const withActive = categories
-        .map(c => ({ cat: c, count: lotteries.filter(l => l.category === c.slug && !isEnded(l)).length }))
-        .filter(x => x.count > 0)
-        .sort((a, b) => b.count - a.count);
+      // 【全ジャンルを出す・2026-09-15 パウロさん指示】
+      // 以前（2026-09-10）は受付中があるジャンルだけ出していたが、ポケカと遊戯王の2つしか並ばず、
+      // 5銘柄を扱っているサイトだと伝わらなかった。全ジャンルを並べ、件数は受付中の数をそのまま出す。
+      // 並びは受付中の多い順（同数ならサイトの登録順）。
+      const withCount = categories
+        .map((c, i) => ({ cat: c, i, count: lotteries.filter(l => l.category === c.slug && !isEnded(l)).length }))
+        .sort((a, b) => b.count - a.count || a.i - b.i);
 
-      grid.innerHTML = withActive.map(({ cat, count }) => `<a class="category-card" href="${CAT_BASE}${cat.slug}/">
+      grid.innerHTML = withCount.map(({ cat, count }) => `<a class="category-card" href="${CAT_BASE}${cat.slug}/">
           ${categoryThumbHtml(cat.slug, "cat-thumb")}
           <div class="cat-body">
             <div class="cat-name">${cat.name}</div>
@@ -76,9 +76,8 @@
           </div>
         </a>`).join("");
 
-      // 受付中が1件も無いときだけ、セクションごと隠す（見出しだけ残ると壊れて見える）
       const section = document.getElementById("category-section");
-      if (section) section.hidden = withActive.length === 0;
+      if (section) section.hidden = withCount.length === 0;
     }
 
     const stats = document.getElementById("trust-stats");
