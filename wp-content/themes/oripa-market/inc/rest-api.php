@@ -197,6 +197,8 @@ function oripa_rest_lotteries() {
 			'purchaseLinkService' => get_post_meta( $p->ID, 'purchase_link_service', true ) ?: '',
 			// 'affiliate' なら「◯◯で購入する」＋PR。空なら通常の抽選（2026-09-15）。
 			'ctaType'             => get_post_meta( $p->ID, 'cta_type', true ) ?: '',
+			// true なら締切日を出さず「なくなり次第終了」と表示する。deadline は並べ替え用の遠い日付（2026-09-15）
+			'untilSoldOut'        => (bool) get_post_meta( $p->ID, 'until_sold_out', true ),
 			// 弾名で紐付けた提携オリパ。空なら PR ボタンを出さない（2026-09-13）。
 			'oripaLink'           => get_post_meta( $p->ID, 'oripa_link_url', true )
 				? array(

@@ -467,6 +467,8 @@
     const DAY_PAGE_SIZE = 8; // 一度に見せる件数。これを超えたら折りたたむ
 
     const onDay = (l, y, m, d) => {
+      // 締切日の無い商品（なくなり次第終了）は締切カレンダーに載せない（2026-09-15）
+      if (l.untilSoldOut) return false;
       const dl = new Date(l.deadline);
       return dl.getFullYear() === y && dl.getMonth() === m && dl.getDate() === d;
     };
