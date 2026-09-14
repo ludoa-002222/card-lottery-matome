@@ -482,6 +482,22 @@ function affiliateSaleCtaHtml(l) {
   return `<a class="btn primary block affiliate-cta" href="${escapeXml(l.applyUrl)}" target="_blank" rel="sponsored noopener">抽選に応募する！</a>`;
 }
 
+/**
+ * 締切の表示（2026-09-15）。
+ * 締切日が無く売り切れで終わる商品（untilSoldOut）は、日付と残り時間を出さず「なくなり次第終了」と書く。
+ * このとき deadline には並べ替え用の遠い日付が入っているが、**画面には絶対に出さない**（嘘の締切になるため）。
+ */
+function deadlineText(l, shop) {
+  const area = shop ? shop.area : "-";
+  if (l.untilSoldOut) return `なくなり次第終了（${area}）`;
+  return `締切 ${fmtDateTime(l.deadline)}（${area}）・第${l.roundNo}回／全${l.roundTotal}回`;
+}
+function ribbonText(l, cd) {
+  if (cd.ended) return "受付終了";
+  if (l.untilSoldOut) return "なくなり次第";
+  return `残${cd.num}${cd.unit}`;
+}
+
 function lotteryCardHtml(l, ctx) {
   const shop = ctx.shops.find(s => s.id === l.shopId);
   const box = ctx.boxes.find(b => b.slug === l.box);
@@ -502,10 +518,10 @@ function lotteryCardHtml(l, ctx) {
     ? `<button type="button" class="text-link oripa-method-open" data-lottery-id="${l.id}">応募方法をみる</button>`
     : "";
   return `
-  <div class="lottery-card ${cd.urgent && !cd.ended ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
+  <div class="lottery-card ${cd.urgent && !cd.ended && !l.untilSoldOut ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
     <div class="thumb-wrap">
       ${lotteryThumbHtml(l, box)}
-      <span class="ribbon ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
+      <span class="ribbon ${cd.ended ? "ended" : cd.urgent && !l.untilSoldOut ? "urgent" : ""}">${ribbonText(l, cd)}</span>
       <span class="method-chip ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>
     </div>
     <div class="card-body">
@@ -513,7 +529,7 @@ function lotteryCardHtml(l, ctx) {
       <div class="badges">${badgeHtml(l)}</div>
       <div class="shop-name">${shop ? shop.name : "店舗名未定"}</div>
       <div class="product-name">${lotteryProductName(l, box)}</div>
-      <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
+      <div class="meta">${deadlineText(l, shop)}</div>
       ${ctaHtml}
       ${methodLinkHtml}
     </div>
@@ -669,11 +685,11 @@ function lotteryRowHtml(l, ctx) {
         <span class="method-chip static ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>
         ${badgeHtml(l)}
       </div>
-      <span class="row-countdown ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
+      <span class="row-countdown ${cd.ended ? "ended" : cd.urgent && !l.untilSoldOut ? "urgent" : ""}">${ribbonText(l, cd)}</span>
     </div>
     <div class="row-shop">${shop ? shop.name : "店舗名未定"}</div>
     <div class="row-product">${lotteryProductName(l, box)}</div>
-    <div class="row-meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
+    <div class="row-meta">${deadlineText(l, shop)}</div>
     <div class="row-verified"><span class="check">✓</span>運営確認済み・${freshnessLabel(l.updatedAt)}</div>
     ${ctaHtml}
     ${methodLinkHtml}
