@@ -403,6 +403,8 @@ body.oripa-modal-open { overflow: hidden; }
 .form-notice.is-success { background: #e7f8ec; color: #16693a; border: 1px solid #bfe8cc; }
 .form-notice.is-error { background: #fdecec; color: #a3231f; border: 1px solid #f6c8c6; }
 .form-notice.is-error ul { margin: 0; padding-left: 1.2em; }
+/* JSでの即時バリデーション用。サーバー再表示時は使わない（サーバーは form-notice のみで知らせる）。 */
+.form-box .is-invalid { border-color: var(--danger); background: var(--danger-soft); }
 
 /* ===== Footer ===== */
 .site-footer { background: var(--header); color: #97a4c2; margin-top: 56px; padding: 34px 0 22px; font-size: .82rem; position: relative; }

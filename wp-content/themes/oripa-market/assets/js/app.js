@@ -42,6 +42,7 @@
     "page-online": () => initMethodPage("online"),
     "page-store": () => initMethodPage("store"),
     "page-calendar": initCalendar,
+    "page-contact": initContact,
   };
 
   const fn = handlers[page];
@@ -574,5 +575,81 @@
     document.getElementById("prev").addEventListener("click", () => { view.setMonth(view.getMonth() - 1); drawCalendar(); });
     document.getElementById("next").addEventListener("click", () => { view.setMonth(view.getMonth() + 1); drawCalendar(); });
     drawCalendar();
+  }
+
+  // ------------------------------------------------------------- contact
+  /**
+   * お問い合わせフォームのフロント側バリデーション。
+   *
+   * サーバー側（page-contact.php）のチェックが本丸で、これはJSが有効な場合の
+   * 体験向上のみ。novalidate はJSでフォームに付与するので、JS無効時はブラウザ
+   * 標準の required / type=email によるバリデーションがそのまま働く。
+   */
+  async function initContact() {
+    const form = document.querySelector(".contact-box");
+    if (!form) return;
+    form.setAttribute("novalidate", "novalidate");
+
+    const fields = [
+      {
+        el: form.querySelector("#contact-name"),
+        message: "お名前を入力してください。",
+        check: (v) => v.trim() !== "",
+      },
+      {
+        el: form.querySelector("#contact-email"),
+        message: "正しいメールアドレスを入力してください。",
+        check: (v, el) => v.trim() !== "" && el.checkValidity(),
+      },
+      {
+        el: form.querySelector("#contact-message"),
+        message: "お問い合わせ内容を入力してください。",
+        check: (v) => v.trim() !== "",
+      },
+    ].filter((f) => f.el);
+
+    let notice = form.parentElement.querySelector(".form-notice.is-error");
+
+    function clearField(field) {
+      field.el.classList.remove("is-invalid");
+    }
+
+    function showErrors(messages) {
+      if (!notice) {
+        notice = document.createElement("div");
+        notice.className = "form-notice is-error";
+        form.parentElement.insertBefore(notice, form);
+      }
+      notice.hidden = false;
+      notice.innerHTML = "<ul>" + messages.map((m) => `<li>${m}</li>`).join("") + "</ul>";
+    }
+
+    function hideErrors() {
+      if (notice) notice.hidden = true;
+    }
+
+    fields.forEach((field) => {
+      field.el.addEventListener("input", () => clearField(field));
+    });
+
+    form.addEventListener("submit", (e) => {
+      const messages = [];
+      let firstInvalid = null;
+      fields.forEach((field) => {
+        clearField(field);
+        if (!field.check(field.el.value, field.el)) {
+          messages.push(field.message);
+          field.el.classList.add("is-invalid");
+          if (!firstInvalid) firstInvalid = field.el;
+        }
+      });
+      if (messages.length) {
+        e.preventDefault();
+        showErrors(messages);
+        firstInvalid.focus();
+      } else {
+        hideErrors();
+      }
+    });
   }
 })();
