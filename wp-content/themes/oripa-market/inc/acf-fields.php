@@ -293,6 +293,8 @@ add_action(
 			'oripa_link_service'    => 'string',
 			'oripa_link_set'        => 'string',
 			'oripa_link_deep'       => 'boolean',
+			// ボタンの種類（2026-09-15追加）。'affiliate' は提携先で直接買える商品（抽選ではない）。
+			'cta_type'              => 'string',
 		);
 		foreach ( $lottery_meta as $key => $type ) {
 			register_post_meta(

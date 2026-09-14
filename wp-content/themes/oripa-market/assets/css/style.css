@@ -842,35 +842,17 @@ body.oripa-modal-open { overflow: hidden; }
 .article-body li { margin-bottom: .5em; line-height: 1.85; }
 .article-body strong { font-weight: 700; }
 
-/* ===== 提携オリパへのPRボタン（2026-09-13）=====
-   応募ボタン（塗りつぶし）と見分けがつくよう、枠線だけの控えめな形にする。
-   色だけで区別しない：形（枠線）とPRの印の両方で「応募ではない広告」だと分かるようにする。 */
-.oripa-pr-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 7px 10px;
-  font-size: .74rem;
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  text-align: center;
-}
-.oripa-pr-link:hover { border-color: var(--accent); color: var(--accent-deep, var(--accent)); }
-.oripa-pr-link .pr-mark {
+/* ===== 提携先で直接買える商品のボタン（2026-09-15）=====
+   形は応募ボタンと同じ。PRの印で「提携先への広告リンク」だと分かるようにする。 */
+.affiliate-cta { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.affiliate-cta .pr-mark {
   flex: 0 0 auto;
-  font-size: .6rem;
+  font-size: .62rem;
   font-weight: 700;
   letter-spacing: .04em;
-  color: var(--ink-soft);
   border: 1px solid currentColor;
   border-radius: 3px;
   padding: 0 4px;
   line-height: 1.5;
+  opacity: .9;
 }
