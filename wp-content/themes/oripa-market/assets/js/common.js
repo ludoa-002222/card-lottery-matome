@@ -462,12 +462,16 @@ function lotteryProductName(l, box) {
  * 提携先で直接買える商品のボタン（2026-09-15追加）。
  *
  * 例: オリくじ「30名限定！30th CELEBRATION-BOXが定価で買える」。抽選ではなく先着・入場制限なので、
- * **「抽選に応募する！」とは書かない。** 提携先（アフィリエイト）へ送るので PR の印と rel="sponsored" を付ける。
+ * **「抽選に応募する！」とは書かない。** 提携先（アフィリエイト）へ送るので rel="sponsored" を付ける。
  * 以前あった「PR この弾のオリパを見る」（抽選カードの下に付く別ボタン）は、パウロさんの判断で廃止した。
+ *
+ * 【PRの印をボタンに付けない・2026-09-15】
+ * ページ全体に「※当ページにはアフィリエイト広告（PR）が含まれます。」を表示しているため、
+ * ギャラリーのカードごとには出さない（パウロさん判断）。rel="sponsored" は検索エンジン向けなので残す。
  */
 function affiliateSaleCtaHtml(l, shop) {
   const name = shop ? escapeXml(shop.name) : "提携先";
-  return `<a class="btn primary block affiliate-cta" href="${escapeXml(l.applyUrl)}" target="_blank" rel="sponsored noopener"><span class="pr-mark">PR</span>${name}で購入する</a>`;
+  return `<a class="btn primary block affiliate-cta" href="${escapeXml(l.applyUrl)}" target="_blank" rel="sponsored noopener">${name}で購入する</a>`;
 }
 
 function lotteryCardHtml(l, ctx) {
