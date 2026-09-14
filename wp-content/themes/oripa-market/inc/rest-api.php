@@ -195,6 +195,8 @@ function oripa_rest_lotteries() {
 			'confidence'     => (float) get_post_meta( $p->ID, 'confidence_score', true ),
 			'purchaseLinkUrl'     => get_post_meta( $p->ID, 'purchase_link_url', true ) ?: '',
 			'purchaseLinkService' => get_post_meta( $p->ID, 'purchase_link_service', true ) ?: '',
+			// 'affiliate' なら「◯◯で購入する」＋PR。空なら通常の抽選（2026-09-15）。
+			'ctaType'             => get_post_meta( $p->ID, 'cta_type', true ) ?: '',
 			// 弾名で紐付けた提携オリパ。空なら PR ボタンを出さない（2026-09-13）。
 			'oripaLink'           => get_post_meta( $p->ID, 'oripa_link_url', true )
 				? array(
