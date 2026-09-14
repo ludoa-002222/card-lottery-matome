@@ -77,6 +77,11 @@ function sortByDeadline(items) {
     const aEnded = ta <= now;
     const bEnded = tb <= now;
     if (aEnded !== bEnded) return aEnded ? 1 : -1;
+    // 受付中の中では、提携先（アフィリエイト）のカードを先頭にする（2026-09-15 パウロさん指示）。
+    // 並び順だけの話で、各カードの飛び先には影響しない。
+    const aAff = !aEnded && a.ctaType === "affiliate";
+    const bAff = !bEnded && b.ctaType === "affiliate";
+    if (aAff !== bAff) return aAff ? -1 : 1;
     return ta - tb;
   });
 }
@@ -458,6 +463,41 @@ function lotteryProductName(l, box) {
   return boxName ? `${title}<span class="product-box">${boxName}</span>` : title;
 }
 
+/**
+ * 提携先で直接買える商品のボタン（2026-09-15追加）。
+ *
+ * 例: オリくじ「30名限定！30th CELEBRATION-BOXが定価で買える」。抽選ではなく先着・入場制限なので、
+ * 提携先（アフィリエイト）へ送るので rel="sponsored" を付ける。
+ *
+ * 【ボタン文言・2026-09-15】
+ * 当初は先着・入場制限なので「◯◯で購入する」としていたが、見た目を他のカードとそろえるため
+ * パウロさんの判断で「抽選に応募する！」に統一した。
+ * 以前あった「PR この弾のオリパを見る」（抽選カードの下に付く別ボタン）は、パウロさんの判断で廃止した。
+ *
+ * 【PRの印をボタンに付けない・2026-09-15】
+ * ページ全体に「※当ページにはアフィリエイト広告（PR）が含まれます。」を表示しているため、
+ * ギャラリーのカードごとには出さない（パウロさん判断）。rel="sponsored" は検索エンジン向けなので残す。
+ */
+function affiliateSaleCtaHtml(l) {
+  return `<a class="btn primary block affiliate-cta" href="${escapeXml(l.applyUrl)}" target="_blank" rel="sponsored noopener">抽選に応募する！</a>`;
+}
+
+/**
+ * 締切の表示（2026-09-15）。
+ * 締切日が無く売り切れで終わる商品（untilSoldOut）は、日付と残り時間を出さず「なくなり次第終了」と書く。
+ * このとき deadline には並べ替え用の遠い日付が入っているが、**画面には絶対に出さない**（嘘の締切になるため）。
+ */
+function deadlineText(l, shop) {
+  const area = shop ? shop.area : "-";
+  if (l.untilSoldOut) return `なくなり次第終了（${area}）`;
+  return `締切 ${fmtDateTime(l.deadline)}（${area}）・第${l.roundNo}回／全${l.roundTotal}回`;
+}
+function ribbonText(l, cd) {
+  if (cd.ended) return "受付終了";
+  if (l.untilSoldOut) return "なくなり次第";
+  return `残${cd.num}${cd.unit}`;
+}
+
 function lotteryCardHtml(l, ctx) {
   const shop = ctx.shops.find(s => s.id === l.shopId);
   const box = ctx.boxes.find(b => b.slug === l.box);
@@ -467,19 +507,21 @@ function lotteryCardHtml(l, ctx) {
   // （2026-09-09修正。それまでは終了済みでも応募ボタンが出ていた）。
   const ctaHtml = cd.ended
     ? `<span class="btn primary block is-disabled" aria-disabled="true">受付終了</span>`
-    : ctaUrl
+    : l.ctaType === "affiliate" && l.applyUrl
+      ? affiliateSaleCtaHtml(l)
+      : ctaUrl
       ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
       : `<span class="btn primary block is-disabled" aria-disabled="true">応募先未定</span>`;
   // 「応募方法をみる」はテキストリンクとして、応募ボタンのすぐ下に小さく配置する（個別詳細ページは廃止）。
   // 終了済みは応募できないので出さない。
-  const methodLinkHtml = l.applyUrl && !cd.ended
+  const methodLinkHtml = l.applyUrl && !cd.ended && l.ctaType !== "affiliate"
     ? `<button type="button" class="text-link oripa-method-open" data-lottery-id="${l.id}">応募方法をみる</button>`
     : "";
   return `
-  <div class="lottery-card ${cd.urgent && !cd.ended ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
+  <div class="lottery-card ${cd.urgent && !cd.ended && !l.untilSoldOut ? "urgent-card" : ""} ${cd.ended ? "is-ended" : ""}">
     <div class="thumb-wrap">
       ${lotteryThumbHtml(l, box)}
-      <span class="ribbon ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
+      <span class="ribbon ${cd.ended ? "ended" : cd.urgent && !l.untilSoldOut ? "urgent" : ""}">${ribbonText(l, cd)}</span>
       <span class="method-chip ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>
     </div>
     <div class="card-body">
@@ -487,7 +529,7 @@ function lotteryCardHtml(l, ctx) {
       <div class="badges">${badgeHtml(l)}</div>
       <div class="shop-name">${shop ? shop.name : "店舗名未定"}</div>
       <div class="product-name">${lotteryProductName(l, box)}</div>
-      <div class="meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
+      <div class="meta">${deadlineText(l, shop)}</div>
       ${ctaHtml}
       ${methodLinkHtml}
     </div>
@@ -628,10 +670,12 @@ function lotteryRowHtml(l, ctx) {
   // カード表示と同じ扱い: 終了済みには応募導線を出さない。
   const ctaHtml = cd.ended
     ? `<span class="btn primary block is-disabled" aria-disabled="true">受付終了</span>`
-    : ctaUrl
+    : l.ctaType === "affiliate" && l.applyUrl
+      ? affiliateSaleCtaHtml(l)
+      : ctaUrl
       ? `<a class="btn primary block" href="${ctaUrl}" target="_blank" rel="noopener nofollow">抽選に応募する！</a>`
       : `<span class="btn primary block is-disabled" aria-disabled="true">応募先未定</span>`;
-  const methodLinkHtml = l.applyUrl && !cd.ended
+  const methodLinkHtml = l.applyUrl && !cd.ended && l.ctaType !== "affiliate"
     ? `<button type="button" class="text-link oripa-method-open" data-lottery-id="${l.id}">応募方法をみる</button>`
     : "";
   return `
@@ -641,11 +685,11 @@ function lotteryRowHtml(l, ctx) {
         <span class="method-chip static ${l.method}">${l.method === "online" ? "オンライン" : "店頭"}</span>
         ${badgeHtml(l)}
       </div>
-      <span class="row-countdown ${cd.ended ? "ended" : cd.urgent ? "urgent" : ""}">${cd.ended ? "受付終了" : `残${cd.num}${cd.unit}`}</span>
+      <span class="row-countdown ${cd.ended ? "ended" : cd.urgent && !l.untilSoldOut ? "urgent" : ""}">${ribbonText(l, cd)}</span>
     </div>
     <div class="row-shop">${shop ? shop.name : "店舗名未定"}</div>
     <div class="row-product">${lotteryProductName(l, box)}</div>
-    <div class="row-meta">締切 ${fmtDateTime(l.deadline)}（${shop ? shop.area : "-"}）・第${l.roundNo}回／全${l.roundTotal}回</div>
+    <div class="row-meta">${deadlineText(l, shop)}</div>
     <div class="row-verified"><span class="check">✓</span>運営確認済み・${freshnessLabel(l.updatedAt)}</div>
     ${ctaHtml}
     ${methodLinkHtml}

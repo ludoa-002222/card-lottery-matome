@@ -60,15 +60,15 @@
 
     const grid = document.getElementById("category-grid");
     if (grid) {
-      // 【受付中があるジャンルだけ出す・2026-09-10】
-      // 全ジャンルを常に並べると「0件」のタイルが並び、探しに来た人が空振りする。
-      // 件数も掲載総数ではなく受付中の数を出す（押した先で応募できる数と一致させる）。
-      const withActive = categories
-        .map(c => ({ cat: c, count: lotteries.filter(l => l.category === c.slug && !isEnded(l)).length }))
-        .filter(x => x.count > 0)
-        .sort((a, b) => b.count - a.count);
+      // 【全ジャンルを出す・2026-09-15 パウロさん指示】
+      // 以前（2026-09-10）は受付中があるジャンルだけ出していたが、ポケカと遊戯王の2つしか並ばず、
+      // 5銘柄を扱っているサイトだと伝わらなかった。全ジャンルを並べ、件数は受付中の数をそのまま出す。
+      // 並びは受付中の多い順（同数ならサイトの登録順）。
+      const withCount = categories
+        .map((c, i) => ({ cat: c, i, count: lotteries.filter(l => l.category === c.slug && !isEnded(l)).length }))
+        .sort((a, b) => b.count - a.count || a.i - b.i);
 
-      grid.innerHTML = withActive.map(({ cat, count }) => `<a class="category-card" href="${CAT_BASE}${cat.slug}/">
+      grid.innerHTML = withCount.map(({ cat, count }) => `<a class="category-card" href="${CAT_BASE}${cat.slug}/">
           ${categoryThumbHtml(cat.slug, "cat-thumb")}
           <div class="cat-body">
             <div class="cat-name">${cat.name}</div>
@@ -76,9 +76,8 @@
           </div>
         </a>`).join("");
 
-      // 受付中が1件も無いときだけ、セクションごと隠す（見出しだけ残ると壊れて見える）
       const section = document.getElementById("category-section");
-      if (section) section.hidden = withActive.length === 0;
+      if (section) section.hidden = withCount.length === 0;
     }
 
     const stats = document.getElementById("trust-stats");
@@ -129,15 +128,11 @@
         return true;
       });
 
-      // 受付中 = 購入導線リンク（アフィリエイト）を持つ抽選を先頭に、その中では締切が近い順。
+      // 受付中 = 提携先（アフィリエイト）のカードを先頭に、その中では締切が近い順（sortByDeadline）。
       // 終了済 = 直近に終わった順。
-      // 【並び順と応募先は別物・2026-09-10】
-      // ここで上位に出すのは並び順の話であって、応募ボタンの飛び先には影響しない。
-      // 応募ボタンは必ず本当の応募先へ飛ぶ（common.js の lotteryCtaUrl）。
-      const activeAll = sortByDeadline(filtered.filter(l => !isEnded(l)));
-      const withLink = activeAll.filter(l => l.purchaseLinkUrl);
-      const withoutLink = activeAll.filter(l => !l.purchaseLinkUrl);
-      const active = [...withLink, ...withoutLink];
+      // 【2026-09-15 修正】以前は purchaseLinkUrl の有無で分けていたが、ジャンル別のリンクが全件に入るため
+      // 実質どれも「リンクあり」で並び替えが効いていなかった。実際に提携先へ送るカード（ctaType）で判定する。
+      const active = sortByDeadline(filtered.filter(l => !isEnded(l)));
       const ended = filtered.filter(isEnded).sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
 
       const cnt = document.getElementById("result-count");
@@ -319,7 +314,11 @@
 
     const scored = live
       .map(l => ({ l, score: scoreOf(l) }))
-      .sort((a, b) => b.score - a.score || new Date(a.l.deadline) - new Date(b.l.deadline));
+      // 提携先のカードを先頭に（2026-09-15）。次に記事との関連度、最後に締切が近い順
+      .sort((a, b) =>
+        (b.l.ctaType === "affiliate") - (a.l.ctaType === "affiliate") ||
+        b.score - a.score ||
+        new Date(a.l.deadline) - new Date(b.l.deadline));
 
     const matched = scored.filter(x => x.score > 0);
     // 3列で並べるので、半端な段が出ないよう6件（2段）にする。
@@ -445,7 +444,8 @@
       });
       const cnt = document.getElementById("cnt");
       if (cnt) cnt.innerHTML = `全<b>${f.length}</b>件`;
-      renderLotteryList("list", f, ctx, 8);
+      // 提携先のカードを先頭に、次に締切が近い順（2026-09-15。それまではAPIの順のままだった）
+      renderLotteryList("list", sortByDeadline(f), ctx, 8);
     }
     [catSel, boxSel, areaSel].forEach(s => s.addEventListener("change", draw));
     draw();
@@ -466,6 +466,8 @@
     const DAY_PAGE_SIZE = 8; // 一度に見せる件数。これを超えたら折りたたむ
 
     const onDay = (l, y, m, d) => {
+      // 締切日の無い商品（なくなり次第終了）は締切カレンダーに載せない（2026-09-15）
+      if (l.untilSoldOut) return false;
       const dl = new Date(l.deadline);
       return dl.getFullYear() === y && dl.getMonth() === m && dl.getDate() === d;
     };
