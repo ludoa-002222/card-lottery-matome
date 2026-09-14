@@ -387,10 +387,22 @@ body.oripa-modal-open { overflow: hidden; }
 /* ===== Forms ===== */
 .form-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); border-top: 4px solid var(--accent); padding: 30px; max-width: 420px; margin: 36px auto; box-shadow: var(--shadow); text-align: center; }
 .form-box label { text-align: left; display: block; font-size: .78rem; margin: 14px 0 5px; color: var(--ink-soft); }
-.form-box input { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: .9rem; background: var(--surface-2); }
+.form-box input, .form-box select, .form-box textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: .9rem; background: var(--surface-2); font-family: inherit; }
+.form-box textarea { resize: vertical; }
 .form-box .btn { width: 100%; margin-top: 18px; }
 .oauth-row { display: flex; gap: 8px; margin-top: 14px; }
 .oauth-row .btn { flex: 1; background: none; color: var(--ink); border: 1px solid var(--border); }
+
+/* お問い合わせフォーム。ログインフォームより項目が多いので少し広く、左寄せにする。 */
+.form-box.contact-box { max-width: 560px; text-align: left; }
+.form-box .req { margin-left: 6px; font-size: .7rem; font-weight: 700; color: var(--accent-deep, var(--accent)); }
+/* ハニーポット：スクリーンリーダー・キーボード操作を妨げないよう非表示にするのは
+   display:none ではなく画面外配置にする（botのフォーム解析を欺くため）。 */
+.hp-field { position: absolute; left: -9999px; top: -9999px; }
+.form-notice { border-radius: var(--radius-md); padding: 14px 18px; margin: 20px 0; font-size: .86rem; }
+.form-notice.is-success { background: #e7f8ec; color: #16693a; border: 1px solid #bfe8cc; }
+.form-notice.is-error { background: #fdecec; color: #a3231f; border: 1px solid #f6c8c6; }
+.form-notice.is-error ul { margin: 0; padding-left: 1.2em; }
 
 /* ===== Footer ===== */
 .site-footer { background: var(--header); color: #97a4c2; margin-top: 56px; padding: 34px 0 22px; font-size: .82rem; position: relative; }
