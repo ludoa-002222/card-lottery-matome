@@ -95,7 +95,7 @@ def main():
         rgba.save(png)
         webp = OUT_DIR / f"{out_name}.webp"
         subprocess.run(
-            ["cwebp", "-quiet", "-q", "82", "-m", "6", "-alpha_q", "95", "-alpha_filter", "best", str(png), "-o", str(webp)],
+            ["cwebp", "-quiet", "-q", "60", "-m", "6", "-alpha_q", "90", "-alpha_filter", "best", str(png), "-o", str(webp)],
             check=True,
         )
         png.unlink()
