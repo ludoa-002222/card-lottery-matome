@@ -77,6 +77,11 @@ function sortByDeadline(items) {
     const aEnded = ta <= now;
     const bEnded = tb <= now;
     if (aEnded !== bEnded) return aEnded ? 1 : -1;
+    // 受付中の中では、提携先（アフィリエイト）のカードを先頭にする（2026-09-15 パウロさん指示）。
+    // 並び順だけの話で、各カードの飛び先には影響しない。
+    const aAff = !aEnded && a.ctaType === "affiliate";
+    const bAff = !bEnded && b.ctaType === "affiliate";
+    if (aAff !== bAff) return aAff ? -1 : 1;
     return ta - tb;
   });
 }
