@@ -14,9 +14,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/favicon.ico?ver=' . ORIPA_THEME_VERSION ); ?>" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/favicon-32x32.png?ver=' . ORIPA_THEME_VERSION ); ?>">
+<link rel="icon" type="image/png" sizes="16x16" href="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/favicon-16x16.png?ver=' . ORIPA_THEME_VERSION ); ?>">
+<link rel="apple-touch-icon" href="<?php echo esc_url( ORIPA_THEME_URI . '/assets/img/apple-touch-icon.png?ver=' . ORIPA_THEME_VERSION ); ?>">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K3BZD9D4');</script>
+<!-- End Google Tag Manager -->
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?> data-page="<?php echo esc_attr( oripa_page_key() ); ?>">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K3BZD9D4"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <?php wp_body_open(); ?>
 
 <header id="site-header" class="site-header">
