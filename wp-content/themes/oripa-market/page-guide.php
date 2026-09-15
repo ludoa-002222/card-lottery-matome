@@ -83,10 +83,10 @@ $box_rows  = oripa_guide_active_boxes( 12 );
 				<li>
 					<a class="guide-step" href="<?php echo esc_url( get_permalink( $post_item ) ); ?>">
 						<span class="no"><?php echo (int) ( $i + 1 ); ?></span>
-						<span>
+						<div>
 							<h3><?php echo esc_html( get_the_title( $post_item ) ); ?></h3>
 							<p><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $post_item->post_content ), 46, '…' ) ); ?></p>
-						</span>
+						</div>
 					</a>
 				</li>
 			<?php endforeach; ?>
