@@ -171,6 +171,11 @@ add_filter( 'xmlrpc_enabled', '__return_false' );
  * （2026-09-15、セキュリティ点検で発覚。/author/admin/ へリダイレクトされ
  * 管理者ユーザー名が外部から分かってしまっていた）。
  * サイトとして著者ページを使う予定は無いので、常にトップへ逃がす。
+ *
+ * 優先度0で登録すること。WPコアの redirect_canonical() が同じ
+ * template_redirect フックの優先度10に既に登録されており、
+ * ?author=1 を /author/admin/ へ正規化リダイレクトして exit してしまうため、
+ * それより先に動かないとここへ到達できない（2026-09-15、実機で発覚）。
  */
 add_action(
 	'template_redirect',
@@ -179,7 +184,8 @@ add_action(
 			wp_safe_redirect( home_url( '/' ), 301 );
 			exit;
 		}
-	}
+	},
+	0
 );
 
 /**
