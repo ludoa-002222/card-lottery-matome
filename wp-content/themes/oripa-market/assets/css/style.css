@@ -70,9 +70,12 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 }
 .logo .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .logo .logo-text small { font-size: .6rem; font-weight: 500; opacity: .6; letter-spacing: .06em; color: #9fb0d0; margin-top: 5px; }
-.nav-links { display: flex; align-items: center; gap: 22px; font-size: .84rem; }
-.nav-links a { opacity: .82; letter-spacing: .01em; }
-.nav-links a:hover { opacity: 1; color: var(--cyan); }
+/* .site-header 配下に限定する。WordPress標準のページ送り（the_posts_pagination）
+   も同じ .nav-links クラスを出力するため、限定しないとモバイル幅で
+   ページ番号リンクまで非表示になっていた（2026-09-15）。 */
+.site-header .nav-links { display: flex; align-items: center; gap: 22px; font-size: .84rem; }
+.site-header .nav-links a { opacity: .82; letter-spacing: .01em; }
+.site-header .nav-links a:hover { opacity: 1; color: var(--cyan); }
 .live-pill {
   display: inline-flex; align-items: center; gap: 6px;
   background: rgba(6,182,212,.12); border: 1px solid rgba(6,182,212,.35);
@@ -88,7 +91,7 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
 .nav-cta { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #fff; padding: 9px 20px; border-radius: var(--radius-sm); font-weight: 700; font-size: .82rem; }
 .nav-cta:hover { filter: brightness(1.08); }
 .menu-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; }
-@media (max-width: 780px) { .nav-links a:not(.nav-cta) { display: none; } }
+@media (max-width: 780px) { .site-header .nav-links a:not(.nav-cta) { display: none; } }
 
 /* ===== Breadcrumb / page title ===== */
 .breadcrumb { font-size: .78rem; color: var(--ink-soft); padding: 16px 0 0; }
@@ -101,6 +104,31 @@ h1, h2, h3 { font-weight: 900; letter-spacing: -.01em; }
   color: var(--verified); border-radius: var(--radius-sm); padding: 4px 12px;
   font-size: .74rem; font-weight: 700;
 }
+
+/* 見出しはaria-labelで十分なので視覚的には隠す（WP標準の隠し方）。
+   これが無いと the_posts_pagination() の見出しがそのまま大きな文字で出てしまう。 */
+.screen-reader-text {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+  border: 0; padding: 0; margin: -1px;
+}
+
+/* 検索結果等（index.phpフォールバック）の the_posts_pagination() 用。 */
+.pager { margin: 30px 0; }
+.pager .nav-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pager .page-numbers {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 36px; padding: 0 10px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: .86rem; font-weight: 600; color: var(--ink);
+  background: var(--surface);
+}
+.pager a.page-numbers:hover { border-color: var(--accent); color: var(--accent-deep); }
+.pager .page-numbers.current { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pager .page-numbers.dots { border: none; background: none; color: var(--ink-soft); }
 
 /* ===== Section heading ===== */
 .section { padding: 32px 0; }
