@@ -406,6 +406,19 @@ body.oripa-modal-open { overflow: hidden; }
 /* JSでの即時バリデーション用。サーバー再表示時は使わない（サーバーは form-notice のみで知らせる）。 */
 .form-box .is-invalid { border-color: var(--danger); background: var(--danger-soft); }
 
+/* iOS Safariはテキスト入力欄のfont-sizeが16px未満だとフォーカス時に
+   ページを勝手に拡大する。デスクトップの見た目は変えたくないので、
+   モバイル幅でだけ16px以上に引き上げる（selectはネイティブピッカーが
+   開くだけでズームは起きないため対象外）。 */
+@media (max-width: 720px) {
+  .form-box input,
+  .form-box textarea,
+  .day-q,
+  .shop-q {
+    font-size: 16px;
+  }
+}
+
 /* ===== Footer ===== */
 .site-footer { background: var(--header); color: #97a4c2; margin-top: 56px; padding: 34px 0 22px; font-size: .82rem; position: relative; }
 /* フッターの覗き込みポーズ。フッター上辺から顔を出す形にするので、上方向へずらす。 */
