@@ -80,13 +80,15 @@ $box_rows  = oripa_guide_active_boxes( 12 );
 		<div class="section-heading"><span class="bar"></span><h2>はじめての人はこの順に</h2></div>
 		<ol class="guide-steps">
 			<?php foreach ( $recommended as $i => $post_item ) : ?>
-				<a class="guide-step" href="<?php echo esc_url( get_permalink( $post_item ) ); ?>">
-					<span class="no"><?php echo (int) ( $i + 1 ); ?></span>
-					<span>
-						<h3><?php echo esc_html( get_the_title( $post_item ) ); ?></h3>
-						<p><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $post_item->post_content ), 46, '…' ) ); ?></p>
-					</span>
-				</a>
+				<li>
+					<a class="guide-step" href="<?php echo esc_url( get_permalink( $post_item ) ); ?>">
+						<span class="no"><?php echo (int) ( $i + 1 ); ?></span>
+						<span>
+							<h3><?php echo esc_html( get_the_title( $post_item ) ); ?></h3>
+							<p><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $post_item->post_content ), 46, '…' ) ); ?></p>
+						</span>
+					</a>
+				</li>
 			<?php endforeach; ?>
 		</ol>
 	</section>
