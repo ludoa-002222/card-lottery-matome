@@ -15,9 +15,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action(
 	'wp_enqueue_scripts',
 	function () {
+		// WPコア同様の慣習: SCRIPT_DEBUG が真の間（wp-env）はソースのまま、
+		// それ以外（本番）は .min を読む。*.min.css/*.min.js は
+		// `npm run build:assets` で生成してコミットしたものを使う
+		// （本番はサーバー上 git pull 方式でビルド工程が無いため。
+		// scripts/build-assets.sh 参照。2026-09-15）。
+		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
 		wp_enqueue_style(
 			'oripa-style',
-			ORIPA_THEME_URI . '/assets/css/style.css',
+			ORIPA_THEME_URI . '/assets/css/style' . $suffix . '.css',
 			array(),
 			ORIPA_THEME_VERSION
 		);
@@ -25,14 +32,14 @@ add_action(
 		// 応募方法ガイド（プラットフォーム別の定数）。common.js より先に読み込む。
 		wp_enqueue_script(
 			'oripa-apply-guides',
-			ORIPA_THEME_URI . '/assets/js/apply-guides.js',
+			ORIPA_THEME_URI . '/assets/js/apply-guides' . $suffix . '.js',
 			array(),
 			ORIPA_THEME_VERSION,
 			true
 		);
 		wp_enqueue_script(
 			'oripa-common',
-			ORIPA_THEME_URI . '/assets/js/common.js',
+			ORIPA_THEME_URI . '/assets/js/common' . $suffix . '.js',
 			array( 'oripa-apply-guides' ),
 			ORIPA_THEME_VERSION,
 			true
@@ -40,14 +47,14 @@ add_action(
 		// 店舗のチェーン系列まとめ（全店舗一覧で使う）。app.js より先に読み込む。
 		wp_enqueue_script(
 			'oripa-shop-groups',
-			ORIPA_THEME_URI . '/assets/js/shop-groups.js',
+			ORIPA_THEME_URI . '/assets/js/shop-groups' . $suffix . '.js',
 			array(),
 			ORIPA_THEME_VERSION,
 			true
 		);
 		wp_enqueue_script(
 			'oripa-app',
-			ORIPA_THEME_URI . '/assets/js/app.js',
+			ORIPA_THEME_URI . '/assets/js/app' . $suffix . '.js',
 			array( 'oripa-common', 'oripa-shop-groups' ),
 			ORIPA_THEME_VERSION,
 			true

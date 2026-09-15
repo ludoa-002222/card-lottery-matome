@@ -157,6 +157,24 @@ GET /wp-json/oripa/v1/bootstrap    → {categories,boxes,shops,lotteries,article
 | 配色・レイアウト | `assets/css/style.css`（静的版と共通のもの） |
 | サンプルデータ | `bin/seed-data/*.json` を差し替えて `npm run wp:seed` |
 
+## CSS/JSのビルド（minify）
+
+本番（`SCRIPT_DEBUG` 未定義）は `assets/css/style.min.css` / `assets/js/*.min.js` を配信する
+（`inc/enqueue.php` が `SCRIPT_DEBUG` の真偽で出し分け）。wp-env はローカル用に `SCRIPT_DEBUG: true`
+を設定済みなので、ソースの `.css`/`.js` をそのまま読み込みデバッグしやすい。
+
+本番デプロイは「サーバー上 git pull」方式でビルド工程が無いため、**`.min` ファイルはソースと一緒に
+リポジトリへコミットする**。`assets/css/style.css` または `assets/js/*.js` を編集したら、コミット前に
+必ず実行すること（`ORIPA_THEME_VERSION` を上げ忘れるとキャッシュが古いままになるのと同様、これを
+忘れると本番に反映されない）:
+
+```bash
+npm run build:assets
+```
+
+内部は `scripts/build-assets.sh`（esbuild）。`--charset=utf8` を外すと日本語が `\uXXXX` エスケープに
+展開されて逆にファイルサイズが増えるので注意（実際に発生した・2026-09-15）。
+
 ## 未対応 / 今後
 
 - 本番デプロイ構成（現状 wp-env のみ）。テーマは `wp-content/themes/oripa-market/` をそのまま持ち出せる
