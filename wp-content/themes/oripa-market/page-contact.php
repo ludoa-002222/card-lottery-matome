@@ -100,10 +100,13 @@ if ( isset( $_POST['oripa_contact_submit'] ) ) {
 						. "種別: {$subject_label}\n"
 						. "お問い合わせ内容:\n{$values['message']}\n"
 						. "----------------------------------------\n\n"
-						. "※このメールは送信専用アドレスから配信しています。ご返信いただいても対応できません。\n"
-						. "追加のご連絡は、お手数ですが改めてお問い合わせフォームよりお願いいたします。\n\n"
+						. "本メールに直接ご返信いただくことも可能です。\n\n"
 						. "オリパマーケット " . home_url( '/' ) . "\n",
-					array( $from_header )
+					// 送信元(From)は認証済みのoripa-market.comドメインのまま。
+					// ユーザーが本メールに返信したときの届け先だけadmin_emailにする
+					// （Fromをadmin_emailの外部アドレスにすると、そのドメイン側の
+					// SPF/DKIMで弾かれてなりすまし判定されるため。2026-09-15）。
+					array( $from_header, 'Reply-To: ' . get_option( 'admin_email' ) )
 				);
 
 				$values = array(
