@@ -145,10 +145,6 @@ function oripa_footer_link_items() {
 			'url'   => home_url( '/faq/' ),
 		),
 		array(
-			'label' => 'お問い合わせ',
-			'url'   => home_url( '/contact/' ),
-		),
-		array(
 			'label' => '全店舗一覧',
 			'url'   => get_post_type_archive_link( 'shop' ),
 		),

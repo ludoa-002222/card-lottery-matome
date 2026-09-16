@@ -134,13 +134,8 @@ GET /wp-json/oripa/v1/bootstrap    → {categories,boxes,shops,lotteries,article
 `bin/seed-data/*.json`（`static/data/*.json` のコピー）を読み、CPT・タクソノミー・ACF値・固定ページを作成。
 **slug で冪等** なので何度実行してもよい（コラムは更新日時も上書き）。
 
-固定ページ12件を作成: `online` `store` `calendar` `trust` `contact` `about` `faq` `company` `terms` `privacy` `mypage` `register`
-（`online/store/calendar/trust/contact/register/mypage` は `page-<slug>.php` が自動採用、`about/faq/company/terms/privacy` は `page.php` ＋ 本文HTML）。
-
-`contact` はサイト独自のお問い合わせフォーム（`page-contact.php`）。`wp_mail()` で `admin_email` 宛に送信するだけの
-シンプルな実装で、DB保存やプラグインは使わない。スパム対策はハニーポット＋nonceのみ（reCAPTCHA等は未導入）。
-本番でメールが届かないときは、まず `wp_mail()` が実際に配送されているか（SMTPプラグイン未導入だとサーバーの
-標準メール送信に依存し、迷惑メール判定や未達になりやすい）を疑うこと。
+固定ページ11件を作成: `online` `store` `calendar` `trust` `about` `faq` `company` `terms` `privacy` `mypage` `register`
+（`online/store/calendar/trust/register/mypage` は `page-<slug>.php` が自動採用、`about/faq/company/terms/privacy` は `page.php` ＋ 本文HTML）。
 
 ## ACF フィールド
 
@@ -156,24 +151,6 @@ GET /wp-json/oripa/v1/bootstrap    → {categories,boxes,shops,lotteries,article
 | 一覧カードの見た目 | `assets/js/common.js` の `lotteryCardHtml()` |
 | 配色・レイアウト | `assets/css/style.css`（静的版と共通のもの） |
 | サンプルデータ | `bin/seed-data/*.json` を差し替えて `npm run wp:seed` |
-
-## CSS/JSのビルド（minify）
-
-本番（`SCRIPT_DEBUG` 未定義）は `assets/css/style.min.css` / `assets/js/*.min.js` を配信する
-（`inc/enqueue.php` が `SCRIPT_DEBUG` の真偽で出し分け）。wp-env はローカル用に `SCRIPT_DEBUG: true`
-を設定済みなので、ソースの `.css`/`.js` をそのまま読み込みデバッグしやすい。
-
-本番デプロイは「サーバー上 git pull」方式でビルド工程が無いため、**`.min` ファイルはソースと一緒に
-リポジトリへコミットする**。`assets/css/style.css` または `assets/js/*.js` を編集したら、コミット前に
-必ず実行すること（`ORIPA_THEME_VERSION` を上げ忘れるとキャッシュが古いままになるのと同様、これを
-忘れると本番に反映されない）:
-
-```bash
-npm run build:assets
-```
-
-内部は `scripts/build-assets.sh`（esbuild）。`--charset=utf8` を外すと日本語が `\uXXXX` エスケープに
-展開されて逆にファイルサイズが増えるので注意（実際に発生した・2026-09-15）。
 
 ## 未対応 / 今後
 
