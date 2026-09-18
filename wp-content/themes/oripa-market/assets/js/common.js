@@ -66,15 +66,17 @@ function latestUpdatedAt(items) {
 }
 
 /**
- * 提携先グループ内の表示優先順位。数字が小さいほど先に出す。
+ * 上位表示グループ内の表示優先順位。数字が小さいほど先に出す。
  * どっかん・オリくじ（A8経由） → 楽天 → Amazon の順（2026-09-19 パウロさん指示）。
- * 該当しない提携先URLは末尾に回す。
+ * Amazon・楽天はボタン文言が「購入する」（提携先アフィリエイト）でも
+ * 「抽選に応募する！」（Amazon自体の抽選応募ページ等）でも同じ扱いにする。
+ * 該当しない上位表示URLは末尾に回す。
  */
 function affiliateRank(item) {
   const url = item.applyUrl || "";
   if (/^https:\/\/px\.a8\.net\//.test(url)) return 0; // どっかん・オリくじ
-  if (/^https:\/\/hb\.afl\.rakuten\.co\.jp\//.test(url)) return 1; // 楽天
-  if (/^https:\/\/www\.amazon\.co\.jp\/s\?/.test(url)) return 2; // Amazon
+  if (/rakuten\.co\.jp\//.test(url)) return 1; // 楽天
+  if (/amazon\.co\.jp\//.test(url)) return 2; // Amazon
   return 3;
 }
 
@@ -90,12 +92,13 @@ function sortByDeadline(items) {
     const aEnded = ta <= now;
     const bEnded = tb <= now;
     if (aEnded !== bEnded) return aEnded ? 1 : -1;
-    // 受付中の中では、提携先（アフィリエイト）のカードを先頭にする（2026-09-15 パウロさん指示）。
+    // 受付中の中では、上位表示対象（Amazon・楽天・提携先アフィリエイト）のカードを先頭にする
+    // （2026-09-15 パウロさん指示、2026-09-19 priorityLinkに変更＝ボタン文言とは独立させた）。
     // 並び順だけの話で、各カードの飛び先には影響しない。
-    const aAff = !aEnded && a.ctaType === "affiliate";
-    const bAff = !bEnded && b.ctaType === "affiliate";
+    const aAff = !aEnded && a.priorityLink;
+    const bAff = !bEnded && b.priorityLink;
     if (aAff !== bAff) return aAff ? -1 : 1;
-    // 提携先同士では、どっかん・オリくじ → 楽天 → Amazon の順にする（2026-09-19）。
+    // 上位表示同士では、どっかん・オリくじ → 楽天 → Amazon の順にする（2026-09-19）。
     if (aAff && bAff) {
       const rankDiff = affiliateRank(a) - affiliateRank(b);
       if (rankDiff !== 0) return rankDiff;

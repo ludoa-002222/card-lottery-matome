@@ -297,6 +297,9 @@ add_action(
 			'cta_type'              => 'string',
 			// 締切日が無く、売り切れで終わる商品（2026-09-15追加）。deadline には表示しない遠い日付が入る。
 			'until_sold_out'        => 'boolean',
+			// 上位表示フラグ（2026-09-19追加）。Amazon・楽天・提携先アフィリエイトの応募URLを持つ
+			// レコードに立つ。cta_type とは独立（ボタン文言は変えず、並び順だけ上げたい場合に使う）。
+			'priority_link'         => 'boolean',
 		);
 		foreach ( $lottery_meta as $key => $type ) {
 			register_post_meta(

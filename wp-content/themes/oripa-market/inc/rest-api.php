@@ -199,6 +199,8 @@ function oripa_rest_lotteries() {
 			'ctaType'             => get_post_meta( $p->ID, 'cta_type', true ) ?: '',
 			// true なら締切日を出さず「なくなり次第終了」と表示する。deadline は並べ替え用の遠い日付（2026-09-15）
 			'untilSoldOut'        => (bool) get_post_meta( $p->ID, 'until_sold_out', true ),
+			// Amazon・楽天・提携先アフィリエイトの応募URLを持つレコードで true。並び順の優先判定に使う（2026-09-19）
+			'priorityLink'        => (bool) get_post_meta( $p->ID, 'priority_link', true ),
 			// 弾名で紐付けた提携オリパ。空なら PR ボタンを出さない（2026-09-13）。
 			'oripaLink'           => get_post_meta( $p->ID, 'oripa_link_url', true )
 				? array(
