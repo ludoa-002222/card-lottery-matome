@@ -66,6 +66,19 @@ function latestUpdatedAt(items) {
 }
 
 /**
+ * 提携先グループ内の表示優先順位。数字が小さいほど先に出す。
+ * どっかん・オリくじ（A8経由） → 楽天 → Amazon の順（2026-09-19 パウロさん指示）。
+ * 該当しない提携先URLは末尾に回す。
+ */
+function affiliateRank(item) {
+  const url = item.applyUrl || "";
+  if (/^https:\/\/px\.a8\.net\//.test(url)) return 0; // どっかん・オリくじ
+  if (/^https:\/\/hb\.afl\.rakuten\.co\.jp\//.test(url)) return 1; // 楽天
+  if (/^https:\/\/www\.amazon\.co\.jp\/s\?/.test(url)) return 2; // Amazon
+  return 3;
+}
+
+/**
  * 締切が近い順に並べ替えた新しい配列を返す。
  * すでに締め切られた（終了）ものは末尾へ回し、その中でも締切が早い順にする。
  */
@@ -82,6 +95,11 @@ function sortByDeadline(items) {
     const aAff = !aEnded && a.ctaType === "affiliate";
     const bAff = !bEnded && b.ctaType === "affiliate";
     if (aAff !== bAff) return aAff ? -1 : 1;
+    // 提携先同士では、どっかん・オリくじ → 楽天 → Amazon の順にする（2026-09-19）。
+    if (aAff && bAff) {
+      const rankDiff = affiliateRank(a) - affiliateRank(b);
+      if (rankDiff !== 0) return rankDiff;
+    }
     return ta - tb;
   });
 }
